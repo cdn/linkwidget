@@ -41,18 +41,11 @@ the terms of any one of the MPL, the GPL or the LGPL.
 
 ***** END LICENSE BLOCK ***** */
 
-window.addEventListener("load", linkWidget.Startup, false);
-window.addEventListener("unload", linkWidget.Shutdown, false);
+var linkWidget = {
 
-function linkWidget () {/*}
-
-linkWidget.prototype = {
-*/
-
-//const linkWidgetPrefPrefix = "extensions.linkwidget.";
  PrefPrefix : "extensions.linkwidget.",
 
- GuessUpAndTopFromURL : false,
+ GuessUpAndTop : false,
  PrefGuessPrevAndNextFromURL : false,
  PrefScanHyperlinks : false,
  Strings : "chrome://linkwidget/locale/main.strings",
@@ -93,7 +86,7 @@ linkWidget.prototype = {
 
 Startup : function () {
   window.removeEventListener("load", linkWidget.Startup, false);
-  linkWidget.Strings = linkWidgetLoadStringBundle(linkWidget.Strings);
+  linkWidget.Strings = linkWidget.LoadStringBundle(linkWidget.Strings);
   for(var i in linkWidget._MenuOrdering) linkWidget.MenuOrdering[linkWidget._MenuOrdering[i]] = (i-0) + 1;
   for each(i in linkWidget._MenuRels) linkWidget.MenuRels[i] = true;
   for each(i in linkWidget._ButtonRels) linkWidget.ButtonRels[i] = true;
@@ -111,7 +104,7 @@ InitVisibleButtons : function () {
   linkWidget.Buttons = {};
   for(var rel in linkWidget.ButtonRels) {
     var elt = document.getElementById("linkwidget-"+rel);
-    if(elt) linkWidget.Buttons[rel] = LinkWidget.initButton(elt, rel);
+    if(elt) linkWidget.Buttons[rel] = this.initButton(elt, rel);
   }
 },
 
@@ -131,7 +124,7 @@ initButton : function (elt, rel) {
   elt.setAttribute("context", "");
   elt.setAttribute("tooltip", "linkwidget-tooltip");
   elt.addEventListener("DOMMouseScroll", linkWidget.MouseScrollHandler, false);
-  for(var i in linkWidget.Button) elt[i] = linkWidget.Button[i];
+  for(var i in this.Button) elt[i] = this.Button[i];
   var popup = elt.popup = document.createElement("menupopup");
   elt.appendChild(popup);
   popup.setAttribute("onpopupshowing", "return this.parentNode.buildMenu();");
@@ -155,9 +148,16 @@ DelayedStartup : function () {
   linkWidget.LoadPrefs();
   gPrefService.addObserver(linkWidget.PrefPrefix, linkWidget.PrefObserver, false);
   for(var h in linkWidget.EventHandlers) {
-      gBrowser.addEventListener(h, window[linkWidget.EventHandlers[h]], false); // 3.6
+    //  gBrowser.addEventListener(h, window[linkWidget.EventHandlers[h]], false); // 3.6
       gBrowser.tabContainer.addEventListener(h, window[linkWidget.EventHandlers[h]], false); // 4.01+
   }
+
+  gBrowser.tabContainer.addEventListener("select", linkWidget.TabSelectedHandler, false);
+  gBrowser.tabContainer.addEventListener("DOMLinkAdded", linkWidget.LinkAddedHandler, false);
+  gBrowser.tabContainer.addEventListener("pagehide", linkWidget.PageHideHandler, false);
+  gBrowser.tabContainer.addEventListener("DOMContentLoaded", linkWidget.PageLoadedHandler, false);
+  gBrowser.tabContainer.addEventListener("pageshow", linkWidget.PageShowHandler, false);
+
   // replace the toolbar customisation callback
     var box = document.getElementById("navigator-toolbox");
     box._preLinkWidget_customizeDone = box.customizeDone;
@@ -622,6 +622,10 @@ GuessLinkRel : function (link, txt) {
 
 };
 
+window.addEventListener("load", linkWidget.Startup, false);
+window.addEventListener("unload", linkWidget.Shutdown, false);
+
+
 function LinkWidgetLink(url, title, lang, media) {
   this.url = url;
   this.title = title || null;
@@ -673,7 +677,6 @@ const linkWidgetItemBase = {
     }
   }
 };
-
 
 
 const linkWidgetButton = {

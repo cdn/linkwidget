@@ -7,9 +7,9 @@
 <name>Link Widgets</name>
 <type>2</type>
 <unpack>true</unpack>
-<version>1.6.6.4</version>
+<version>1.7</version>
 <description>A site-navigation tool</description>
-<homepageURL>http://clav.mozdev.org/</homepageURL>
+<homepageURL>https://addons.mozilla.org/</homepageURL>
 <optionsURL>chrome://linkwidget/content/options.xul</optionsURL>
 
 <creator>Stephen Clavering</creator>

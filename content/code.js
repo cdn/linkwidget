@@ -25,6 +25,7 @@ Contributor(s):
   Stuart Ballard <sballard@netreach.net>
   Chris Neale <cdn@mozdev.org>
   Stephen Clavering <mozilla@clav.me.uk>
+  King Brian
 
 Alternatively, the contents of this file may be used under the terms of
 either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -95,26 +96,28 @@ function linkWidgetStartup() {
   for each(i in _linkWidgetMenuRels) linkWidgetMenuRels[i] = true;
   for each(i in _linkWidgetButtonRels) linkWidgetButtonRels[i] = true;
   linkWidgetInitMoreMenu();
-  linkWidgetInitVisbileButtons();
-
-  setTimeout(linkWidgetDelayedStartup, 1); // needs to happen after Fx's delayedStartup()
+  linkWidgetInitVisibleButtons();
+  setTimeout(linkWidgetDelayedStartup, 1); // needs to happen after Fx's delayedStartup(); Fc?
 }
 
 function linkWidgetDelayedStartup() {
   linkWidgetLoadPrefs();
   gPrefService.addObserver(linkWidgetPrefPrefix, linkWidgetPrefObserver, false);
-  for(var h in linkWidgetEventHandlers)
-    gBrowser.addEventListener(h, window[linkWidgetEventHandlers[h]], false);
+  for(var h in linkWidgetEventHandlers) {
+      gBrowser.addEventListener(h, window[linkWidgetEventHandlers[h]], false); // 3.6
+      gBrowser.tabContainer.addEventListener(h, window[linkWidgetEventHandlers[h]], false); // 4.01+
+  }
   // replace the toolbar customisation callback
-  var box = document.getElementById("navigator-toolbox");
-  box._preLinkWidget_customizeDone = box.customizeDone;
-  box.customizeDone = linkWidgetToolboxCustomizeDone;
+    var box = document.getElementById("navigator-toolbox");
+    box._preLinkWidget_customizeDone = box.customizeDone;
+    box.customizeDone = linkWidgetToolboxCustomizeDone;
 }
 
 function linkWidgetShutdown() {
   window.removeEventListener("unload", linkWidgetShutdown, false);
-  for(var h in linkWidgetEventHandlers)
-    gBrowser.addEventListener(h, window[linkWidgetEventHandlers[h]], false);  
+  for(var h in linkWidgetEventHandlers) {
+      gBrowser.addEventListener(h, window[linkWidgetEventHandlers[h]], false);  
+  }
   gPrefService.removeObserver(linkWidgetPrefPrefix, linkWidgetPrefObserver);
 }
 
@@ -123,7 +126,12 @@ window.addEventListener("unload", linkWidgetShutdown, false);
 
 
 function linkWidgetLoadPrefs() {
-  const branch = gPrefService.getBranch(linkWidgetPrefPrefix);
+
+const branch = Components.classes["@mozilla.org/preferences-service;1"]
+                         .getService(Components.interfaces.nsIPrefService)
+                         .QueryInterface(Components.interfaces.nsIPrefBranch)
+                         .getBranch(linkWidgetPrefPrefix);
+//  const branch = gPrefService.getBranch(linkWidgetPrefPrefix);
   linkWidgetPrefScanHyperlinks = branch.getBoolPref("scanHyperlinks");
   linkWidgetPrefGuessUpAndTopFromURL = branch.getBoolPref("guessUpAndTopFromURL");
   linkWidgetPrefGuessPrevAndNextFromURL = branch.getBoolPref("guessPrevAndNextFromURL");
@@ -146,7 +154,7 @@ function linkWidgetLoadPrefs() {
 const linkWidgetPrefObserver = {
   observe: function(subject, topic, data) {
 //    dump("lwpref: subject="+subject.root+" topic="+topic+" data="+data+"\n");
-    // there're only three of them
+    // there're only three/four of them
     linkWidgetLoadPrefs();
   }
 };
@@ -163,7 +171,7 @@ function linkWidgetInitMoreMenu() {
   linkWidgetMorePopup = document.getElementById("linkwidget-more-popup");
 }
 
-function linkWidgetInitVisbileButtons() {
+function linkWidgetInitVisibleButtons() {
   linkWidgetButtons = {};
   for(var rel in linkWidgetButtonRels) {
     var elt = document.getElementById("linkwidget-"+rel);
@@ -224,6 +232,7 @@ function linkWidgetPageLoadedHandler(event) {
 
 
 function linkWidgetTabSelectedHandler(event) {
+//  let newTab = event.originalTarget;
   if(event.originalTarget.localName != "tabs") return;
   linkWidgetRefreshLinks();
 }
@@ -240,6 +249,7 @@ function linkWidgetPageShowHandler(event) {
 
 
 function linkWidgetRefreshLinks() {
+//alert('lWRL');
   for each(var btn in linkWidgetButtons) btn.show(null);
   if(linkWidgetMoreMenu) linkWidgetMoreMenu.disabled = true;
 
@@ -298,7 +308,7 @@ function linkWidgetToolboxCustomizeDone(somethingChanged) {
 
   linkWidgetInitMoreMenu();
   for each(var btn in linkWidgetButtons) btn.show(null);
-  linkWidgetInitVisbileButtons();
+  linkWidgetInitVisibleButtons();
   for(var rel in linkWidgetViews) {
     var item = linkWidgetViews[rel];
     if(!linkWidgetButtons[rel] && linkWidgetMoreMenu) continue;
@@ -331,7 +341,7 @@ function linkWidgetFillTooltip(tooltip, event) {
   line1.hidden = !(line1.value = text1);
   line2.hidden = !(line2.value = text2);
   // don't show the tooltip if it's over a submenu of the More menu
-  return !(!text1 && !text2); // return a bool, not a string
+  return !(!text1 && !text2); // return a bool, not a string; [OR] == NAND ( !A !B )
 }
 
 function linkWidgetItemClicked(e) {
@@ -352,14 +362,17 @@ function linkWidgetButtonRightClicked(e) {
 
 function linkWidgetLoadPage(e) {
   const url = e.target.linkURL;
-  const sourceURL = content.document.documentURI;
+  const sourceURL = content.document.documentURI; // ?
   const button = e.type=="command" ? 0 : e.button;
   // Make handleLinkClick find the right origin URL
-  const fakeEvent = { target: { ownerDocument: { location : { href: sourceURL }}},
+ // const fakeEvent = { target: { ownerDocument: { location : { href: sourceURL }}}, // Fx 3.5 revert required ?
+  const fakeEvent = { target: { ownerDocument: content.document },
       button: button, __proto__: e }; // proto must be set last
   // handleLinkClick deals with modified left-clicks, and middle-clicks
-  const didHandleClick = handleLinkClick(fakeEvent, url, null);
-  if(didHandleClick || button != 0) return;
+  if(typeof handleLinkClick == 'function') {
+   const didHandleClick = handleLinkClick(fakeEvent, url, null);
+   if(didHandleClick || button != 0) return;
+  }
   linkWidgetLoadPageInCurrentBrowser(url);
 }
 
@@ -371,9 +384,11 @@ function linkWidgetGo(rel) {
 
 function linkWidgetLoadPageInCurrentBrowser(url) {
   // urlSecurityCheck wanted a URL-as-string for Fx 2.0, but an nsIPrincipal on trunk
-  if(gBrowser.contentPrincipal) urlSecurityCheck(url, gBrowser.contentPrincipal);
-  else urlSecurityCheck(url, content.document.documentURI);
-  gBrowser.loadURI(url);
+
+    if(gBrowser.contentPrincipal) urlSecurityCheck(url, gBrowser.contentPrincipal);
+    else urlSecurityCheck(url, content.document.documentURI);
+    gBrowser.loadURI(url);
+
   content.focus();
 }
 
@@ -439,7 +454,7 @@ function linkWidgetGetLinkRels(relStr, revStr, mimetype, title) {
   // Ignore anything Firefox regards as an RSS/Atom-feed link
   if(relStr && /alternate/i.test(relStr)) {
     // xxx have seen JS errors where "mimetype has no properties" (i.e., is null)
-    const type = mimetype.replace(/\s|;.*/g, "").toLowerCase();
+    if(mimetype) { const type = mimetype.replace(/\s|;.*/g, "").toLowerCase(); }
     const feedtype = /^application\/(?:rss|atom)\+xml$/;
     const xmltype = /^(?:application|text)\/(?:rdf\+)?xml$/;
     if(feedtype.test(type) || (xmltype.test(type) && /\brss\b/i.test(title))) return null;

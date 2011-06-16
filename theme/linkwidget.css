@@ -9,7 +9,7 @@ Contributor(s):
 */
 
 .linkwidget-button, .linkwidget-menu, .linkwidget-menuitem {
-  list-style-image: url(chrome://linkwidget/skin/buttons.png) !important;
+  list-style-image: url(chrome://linkwidget/skin/buttons.png) !important
 }
 
 .linkwidget-button[disabled=true] { opacity: 0.5 }

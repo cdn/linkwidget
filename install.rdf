@@ -5,7 +5,9 @@
 
 <id>linkwidget@clav.mozdev.org</id>
 <name>Link Widgets</name>
-<version>1.5</version>
+<type>2</type>
+<unpack>true</unpack>
+<version>1.6.6.4</version>
 <description>A site-navigation tool</description>
 <homepageURL>http://clav.mozdev.org/</homepageURL>
 <optionsURL>chrome://linkwidget/content/options.xul</optionsURL>
@@ -24,20 +26,13 @@
 <contributor>Sönke Tesch (German translator)</contributor>
 <contributor>Antonio de Urquia (Spanish translator)</contributor>
 <contributor>rexx (Chinese translator)</contributor>
+<contributor>King Brian</contributor>
 
 <targetApplication>
   <r:Description>
     <id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</id>
-    <minVersion>1.5</minVersion>
-    <maxVersion>1.5.0.*</maxVersion>
-  </r:Description>
-</targetApplication>
-
-<targetApplication>
-  <r:Description>
-    <id>{a463f10c-3994-11da-9945-000d60ca027b}</id>
-    <minVersion>0.5</minVersion>
-    <maxVersion>0.7.1</maxVersion>
+    <minVersion>1.5.0.4</minVersion>
+    <maxVersion>5.*</maxVersion>
   </r:Description>
 </targetApplication>
 </r:Description>

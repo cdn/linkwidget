@@ -78,8 +78,6 @@ the terms of any one of the MPL, the GPL or the LGPL.
       oncommand="linkWidgetGo('last');"/>
 </keyset>
 
-
-<toolbarpalette id="BrowserToolbarPalette">
   <toolbarbutton id="linkwidget-top" label="&top.label;" fallbackTooltipText="&top.tooltip;"
       type="menu-button" disabled="true" class="linkwidget-button toolbarbutton-1"/>
   <toolbarbutton id="linkwidget-up" label="&up.label;" fallbackTooltipText="&up.tooltip;"
@@ -101,6 +99,16 @@ the terms of any one of the MPL, the GPL or the LGPL.
       >
     <menupopup id="linkwidget-more-popup" onpopupshowing="linkWidgetOnMoreMenuShowing();"/>
   </toolbarbutton>
+
+<toolbarpalette id="BrowserToolbarPalette">
+  <toolbarbutton id="linkwidget-top"/>
+  <toolbarbutton id="linkwidget-up"/>
+  <toolbarbutton id="linkwidget-first"/>
+  <toolbarbutton id="linkwidget-prev"/>
+  <toolbarbutton id="linkwidget-next"/>
+  <toolbarbutton id="linkwidget-last"/>
+
+  <toolbarbutton id="linkwidget-more-menu"/>
 </toolbarpalette>
 
 </overlay>

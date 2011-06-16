@@ -1,0 +1,35 @@
+<HTML>
+<HEAD>
+
+<link rel=single href="/a">
+<link rel=singletitled title="Single Titled" href="/b">
+<link rel=multi href="/c">
+<link rel=multi href="/d">
+<link rel=multi href="/e">
+<link rel=multititled title="Multiple Titled 1" href="/f">
+<link rel=multititled title="Multiple Titled 2" href="/g">
+<link rel=multititled title="Multiple Titled 3" href="/h">
+
+</HEAD>
+<BODY>
+
+<p>This page has the following links:</p>
+
+<p><b>&lt;link rel=single href=&quot;/a&quot;&gt;</b><br>
+Definitely needs to be fixed.  This should be a top-level choice, like Authors and Copyright, and not be in a submenu.</p>
+
+<p><b>&lt;link rel=singletitled title=&quot;Single Titled&quot; href=&quot;/b&quot;&gt;</b><br>
+Debatable.  Title could imply being part of a group, so it should be in a submenu.  Title could also just be a more readable version of the rel, such as how we display Table of Contents for contents or toc, so it should be a top level item.</p>
+
+<p><b>&lt;link rel=multi href=&quot;/c&quot;&gt;<br>
+&lt;link rel=multi href=&quot;/d&quot;&gt;<br>
+&lt;link rel=multi href=&quot;/e&quot;&gt;</b><br>
+Difficult to handle well.  Should definitely be in a submenu, but all the choices have the same name and thus aren't very helpful.  I think we should use the rel for the menu and the href for the choices.  Not great, but better.</p>
+
+<p><b>&lt;link rel=multititled title=&quot;Multiple Titled 1&quot; href=&quot;/f&quot;&gt;<br>
+&lt;link rel=multititled title=&quot;Multiple Titled 2&quot; href=&quot;/g&quot;&gt;<br>
+&lt;link rel=multititled title=&quot;Multiple Titled 3&quot; href=&quot;/h&quot;&gt;</b><br>
+This is fine.  Submenu is rel, choices are titles.</p>
+
+</BODY>
+</HTML>

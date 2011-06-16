@@ -1,0 +1,26 @@
+# Menus use the 2rel string (e.g. 2index) if available
+
+
+top.label   = En haut
+up.label    = Vers le haut
+first.label = Le premier
+prev.label  = Précédent
+next.label  = Suivant
+last.label  = Le dernier
+
+toc         = Table des matières
+chapters    = Chapitres
+sections    = Sections
+subsections = Sous-sections
+appendices  = Appendices
+glossary    = Glossaire
+2glossary   = Glossaires
+index       = Index
+2index      = Index
+
+help      = Aide
+search    = Recherche
+author    = Auteur(s)
+copyright = Copyright
+bookmark  = Marque-pages
+alternate = Autres versions

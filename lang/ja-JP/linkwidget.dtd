@@ -1,0 +1,58 @@
+<!ENTITY top.label "トップ">
+<!ENTITY top.tooltip "サイトのトップ">
+<!ENTITY up.label "上">
+<!ENTITY up.tooltip "上の段階">
+<!ENTITY first.label "最初">
+<!ENTITY first.tooltip "最初のページ">
+<!ENTITY prev.label "前">
+<!ENTITY prev.tooltip "前のページ">
+<!ENTITY next.label "次">
+<!ENTITY next.tooltip "次のページ">
+<!ENTITY last.label "最後">
+<!ENTITY last.tooltip "最後のページ">
+<!ENTITY more.label "その他">
+<!ENTITY more.tooltip "他の関連するページ">
+
+<!ENTITY toc "目次">
+<!ENTITY chapters "章">
+<!ENTITY sections "節">
+<!ENTITY subsections "款">
+<!ENTITY appendices "付属書">
+
+<!ENTITY glossary "用語集">
+<!ENTITY index "索引">
+
+<!ENTITY help "ヘルプ">
+<!ENTITY search "検索">
+<!ENTITY author "著者">
+<!ENTITY copyright "著作権表示">
+
+<!ENTITY bookmark "ブックマーク">
+<!ENTITY alternate "他のバージョン">
+
+<!-- keyboard shortcuts -->
+<!ENTITY keycode.top "VK_UP">
+<!ENTITY modifiers.top "alt shift">
+<!ENTITY keycode.up "VK_UP">
+
+<!ENTITY modifiers.up "alt">
+
+<!ENTITY key.first "[">
+<!ENTITY modifiers.first "accel shift">
+<!ENTITY key.prev "[">
+<!ENTITY modifiers.prev "accel">
+<!ENTITY key.next "]">
+
+<!ENTITY modifiers.next "accel">
+<!ENTITY key.last "]">
+<!ENTITY modifiers.last "accel shift">
+
+<!ENTITY keycode2.first "VK_PAGE_UP">
+<!ENTITY modifiers2.first "alt shift">
+<!ENTITY keycode2.prev "VK_PAGE_UP">
+
+<!ENTITY modifiers2.prev "alt">
+<!ENTITY keycode2.next "VK_PAGE_DOWN">
+<!ENTITY modifiers2.next "alt">
+<!ENTITY keycode2.last "VK_PAGE_DOWN">
+<!ENTITY modifiers2.last "alt shift">

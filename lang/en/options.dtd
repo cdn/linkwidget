@@ -1,0 +1,15 @@
+<!--
+Licence: MPL 1.1/GPL 2.0/LGPL 2.1
+
+Original Author:
+  Stephen Clavering <mozilla@clav.me.uk>
+-->
+
+<!ENTITY title "Link Widget Options">
+
+<!ENTITY linkGuessing "Link Guessing">
+<!ENTITY linkGuessingDescription "The Link Widget can guess links for the many pages which do not provide them.">
+
+<!ENTITY scanHyperlinks "Scan the hyperlinks on the page for First, Previous, Next and Last Page links">
+<!ENTITY guessUpAndTopFromURL "Guess Up and Top links based on the URL of the page">
+<!ENTITY guessPrevAndNextFromURL "Guess Previous and Next Page links based on numbers in the URL of the page">

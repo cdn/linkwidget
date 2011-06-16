@@ -1,0 +1,50 @@
+<!--
+Licence: MPL 1.1/GPL 2.0/LGPL 2.1
+
+Original Author:
+  Giancarlo Dessì <gian@cettolini.it>
+
+Translated from en-US version, which was by:
+  Christopher Hoess <choess@stwing.upenn.edu>
+  Eric Hodel <drbrain@segment7.net>
+  Stuart Ballard <sballard@netreach.net>
+-->
+
+<!ENTITY top.label "Inizio">
+<!ENTITY top.tooltip "Pagina iniziale del sito Web">
+<!ENTITY up.label "Sali">
+<!ENTITY up.tooltip "Sali di un livello nel sito Web">
+<!ENTITY first.label "Primo">
+<!ENTITY first.tooltip "Prima pagina in sequenza">
+<!ENTITY prev.label "Precedente">
+<!ENTITY prev.tooltip "Pagina precedente">
+<!ENTITY next.label "Successivo">
+<!ENTITY next.tooltip "Pagina successiva">
+<!ENTITY last.label "Ultimo">
+<!ENTITY last.tooltip "Ultima pagina in sequenza">
+<!ENTITY more.label "Altro">
+<!ENTITY more.tooltip "Altre pagine correlate">
+
+<!-- keyboard shortcuts -->
+<!ENTITY keycode.top "VK_UP">
+<!ENTITY modifiers.top "alt shift">
+<!ENTITY keycode.up "VK_UP">
+<!ENTITY modifiers.up "alt">
+
+<!ENTITY key.first "[">
+<!ENTITY modifiers.first "accel shift">
+<!ENTITY key.prev "[">
+<!ENTITY modifiers.prev "accel">
+<!ENTITY key.next "]">
+<!ENTITY modifiers.next "accel">
+<!ENTITY key.last "]">
+<!ENTITY modifiers.last "accel shift">
+
+<!ENTITY keycode2.first "VK_PAGE_UP">
+<!ENTITY modifiers2.first "alt shift">
+<!ENTITY keycode2.prev "VK_PAGE_UP">
+<!ENTITY modifiers2.prev "alt">
+<!ENTITY keycode2.next "VK_PAGE_DOWN">
+<!ENTITY modifiers2.next "alt">
+<!ENTITY keycode2.last "VK_PAGE_DOWN">
+<!ENTITY modifiers2.last "alt shift">

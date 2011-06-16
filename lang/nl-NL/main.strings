@@ -1,0 +1,24 @@
+top   = Top
+up    = Omhoog
+first = Eerste
+prev  = Vorige
+next  = Volgende
+last  = Laatste
+
+toc        = Inhoudsopgave
+chapter    = Hoofdstukken
+section    = Secties
+subsection = Subsecties
+appendix   = Bijlage
+2appendix  = Bijlagen
+glossary   = Verklarende woordenlijst
+2glossary  = Verklarende woordenlijsten
+index      = Index
+2index     = Indices
+
+help   = Help
+search = Zoek
+author = Auteurs
+copyright = Auteursrecht
+bookmark  = Bladwijzers
+alternate = Andere Versies

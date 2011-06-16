@@ -1,0 +1,45 @@
+<!--
+Licence: MPL 1.1/GPL 2.0/LGPL 2.1
+
+Original Author:
+  Rotem Liss <mail % rotemliss.com>
+-->
+
+<!ENTITY top.label "ראש האתר">
+<!ENTITY top.tooltip "הדף הראשי של האתר">
+<!ENTITY up.label "מעלה">
+<!ENTITY up.tooltip "רמה אחת למעלה באתר">
+<!ENTITY first.label "הראשון">
+<!ENTITY first.tooltip "הדף הראשון בסדרה">
+<!ENTITY prev.label "הקודם">
+<!ENTITY prev.tooltip "הדף הקודם ">
+<!ENTITY next.label "הבא">
+<!ENTITY next.tooltip "הדף הבא בסדרה">
+<!ENTITY last.label "האחרון">
+<!ENTITY last.tooltip "הדף האחרון בסדרה">
+<!ENTITY more.label "עוד">
+<!ENTITY more.tooltip "דפים קשורים אחרים">
+
+<!-- keyboard shortcuts -->
+<!ENTITY keycode.top "VK_UP">
+<!ENTITY modifiers.top "alt shift">
+<!ENTITY keycode.up "VK_UP">
+<!ENTITY modifiers.up "alt">
+
+<!ENTITY key.first "[">
+<!ENTITY modifiers.first "accel shift">
+<!ENTITY key.prev "[">
+<!ENTITY modifiers.prev "accel">
+<!ENTITY key.next "]">
+<!ENTITY modifiers.next "accel">
+<!ENTITY key.last "]">
+<!ENTITY modifiers.last "accel shift">
+
+<!ENTITY keycode2.first "VK_PAGE_UP">
+<!ENTITY modifiers2.first "alt shift">
+<!ENTITY keycode2.prev "VK_PAGE_UP">
+<!ENTITY modifiers2.prev "alt">
+<!ENTITY keycode2.next "VK_PAGE_DOWN">
+<!ENTITY modifiers2.next "alt">
+<!ENTITY keycode2.last "VK_PAGE_DOWN">
+<!ENTITY modifiers2.last "alt shift">

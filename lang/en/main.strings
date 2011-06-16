@@ -1,0 +1,27 @@
+# Menus use the 2rel string (e.g. 2index) if available
+
+
+top   = Top
+up    = Up
+first = First Page
+prev  = Previous Page
+next  = Next Page
+last  = Last Page
+
+toc        = Table of Contents
+chapter    = Chapters
+section    = Sections
+subsection = Subsections
+appendix   = Appendix
+2appendix  = Appendices
+glossary   = Glossary
+2glossary  = Glossaries
+index      = Index
+2index     = Indices
+
+help   = Help
+search = Search
+author = Authors
+copyright = Copyright
+bookmark  = Bookmarks
+alternate = Other Versions

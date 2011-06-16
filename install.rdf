@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+
+<r:RDF xmlns:r="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.mozilla.org/2004/em-rdf#">
+<r:Description about="urn:mozilla:install-manifest">
+
+<id>linkwidget@clav.mozdev.org</id>
+<name>Link Widgets</name>
+<version>1.5</version>
+<description>A site-navigation tool</description>
+<homepageURL>http://clav.mozdev.org/</homepageURL>
+<optionsURL>chrome://linkwidget/content/options.xul</optionsURL>
+
+<creator>Stephen Clavering</creator>
+<contributor>Chris Neale</contributor>
+<contributor>The Tango Project Artists – see http://tango.freedesktop.org/</contributor>
+<contributor>Xavier Robin (French translator)</contributor>
+<contributor>Giancarlo Dessì (Localizzazione italiana)</contributor>
+<contributor>Rob de Vries (Dutch translator)</contributor>
+<contributor>Peter Ondraska (Slovensky preklad)</contributor>
+<contributor>Tomáš Kopečný (cs-CZ translator)</contributor>
+<contributor>Rotem Liss (תרגום לעברית)</contributor>
+<contributor>Japanese Firefox Community</contributor>
+<contributor>Alexander Gieg (tradução para Português Brasileiro)</contributor>
+<contributor>Sönke Tesch (German translator)</contributor>
+<contributor>Antonio de Urquia (Spanish translator)</contributor>
+<contributor>rexx (Chinese translator)</contributor>
+
+<targetApplication>
+  <r:Description>
+    <id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</id>
+    <minVersion>1.5</minVersion>
+    <maxVersion>1.5.0.*</maxVersion>
+  </r:Description>
+</targetApplication>
+
+<targetApplication>
+  <r:Description>
+    <id>{a463f10c-3994-11da-9945-000d60ca027b}</id>
+    <minVersion>0.5</minVersion>
+    <maxVersion>0.7.1</maxVersion>
+  </r:Description>
+</targetApplication>
+</r:Description>
+</r:RDF>

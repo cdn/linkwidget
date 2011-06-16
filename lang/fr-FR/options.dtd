@@ -1,0 +1,15 @@
+<!--
+Licence: MPL 1.1/GPL 2.0/LGPL 2.1
+
+Original Author:
+  Stephen Clavering <mozilla@clav.me.uk>
+-->
+
+<!ENTITY title "Options de la barre de navigation">
+
+<!ENTITY linkGuessing "Deviner les liens">
+<!ENTITY linkGuessingDescription "La barre de navigation peut essayer de deviner les liens pour les pages web ne fournissent pas l'élément HTML &lt;link&gt; dont elle dépend en utilisant les stratégies suivantes :">
+
+<!ENTITY scanHyperlinks "Scanner les hyperliens de la page pour trouver les liens vers les pages «&#8201;Précédente&#8201;», «&#8201;Première&#8201;», «&#8201;Suivante&#8201;» et «&#8201;Dernière&#8201;».">
+<!ENTITY guessUpAndTopFromURL "Deviner les liens des pages «&#8201;Niveau supérieur de l'arborescence&#8201;» et «&#8201;Début de l'arborescence&#8201;» en se basant sur l'URL de la page.">
+<!ENTITY guessPrevAndNextFromURL "Deviner les liens des pages «&#8201;Précédente&#8201;» et «&#8201;Suivante&#8201;» de la séquence en se basant sur les parties numériques de l'URL de la page.">

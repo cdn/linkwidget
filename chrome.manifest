@@ -1,0 +1,18 @@
+content linkwidget jar:linkwidget.jar!/content/ xpcnativewrappers=yes
+overlay chrome://browser/content/browser.xul chrome://linkwidget/content/overlay.xul
+
+skin  linkwidget classic/1.0 jar:linkwidget.jar!/theme/
+style chrome://global/content/customizeToolbar.xul chrome://linkwidget/skin/linkwidget.css
+
+locale linkwidget en    jar:linkwidget.jar!/lang/en/
+locale linkwidget cs-CZ jar:linkwidget.jar!/lang/cs-CZ/
+locale linkwidget de    jar:linkwidget.jar!/lang/de/
+locale linkwidget es    jar:linkwidget.jar!/lang/es/
+locale linkwidget fr-FR jar:linkwidget.jar!/lang/fr-FR/
+locale linkwidget he-IL jar:linkwidget.jar!/lang/he-IL/
+locale linkwidget it    jar:linkwidget.jar!/lang/it/
+locale linkwidget ja-JP jar:linkwidget.jar!/lang/ja-JP/
+locale linkwidget nl-NL jar:linkwidget.jar!/lang/nl-NL/
+locale linkwidget sk-SK jar:linkwidget.jar!/lang/sk-SK/
+locale linkwidget pt-BR jar:linkwidget.jar!/lang/pt-BR/
+locale linkwidget zh-TW jar:linkwidget.jar!/lang/zh-TW/

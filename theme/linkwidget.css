@@ -1,0 +1,85 @@
+/*
+Licence: MPL 1.1/GPL 2.0/LGPL 2.1
+
+The Original Code is the Link Widget extension for Firefox
+
+Contributor(s):
+  Stephen Clavering <mozilla@clav.me.uk>
+  Chris Neale <cdn@mozdev.org>  (tweaks and email icon for mailto: links)
+*/
+
+.linkwidget-button, .linkwidget-menu, .linkwidget-menuitem {
+  list-style-image: url(chrome://linkwidget/skin/buttons.png) !important;
+}
+
+.linkwidget-button[disabled=true] { opacity: 0.5 }
+
+/* for the default theme we use icons with built-in dropmarkers, but other themes might want to keep them separate */
+.linkwidget-button dropmarker { display: none }
+
+toolbar[iconsize="small"] .linkwidget-button > .toolbarbutton-menubutton-button { -moz-box-orient: horizontal; }
+
+/* Charamel sets -moz-image-region on the <hbox> wrapping the <image> within <menuitem>s */
+.linkwidget-button .menu-iconic-left { -moz-image-region: inherit !important; }
+
+
+/* menuitems and submenus */
+.linkwidget-menu { -moz-image-region: rect(64px 112px 80px 96px); }
+.linkwidget-menu[open=true] { -moz-image-region: rect(64px 128px 80px 112px); }
+.linkwidget-menuitem { -moz-image-region: rect(24px 144px 40px 128px); }
+.linkwidget-menuitem[href^="mailto:"] { -moz-image-region: rect(24px 112px 40px 96px); }
+
+
+/* large toolbar buttons */
+#linkwidget-top { -moz-image-region: rect(0 24px 24px 0); }
+#linkwidget-top[multi] { -moz-image-region: rect(40px 24px 64px 0); }
+
+#linkwidget-up { -moz-image-region: rect(0 48px 24px 24px); }
+#linkwidget-up[multi] { -moz-image-region: rect(40px 48px 64px 24px); }
+
+#linkwidget-first { -moz-image-region: rect(0 72px 24px 48px); }
+#linkwidget-first[multi] { -moz-image-region: rect(40px 72px 64px 48px); }
+
+#linkwidget-prev { -moz-image-region: rect(0 96px 24px 72px); }
+#linkwidget-prev[multi] { -moz-image-region: rect(40px 96px 64px 72px); }
+
+#linkwidget-next { -moz-image-region: rect(0 120px 24px 96px); }
+#linkwidget-next[multi] { -moz-image-region: rect(40px 120px 64px 96px); }
+
+#linkwidget-last { -moz-image-region: rect(0 144px 24px 120px); }
+#linkwidget-last[multi] { -moz-image-region: rect(40px 144px 64px 120px); }
+
+#linkwidget-more-menu { -moz-image-region: rect(0 168px 24px 144px); }
+#linkwidget-more-menu[open=true] { -moz-image-region: rect(40px 168px 64px 144px); }
+
+
+/* small toolbar buttons, and special icons for some More menu entries */
+.linkwidget-rel-top,
+toolbar[iconsize="small"] #linkwidget-top { -moz-image-region: rect(24px 16px 40px 0); }
+toolbar[iconsize="small"] #linkwidget-top[multi] { -moz-image-region: rect(64px 16px 80px 0); }
+
+.linkwidget-rel-up,
+toolbar[iconsize="small"] #linkwidget-up { -moz-image-region: rect(24px 32px 40px 16px); }
+toolbar[iconsize="small"] #linkwidget-up[multi] { -moz-image-region: rect(64px 32px 80px 16px); }
+
+.linkwidget-rel-first,
+toolbar[iconsize="small"] #linkwidget-first { -moz-image-region: rect(24px 48px 40px 32px); }
+toolbar[iconsize="small"] #linkwidget-first[multi] { -moz-image-region: rect(64px 48px 80px 32px); }
+
+.linkwidget-rel-prev,
+toolbar[iconsize="small"] #linkwidget-prev { -moz-image-region: rect(24px 64px 40px 48px); }
+toolbar[iconsize="small"] #linkwidget-prev[multi] { -moz-image-region: rect(64px 64px 80px 48px); }
+
+.linkwidget-rel-next,
+toolbar[iconsize="small"] #linkwidget-next { -moz-image-region: rect(24px 80px 40px 64px); }
+toolbar[iconsize="small"] #linkwidget-next[multi] { -moz-image-region: rect(64px 80px 80px 64px); }
+
+.linkwidget-rel-last,
+toolbar[iconsize="small"] #linkwidget-last { -moz-image-region: rect(24px 96px 40px 80px); }
+toolbar[iconsize="small"] #linkwidget-last[multi] { -moz-image-region: rect(64px 96px 80px 80px); }
+
+toolbar[iconsize="small"] #linkwidget-more-menu { -moz-image-region: rect(64px 112px 80px 96px); }
+toolbar[iconsize="small"] #linkwidget-more-menu[open=true] { -moz-image-region: rect(64px 128px 80px 112px); }
+
+
+#status-bar .linkwidget-button { max-height: none; }

@@ -1,0 +1,23 @@
+top   = Startseite
+up    = Aufwärts
+first = Erste
+prev  = Vorangehende
+next  = Nächste
+last  = Letzte
+
+toc        = Inhalt
+chapters   = Kapitel
+sections   = Abschnitte
+subsections = Unterabschnitte
+appendices = Anhänge
+glossary   = Glossar
+2glossary  = Glossare
+index      = Index
+2index     = Indizes
+
+help      = Hilfe
+search    = Suche
+author    = Autoren
+copyright = Recht
+bookmark  = Lesezeichen
+alternate = Andere Versionen

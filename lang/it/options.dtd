@@ -1,0 +1,15 @@
+<!--
+Licence: MPL 1.1/GPL 2.0/LGPL 2.1
+
+Author:
+  Giancarlo Dessì <gian@cettolini.it>
+-->
+
+<!ENTITY title "Opzioni della barra dei collegamenti correlati del sito">
+
+<!ENTITY linkGuessing "Ipotizza i collegamenti del sito">
+<!ENTITY linkGuessingDescription "Molte pagine Web non forniscono gli elementi HTML &lt;link&gt; da cui dipende Link Widget. L'attivazione di queste impostazioni fa in modo che linkWidget cerchi i probabili collegamenti correlati in base all'URL">
+
+<!ENTITY scanHyperlinks "Cerca i collegamenti ipertestuali alla Prima pagina, alla Precedente, alla Successiva e all'Ultima">
+<!ENTITY guessUpAndTopFromURL "Ipotizza i collegamenti Inizio e Sali in base all'URL della pagina">
+<!ENTITY guessPrevAndNextFromURL "Ipotizza i collegamenti alle pagine Precedente e successiva in base alla parte numerica dell'URL della pagina">

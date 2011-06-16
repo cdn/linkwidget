@@ -1,0 +1,15 @@
+<!--
+Licence: MPL 1.1/GPL 2.0/LGPL 2.1
+
+Author:
+   Tomáš Kopečný <georgo10 seznam.cz>
+-->
+
+<!ENTITY title "Nastavebá Link Widget">
+
+<!ENTITY linkGuessing "Hádání odkazů">
+<!ENTITY linkGuessingDescription "Spousta webů nepodporuje HTML &lt;odkazové&gt; elementy, které by Link Widget rozpoznal.">
+
+<!ENTITY scanHyperlinks "Zkoumat odkazy na stránce pro První, Předchozí, Další a Poslední">
+<!ENTITY guessUpAndTopFromURL "Odhadovat Nahoru a  Úvod podle URL stránky">
+<!ENTITY guessPrevAndNextFromURL "Odhadovat Předchozí a Další na stránkách postavených z číselných částí v URL">

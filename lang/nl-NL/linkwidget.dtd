@@ -1,0 +1,44 @@
+<!--
+Licence: MPL 1.1/GPL 2.0/LGPL 2.1
+
+Author: Rob de Vries
+-->
+
+<!ENTITY top.label "Top">
+<!ENTITY top.tooltip "Top van de website">
+<!ENTITY up.label "Omhoog">
+<!ENTITY up.tooltip "Een niveau omhoog">
+<!ENTITY first.label "Eerste">
+<!ENTITY first.tooltip "Eerste pagina in volgorde">
+<!ENTITY prev.label "Vorige">
+<!ENTITY prev.tooltip "Vorige pagina in volgorde">
+<!ENTITY next.label "Volgende">
+<!ENTITY next.tooltip "Volgende pagina in volgorde">
+<!ENTITY last.label "Laatste">
+<!ENTITY last.tooltip "Laatste pagina in volgorde">
+<!ENTITY more.label "Meer">
+<!ENTITY more.tooltip "Andere gerelateerde pagina's">
+
+<!-- keyboard shortcuts -->
+<!ENTITY keycode.top "VK_UP">
+<!ENTITY modifiers.top "alt shift">
+<!ENTITY keycode.up "VK_UP">
+<!ENTITY modifiers.up "alt">
+
+<!ENTITY key.first "[">
+<!ENTITY modifiers.first "accel shift">
+<!ENTITY key.prev "[">
+<!ENTITY modifiers.prev "accel">
+<!ENTITY key.next "]">
+<!ENTITY modifiers.next "accel">
+<!ENTITY key.last "]">
+<!ENTITY modifiers.last "accel shift">
+
+<!ENTITY keycode2.first "VK_PAGE_UP">
+<!ENTITY modifiers2.first "alt shift">
+<!ENTITY keycode2.prev "VK_PAGE_UP">
+<!ENTITY modifiers2.prev "alt">
+<!ENTITY keycode2.next "VK_PAGE_DOWN">
+<!ENTITY modifiers2.next "alt">
+<!ENTITY keycode2.last "VK_PAGE_DOWN">
+<!ENTITY modifiers2.last "alt shift">

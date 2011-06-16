@@ -1,0 +1,8 @@
+<!ENTITY title "Opciones de LinkWidget">
+
+<!ENTITY linkGuessing "Adivinar enlaces">
+<!ENTITY linkGuessingDescription "LinkWidget puede intentar adivinar los enlaces de las muchas páginas que no los proporcionan.">
+
+<!ENTITY scanHyperlinks "Analizar los hipervínculos de la página para encontrar los enlaces de las páginas primera, previa, siguiente y última">
+<!ENTITY guessUpAndTopFromURL "Adivinar enlaces a página de inicio y subir un nivel a partir de la URL de la página">
+<!ENTITY guessPrevAndNextFromURL "Adivinar enlaces a página previa y siguiente a partir de las partes numéricas de la URL de la página">

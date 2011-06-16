@@ -1,0 +1,28 @@
+# Menus use the 2rel string (e.g. 2index) if available
+
+
+top   = Vrchol
+up    = Nahor
+first = Prvá
+prev  = Predchádzajúca
+next  = Ďalšia
+last  = Posledná
+
+toc        = Obsah
+chapter    = Kapitoly
+section    = Sekcie
+subsection = Podsekcie
+appendix   = Dodatok
+2appendix  = Dodatky
+glossary   = Glosár
+2glossary  = Glosáre
+index      = Register
+2index     = Registre
+
+help   = Pomocník
+search = Hľadanie
+author = Autori
+copyright = Copyright
+bookmark  = Záložky
+alternate = Iné verzie
+

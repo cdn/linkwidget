@@ -1,0 +1,15 @@
+<!--
+Licence: MPL 1.1/GPL 2.0/LGPL 2.1
+
+Original Author:
+  Rotem Liss <mail % rotemliss.com>
+-->
+
+<!ENTITY title "אפשרויות Link Widget">
+
+<!ENTITY linkGuessing "ניחוש קישורים">
+<!ENTITY linkGuessingDescription "Link Widget יכול לנחש קישורים בדפים שונים שלא מציינים אותם מפורשות.">
+
+<!ENTITY scanHyperlinks "סרוק הקישורים בדף למציאת הקישורים לדפים הראשון, הקודם, הבא והאחרון בסדרה">
+<!ENTITY guessUpAndTopFromURL "נחש את הקישורים ״רמה האחת למעלה״ ו״ראש האתר״">
+<!ENTITY guessPrevAndNextFromURL "נחש את הקישורים לדפים הקודם והבא בסדרה בהתבסס על החלקים המספריים ב־URL של הדף">

@@ -1,0 +1,45 @@
+<!--
+Licence: MPL 1.1/GPL 2.0/LGPL 2.1
+
+Author:
+  Tomáš Kopečný <georgo10 seznam.cz>
+-->
+
+<!ENTITY top.label "Úvod">
+<!ENTITY top.tooltip "Na úvod webové stránky">
+<!ENTITY up.label "Nahoru">
+<!ENTITY up.tooltip "Nahoru o úroveň webové stránky">
+<!ENTITY first.label "První">
+<!ENTITY first.tooltip "První stránka v pořadí">
+<!ENTITY prev.label "Předchozí">
+<!ENTITY prev.tooltip "Předchozí stránka v pořadí">
+<!ENTITY next.label "Další">
+<!ENTITY next.tooltip "Další stránka v pořadí">
+<!ENTITY last.label "Poslední">
+<!ENTITY last.tooltip "Poslední stránka v pořadí">
+<!ENTITY more.label "Další">
+<!ENTITY more.tooltip "Ostatní související stránky">
+
+<!-- keyboard shortcuts -->
+<!ENTITY keycode.top "VK_UP">
+<!ENTITY modifiers.top "alt shift">
+<!ENTITY keycode.up "VK_UP">
+<!ENTITY modifiers.up "alt">
+
+<!ENTITY key.first "[">
+<!ENTITY modifiers.first "accel shift">
+<!ENTITY key.prev "[">
+<!ENTITY modifiers.prev "accel">
+<!ENTITY key.next "]">
+<!ENTITY modifiers.next "accel">
+<!ENTITY key.last "]">
+<!ENTITY modifiers.last "accel shift">
+
+<!ENTITY keycode2.first "VK_PAGE_UP">
+<!ENTITY modifiers2.first "alt shift">
+<!ENTITY keycode2.prev "VK_PAGE_UP">
+<!ENTITY modifiers2.prev "alt">
+<!ENTITY keycode2.next "VK_PAGE_DOWN">
+<!ENTITY modifiers2.next "alt">
+<!ENTITY keycode2.last "VK_PAGE_DOWN">
+<!ENTITY modifiers2.last "alt shift">

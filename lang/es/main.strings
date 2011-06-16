@@ -1,0 +1,24 @@
+top   = Inicio
+up    = Subir
+first = Primera página
+prev  = Página previa
+next  = Siguiente página
+last  = Última página
+
+toc        = Índice de materias
+chapter    = Capítulos
+section    = Secciones
+subsection = Subsecciones
+appendix   = Apéndice
+2appendix  = Apéndices
+glossary   = Glosario
+2glossary  = Glosarios
+index      = Índices
+2index     = Índices
+
+help   = Ayuda
+search = Buscar
+author = Autores
+copyright = Copyright
+bookmark  = Marcadores
+alternate = Otras versiones

@@ -1,0 +1,29 @@
+# Language: Czech
+# Encoding: UTF-8
+# Translator: Tomas Kopecny
+
+top   = Na úvod
+up    = Nahoru
+first = První stránka
+prev  = Předchozí stránka
+next  = Další stránka
+last  = Poslední stránka
+
+toc        = Table of Contents
+chapter    = Kapitoly
+section    = Sekce
+subsection = Podsekce
+appendix   = Dodatek
+2appendix  = Dodatky
+glossary   = Slovník
+2glossary  = Slovníky
+index      = Rejstřík
+2index     = Rejstříky
+
+help   = Nápověda
+search = Hledat
+author = Autoři
+copyright = Copyright
+bookmark  = Záložky
+alternate = Ostatní verze
+

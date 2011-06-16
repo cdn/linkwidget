@@ -1,0 +1,27 @@
+# Menus use the 2rel string (e.g. 2index) if available
+
+
+top   = Inizio
+up    = Sali
+first = Prima
+prev  = Precedente
+next  = Successiva
+last  = Ultima
+
+toc        = Sommario
+chapter    = Capitoli
+section    = Sezioni
+subsection = Sottosezioni
+appendix   = Appendice
+2appendix  = Appendici
+glossary   = Glossario
+2glossary  = Glossari
+index      = Indice
+2index     = Indici
+
+help   = Guida
+search = Cerca
+author = Autori
+copyright = Copyright
+bookmark  = Segnalibri
+alternate = Altre Versioni

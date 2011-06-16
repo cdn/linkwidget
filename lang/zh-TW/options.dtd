@@ -1,0 +1,15 @@
+<!--
+Licence: MPL 1.1/GPL 2.0/LGPL 2.1
+
+Original Author:
+  Stephen Clavering <mozilla@clav.me.uk>
+-->
+
+<!ENTITY title "Link Widget 選項">
+
+<!ENTITY linkGuessing "猜測連結">
+<!ENTITY linkGuessingDescription "Link Widget 可以猜測許多頁面沒有顯示的連結.">
+
+<!ENTITY scanHyperlinks "從頁面中的超連結搜尋第一頁、上一頁、下一頁及最後一頁的連結">
+<!ENTITY guessUpAndTopFromURL "以頁面網址猜測上一層及最上層連結">
+<!ENTITY guessPrevAndNextFromURL "以頁面網址的數字部份猜預測上一頁及下一頁連結">

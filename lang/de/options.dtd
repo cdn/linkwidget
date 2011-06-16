@@ -1,0 +1,16 @@
+<!--
+Licence: MPL 1.1/GPL 2.0/LGPL 2.1
+
+Original Author:
+  Sönke Tesch <soenketesch gmx.de>
+-->
+
+<!ENTITY title "Einstellungen für die Link Widget">
+
+<!ENTITY linkGuessing "Zusammenhänge erraten">
+<!ENTITY linkGuessingDescription "Link Widget kann versuchen, aus dem Inhalt einer Seite auf verwandte Seiten zu schließen.">
+
+<!ENTITY scanHyperlinks "Nach Hinweisen auf nächste, vorangehende, erste und letzte Seite suchen">
+<!ENTITY guessUpAndTopFromURL "Adresse der übergeordneten und der Startseite aus der aktuellen Adresse konstruieren">
+<!ENTITY guessPrevAndNextFromURL "Nächste und vorangehende Seite aus Zahlmustern in der aktuellen Adresse erraten">
+

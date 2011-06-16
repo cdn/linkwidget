@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<!-- ***** BEGIN LICENSE BLOCK *****
+Version: MPL 1.1/GPL 2.0/LGPL 2.1
+
+The contents of this file are subject to the Mozilla Public License Version
+1.1 (the "License"); you may not use this file except in compliance with
+the License. You may obtain a copy of the License at
+http://www.mozilla.org/MPL/
+
+Software distributed under the License is distributed on an "AS IS" basis,
+WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+for the specific language governing rights and limitations under the
+License.
+
+The Original Code is the Site Navigation Toolbar from Mozilla 1.x
+
+The Initial Developer of the Original Code is Eric Hodel <drbrain@segment7.net>.
+
+Portions created by the Initial Developer are Copyright (C) 2001
+the Initial Developer. All Rights Reserved.
+
+Contributor(s):
+     Christopher Hoess <choess@force.stwing.upenn.edu>
+     Tim Taylor <tim@tool-man.org>
+     Stuart Ballard <sballard@netreach.net>
+     Chris Neale <cdn@mozdev.org>
+     Stephen Clavering <mozilla@clav.me.uk>
+
+Alternatively, the contents of this file may be used under the terms of
+either the GNU General Public License Version 2 or later (the "GPL"), or
+the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+in which case the provisions of the GPL or the LGPL are applicable instead
+of those above. If you wish to allow use of your version of this file only
+under the terms of either the GPL or the LGPL, and not to allow others to
+use your version of this file under the terms of the MPL, indicate your
+decision by deleting the provisions above and replace them with the notice
+and other provisions required by the LGPL or the GPL. If you do not delete
+the provisions above, a recipient may use your version of this file under
+the terms of any one of the MPL, the GPL or the LGPL.
+
+***** END LICENSE BLOCK ***** -->
+
+<?xml-stylesheet href="chrome://linkwidget/skin/linkwidget.css" type="text/css"?>
+
+<!DOCTYPE overlay SYSTEM "chrome://linkwidget/locale/linkwidget.dtd">
+
+<overlay id="linkWidgetOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script type="application/x-javascript" src="code.js"/>
+
+  <popupset id="mainPopupSet">
+    <tooltip id="linkwidget-tooltip" orient="vertical"
+        onpopupshowing="return linkWidgetFillTooltip(this, event);">
+      <label id="linkwidget-tooltip-1"/>
+      <label id="linkwidget-tooltip-2" crop="center"/>
+    </tooltip>
+  </popupset>
+
+<keyset id="mainKeyset">
+  <key id="linkwidget-key-top" keycode="&keycode.top;" modifiers="&modifiers.top;"
+      oncommand="linkWidgetGo('top');"/>
+  <key id="linkwidget-key-up" keycode="&keycode.up;" modifiers="&modifiers.up;"
+      oncommand="linkWidgetGo('up');"/>
+  <key id="linkwidget-key-first" key="&key.first;" modifiers="&modifiers.first;"
+      oncommand="linkWidgetGo('first');"/>
+  <key id="linkwidget-key2-first" keycode="&keycode2.first;" modifiers="&modifiers2.first;"
+      oncommand="linkWidgetGo('first');"/>
+  <key id="linkwidget-key-prev" key="&key.prev;" modifiers="&modifiers.prev;"
+      oncommand="linkWidgetGo('prev');"/>
+  <key id="linkwidget-key2-prev" keycode="&keycode2.prev;" modifiers="&modifiers2.prev;"
+      oncommand="linkWidgetGo('prev');"/>
+  <key id="linkwidget-key-next" key="&key.next;" modifiers="&modifiers.next;"
+      oncommand="linkWidgetGo('next');"/>
+  <key id="linkwidget-key2-next" keycode="&keycode2.next;" modifiers="&modifiers2.next;"
+      oncommand="linkWidgetGo('next');"/>
+  <key id="linkwidget-key-last" key="&key.last;" modifiers="&modifiers.last;"
+      oncommand="linkWidgetGo('last');"/>
+  <key id="linkwidget-key2-last" keycode="&keycode2.last;" modifiers="&modifiers2.last;"
+      oncommand="linkWidgetGo('last');"/>
+</keyset>
+
+
+<toolbarpalette id="BrowserToolbarPalette">
+  <toolbarbutton id="linkwidget-top" label="&top.label;" fallbackTooltipText="&top.tooltip;"
+      type="menu-button" disabled="true" class="linkwidget-button toolbarbutton-1"/>
+  <toolbarbutton id="linkwidget-up" label="&up.label;" fallbackTooltipText="&up.tooltip;"
+      type="menu-button" disabled="true" class="linkwidget-button toolbarbutton-1"/>
+  <toolbarbutton id="linkwidget-first" label="&first.label;" fallbackTooltipText="&first.tooltip;"
+      type="menu-button" disabled="true" class="linkwidget-button toolbarbutton-1"/>
+  <toolbarbutton id="linkwidget-prev" label="&prev.label;" fallbackTooltipText="&prev.tooltip;"
+      type="menu-button" disabled="true" class="linkwidget-button toolbarbutton-1"/>
+  <toolbarbutton id="linkwidget-next" label="&next.label;" fallbackTooltipText="&next.tooltip;"
+      type="menu-button" disabled="true" class="linkwidget-button toolbarbutton-1"/>
+  <toolbarbutton id="linkwidget-last" label="&last.label;" fallbackTooltipText="&last.tooltip;"
+      type="menu-button" disabled="true" class="linkwidget-button toolbarbutton-1"/>
+
+  <toolbarbutton id="linkwidget-more-menu" label="&more.label;" fallbackTooltipText="&more.tooltip;"
+      type="menu" orient="" tooltip="linkwidget-tooltip" context="" disabled="true"
+      class="linkwidget-button toolbarbutton-1"
+      oncommand="return linkWidgetLoadPage(event);" onclick="linkWidgetItemClicked(event);"
+      onmouseover="linkWidgetMouseEnter(event);" onmouseout="linkWidgetMouseExit(event);"
+      >
+    <menupopup id="linkwidget-more-popup" onpopupshowing="linkWidgetOnMoreMenuShowing();"/>
+  </toolbarbutton>
+</toolbarpalette>
+
+</overlay>

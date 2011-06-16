@@ -1,0 +1,38 @@
+<!ENTITY top.label "En haut">
+<!ENTITY top.tooltip "Début de l'arborescence du site">
+<!ENTITY up.label "Vers le haut">
+<!ENTITY up.tooltip "Progresser d'un niveau dans l'arborescence du site">
+<!ENTITY first.label "Le premier">
+<!ENTITY first.tooltip "Première page de la séquence">
+<!ENTITY prev.label "Précédent">
+<!ENTITY prev.tooltip "Page précédente de la séquence">
+<!ENTITY next.label "Suivant">
+<!ENTITY next.tooltip "Page suivante de la séquence">
+<!ENTITY last.label "Le dernier">
+<!ENTITY last.tooltip "Dernière page de la séquence">
+<!ENTITY more.label "Plus">
+<!ENTITY more.tooltip "Autres pages en rapport">
+
+<!-- keyboard shortcuts -->
+<!ENTITY keycode.top "VK_UP">
+<!ENTITY modifiers.top "alt shift">
+<!ENTITY keycode.up "VK_UP">
+<!ENTITY modifiers.up "alt">
+
+<!ENTITY key.first "[">
+<!ENTITY modifiers.first "accel shift">
+<!ENTITY key.prev "[">
+<!ENTITY modifiers.prev "accel">
+<!ENTITY key.next "]">
+<!ENTITY modifiers.next "accel">
+<!ENTITY key.last "]">
+<!ENTITY modifiers.last "accel shift">
+
+<!ENTITY keycode2.first "VK_PAGE_UP">
+<!ENTITY modifiers2.first "alt shift">
+<!ENTITY keycode2.prev "VK_PAGE_UP">
+<!ENTITY modifiers2.prev "alt">
+<!ENTITY keycode2.next "VK_PAGE_DOWN">
+<!ENTITY modifiers2.next "alt">
+<!ENTITY keycode2.last "VK_PAGE_DOWN">
+<!ENTITY modifiers2.last "alt shift">

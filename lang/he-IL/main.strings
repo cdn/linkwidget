@@ -1,0 +1,27 @@
+﻿# Menus use the 2rel string (e.g. 2index) if available
+
+
+top   = הדף העליון
+up    = רמה אחת למעלה
+first = הדף הראשון
+prev  = הדף הקודם
+next  = הדף הבא
+last  = הדף האחרון
+
+toc        = תוכן העניינים
+chapter    = פרקים
+section    = מקטעים
+subsection = תת־מקטעים
+appendix   = נספח
+2appendix  = נספחים
+glossary   = מילון
+2glossary  = מילונים
+index      = אינדקס
+2index     = אינדקסים
+
+help   = עזרה
+search = חיפוש
+author = מחברים
+copyright = זכויות יוצרים
+bookmark  = סימניות
+alternate = גרסאות אחרות

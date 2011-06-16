@@ -1,0 +1,9 @@
+<!ENTITY title "Link Widgetの設定">
+
+<!ENTITY linkGuessing "ナビゲーションリンクの推測">
+
+<!ENTITY linkGuessingDescription "多くのWeb ページはナビゲーションリンクを提供しません。">
+
+<!ENTITY scanHyperlinks "最初、前、次、最後のページへのリンクをスキャンする">
+<!ENTITY guessUpAndTopFromURL "URLから上とトップのURLを推測する">
+<!ENTITY guessPrevAndNextFromURL "URLの数値の部分に基づいて前と次のURLを推測する">

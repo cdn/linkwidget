@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+
+<head>
+
+<title>Link Widget test page</title>
+
+<!-- stylesheet links should not show -->
+<link rel="stylesheet" type="text/css" href="foo.css" title="foo style">
+
+<!-- some general rel type tests -->
+<link rel="First" href="http://www.mrflip.com/resources/NavLink/index.html" title="First: NavLink: Maintain Navigational &lt;LINK&gt; Tags">
+<link rel="Prev" href="http://www.mrflip.com/resources/NavLink/index.html" title="Prev: NavLink: Maintain Navigational &lt;LINK&gt; Tags">
+<link rel="Next" href="http://www.mrflip.com/resources/NavLink/GetNavLink.html" title="Next: Navlink: How to Get It">
+<link rel="Last" href="http://www.mrflip.com/resources/NavLink/example/index.html" title="Last: NavLink: Example Tree">
+<link rel="Chapter" href="http://www.mrflip.com/resources/NavLink/index.html" title="[1] NavLink: Maintain Navigational &lt;LINK&gt; Tags">
+<link rel="Chapter" href="http://www.mrflip.com/resources/NavLink/AboutLinkTags.html" title="[2] NavLink: About &lt;LINK&gt; Tags">
+<link rel="Chapter" href="http://www.mrflip.com/resources/NavLink/GetNavLink.html" title="[3] Navlink: How to Get It">
+<link rel="Chapter" href="http://www.mrflip.com/resources/NavLink/UseNavLink.html" title="[4] Navlink: How to Use It">
+<link rel="Chapter" href="http://www.mrflip.com/resources/NavLink/example/index.html" title="[5] NavLink: Example Tree">
+<link rel="Section" href="http://www.mrflip.com/resources/NavLink/example/1.html" title="[5.1] NavLink: Example Tree">
+<link rel="Subsection" href="http://www.mrflip.com/resources/NavLink/example/1.1.html" title="[5.1.1] NavLink: Example Tree">
+<link rel="Subsection" href="http://www.mrflip.com/resources/NavLink/example/1.2.html" title="[5.1.2] NavLink: Example Tree">
+<link rel="Subsection" href="http://www.mrflip.com/resources/NavLink/example/1.2.1.html" title="[5.1.2.1] NavLink: Example Tree">
+<link rel="Subsection" href="http://www.mrflip.com/resources/NavLink/example/1.2.2.html" title="[5.1.2.2] NavLink: Example Tree">
+<link rel="Subsection" href="http://www.mrflip.com/resources/NavLink/example/1.2.3.html" title="[5.1.2.3] NavLink: Example Tree">
+<link rel="Subsection" href="http://www.mrflip.com/resources/NavLink/example/1.2.4.html" title="[5.1.2.4] NavLink: Example Tree">
+<link rel="Section" href="http://www.mrflip.com/resources/NavLink/example/2.html" title="[5.2] NavLink: Example Tree">
+<link rel="Subsection" href="http://www.mrflip.com/resources/NavLink/example/2.1.html" title="[5.2.1] NavLink: Example Tree">
+<link rel="Section" href="http://www.mrflip.com/resources/NavLink/example/3.html" title="[5.3] NavLink: Example Tree">
+<link rel="Section" href="http://www.mrflip.com/resources/NavLink/example/4.html" title="[5.4] NavLink: Example Tree">
+<link rel="Top" title="Top of Site" href="http://www.mrflip.com/resources/NavLink/index.html">
+<link rel="Contents" title="Site Contents" href="http://www.mrflip.com/resources/NavLink/index.html">
+<link rel="Search" title="Site Search" href="http://www.mrflip.com/search.html">
+
+<!-- the all important rev=made test ;) -->
+<link rev="made" title="Email Author" href="mailto:noone@example.com">
+
+<!-- extra 'next' links -->
+<link rel="Next" href="#foo2" title="2nd 'next' link">
+<link rel="Next" href="#foo3" title="3rd 'next' link">
+<link rel="Next" href="#foo4" title="4th 'next' link">
+<link rel="Next" href="#foo5" title="5th 'next' link">
+
+<!-- some silly link types to test the LinkWidgetTransientMenu functionality -->
+<link rel="flibble" title="flibble homepage" href="http://mozilla.org/projects/firebird/">
+<link rel="flibble" title="nice stuff for flibble" href="http://cdn.mozdev.org/">
+
+<!-- some hreflang tests -->
+<link rel="alternate" hreflang="en" title="an english page" href="http://example.com/1">
+<link rel="alternate" hreflang="es" title="spanish page" href="http://example.com/2">
+<link rel="alternate" hreflang="de" title="german page" href="http://example.com/3">
+<!-- a 5 char lang code test -->
+<link rel="alternate" hreflang="en-GB" title="a uk english page" href="http://example.com/4">
+
+<!-- nonsensical language code test -->
+<link rel="alternate" hreflang="gibberish" title="an hreflang=gibberish page :)" href="http://example.com/5">
+
+<!-- some media tests (to show hpw badly we handle these at the moment) -->
+<link rel="alternate" media="print" title="the page title" href="http://example.com/">
+<link rel="alternate" media="" title="the page title" href="http://example.com/2">
+
+<!-- XXX should we test <meta http-equiv="link">, or whatever that silly syntax is ? -->
+
+<!-- some links with multiple rel/rev values -->
+<link rel="next child" href="http://example.com/7" title="A rel='next child' link. could be shown twice if we're careless">
+<link rel="next" rev="prev" href="http://example.com/8" title="A rel=next,rev=prev link, which is probably valid">
+<link rel="next last" href="http://example.com/9" title="A page which is both next and last">
+
+<link rel="next prefetch" href="http://example.com/10" title="rel='next prefetch'. should show">
+
+<!-- some links with rel types we want to ignore, to be sure it's working correctly -->
+<link rel="prefetch" href="http://example.com/11" title="A prefetch link. should not show">
+<link rel="icon" href="http://example.com/12" title="an icon link. should not show">
+
+<!-- some rev only tests -->
+<link rev="prev" href="http://example.com/13" title="rev=prev test">
+
+<!-- a rel=made test. the moz link widget would map this onto the Author link, which is incorrect
+     (though it probably doesn't matter, since it's unlikely to be used) -->
+<link rel="made" href="http://example.com/14" title="rel=made, useful for web-design company maybe?">
+</head>
+
+
+<body>
+<p>you're expected (for the moment) to view the source for this page to work out what links should show</p>
+</body>
+
+</html>

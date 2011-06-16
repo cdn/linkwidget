@@ -1,0 +1,45 @@
+<!--
+Licence: MPL 1.1/GPL 2.0/LGPL 2.1
+
+Original Author:
+  Alexander Gieg <alexgieg % gmail.com>
+-->
+
+<!ENTITY top.label "Início">
+<!ENTITY top.tooltip "Página inicial do site">
+<!ENTITY up.label "Acima">
+<!ENTITY up.tooltip "Sobe um nível no site">
+<!ENTITY first.label "Primeira">
+<!ENTITY first.tooltip "Primeira página na seqüência">
+<!ENTITY prev.label "Anterior">
+<!ENTITY prev.tooltip "Página anterior na seqüência">
+<!ENTITY next.label "Próxima">
+<!ENTITY next.tooltip "Página seguinte na seqüência">
+<!ENTITY last.label "Última">
+<!ENTITY last.tooltip "Última página na seqüência">
+<!ENTITY more.label "Mais">
+<!ENTITY more.tooltip "Outras páginas relacionadas">
+
+<!-- keyboard shortcuts -->
+<!ENTITY keycode.top "VK_UP">
+<!ENTITY modifiers.top "alt shift">
+<!ENTITY keycode.up "VK_UP">
+<!ENTITY modifiers.up "alt">
+
+<!ENTITY key.first ",">
+<!ENTITY modifiers.first "accel shift">
+<!ENTITY key.prev ",">
+<!ENTITY modifiers.prev "accel">
+<!ENTITY key.next ".">
+<!ENTITY modifiers.next "accel">
+<!ENTITY key.last ".">
+<!ENTITY modifiers.last "accel shift">
+
+<!ENTITY keycode2.first "VK_PAGE_UP">
+<!ENTITY modifiers2.first "alt shift">
+<!ENTITY keycode2.prev "VK_PAGE_UP">
+<!ENTITY modifiers2.prev "alt">
+<!ENTITY keycode2.next "VK_PAGE_DOWN">
+<!ENTITY modifiers2.next "alt">
+<!ENTITY keycode2.last "VK_PAGE_DOWN">
+<!ENTITY modifiers2.last "alt shift">

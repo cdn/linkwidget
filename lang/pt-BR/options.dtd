@@ -1,0 +1,15 @@
+<!--
+Licence: MPL 1.1/GPL 2.0/LGPL 2.1
+
+Author:
+  Alexander Gieg <alexgieg % gmail.com>
+-->
+
+<!ENTITY title "Opções do Link Widget">
+
+<!ENTITY linkGuessing "Adivinhar Ligações">
+<!ENTITY linkGuessingDescription "O Link Widget pode tentar adivinhar ligações em sites que não as informam.">
+
+<!ENTITY scanHyperlinks "Buscar na página por links 'Primeiro', 'Anterior', 'Próximo' e 'Última Página'">
+<!ENTITY guessUpAndTopFromURL "Adivinhar ligações 'Acima' e 'Início' com base na URL da página">
+<!ENTITY guessPrevAndNextFromURL "Adivinhar ligações 'Anterior' e 'Próxima Página' com base em partes numéricas na URL da página">

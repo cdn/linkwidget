@@ -1,0 +1,14 @@
+<!--
+Licence: MPL 1.1/GPL 2.0/LGPL 2.1
+
+Author: Rob de Vries
+-->
+
+<!ENTITY title "Link Widget Opties">
+
+<!ENTITY linkGuessing "Link 'Raden'">
+<!ENTITY linkGuessingDescription "Veel webpagina's voorzien niet in de HTML &lt;link&gt; elementen waarop de Link Widget vertrouwt.">
+
+<!ENTITY scanHyperlinks "Scan de hyperlinks op de pagina voor de Eerste, Vorige, Volgende en laatste pagina links">
+<!ENTITY guessUpAndTopFromURL "'Raadt' Omhoog en Top links op basis van de URL van de pagina">
+<!ENTITY guessPrevAndNextFromURL "'Raadt' Vorige en Volgende pagina links gebaseerd op numerieke delen van de URL van de pagina">

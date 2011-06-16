@@ -1,0 +1,38 @@
+<!ENTITY top.label "Inicio">
+<!ENTITY top.tooltip "Página inicio del sitio web">
+<!ENTITY up.label "Subir">
+<!ENTITY up.tooltip "Subir un nivel en la página web">
+<!ENTITY first.label "Primera">
+<!ENTITY first.tooltip "Primera página de esta secuencia">
+<!ENTITY prev.label "Previa">
+<!ENTITY prev.tooltip "Página previa de esta secuencia">
+<!ENTITY next.label "Siguiente">
+<!ENTITY next.tooltip "Siguiente página de esta secuencia">
+<!ENTITY last.label "Última">
+<!ENTITY last.tooltip "Última página de esta secuencia">
+<!ENTITY more.label "Más">
+<!ENTITY more.tooltip "Otras páginas relacionadas">
+
+<!-- keyboard shortcuts -->
+<!ENTITY keycode.top "VK_UP">
+<!ENTITY modifiers.top "alt meta">
+<!ENTITY keycode.up "VK_UP">
+<!ENTITY modifiers.up "alt">
+
+<!ENTITY key.first ",">
+<!ENTITY modifiers.first "accel meta">
+<!ENTITY key.prev ",">
+<!ENTITY modifiers.prev "accel">
+<!ENTITY key.next ".">
+<!ENTITY modifiers.next "accel">
+<!ENTITY key.last ".">
+<!ENTITY modifiers.last "accel meta">
+
+<!ENTITY keycode2.first "VK_PAGE_UP">
+<!ENTITY modifiers2.first "alt meta">
+<!ENTITY keycode2.prev "VK_PAGE_UP">
+<!ENTITY modifiers2.prev "alt">
+<!ENTITY keycode2.next "VK_PAGE_DOWN">
+<!ENTITY modifiers2.next "alt">
+<!ENTITY keycode2.last "VK_PAGE_DOWN">
+<!ENTITY modifiers2.last "alt meta">

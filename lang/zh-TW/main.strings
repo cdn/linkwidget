@@ -1,0 +1,27 @@
+# Menus use the 2rel string (e.g. 2index) if available
+
+
+top   = 最上層
+up    = 上一層
+first = 第一頁
+prev  = 上一頁
+next  = 下一頁
+last  = 最後頁
+
+toc        = 目錄
+chapter    = 章
+section    = 節
+subsection = 小節
+appendix   = 附錄
+2appendix  = 附錄
+glossary   = 詞彙
+2glossary  = 詞彙
+index      = 索引
+2index     = 索引
+
+help   = 幫助
+search = 搜尋
+author = 作者
+copyright = 版權
+bookmark  = 書籤
+alternate = 其他版本

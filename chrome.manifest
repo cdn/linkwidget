@@ -1,18 +1,18 @@
-content linkwidget jar:linkwidget.jar!/content/ xpcnativewrappers=yes
+content linkwidget chrome/content/ xpcnativewrappers=yes
 overlay chrome://browser/content/browser.xul chrome://linkwidget/content/overlay.xul
 
-skin  linkwidget classic/1.0 jar:linkwidget.jar!/theme/
+skin  linkwidget classic/1.0 chrome/skin/classic/
 style chrome://global/content/customizeToolbar.xul chrome://linkwidget/skin/linkwidget.css
 
-locale linkwidget en    jar:linkwidget.jar!/lang/en/
-locale linkwidget cs-CZ jar:linkwidget.jar!/lang/cs-CZ/
-locale linkwidget de    jar:linkwidget.jar!/lang/de/
-locale linkwidget es    jar:linkwidget.jar!/lang/es/
-locale linkwidget fr-FR jar:linkwidget.jar!/lang/fr-FR/
-locale linkwidget he-IL jar:linkwidget.jar!/lang/he-IL/
-locale linkwidget it    jar:linkwidget.jar!/lang/it/
-locale linkwidget ja-JP jar:linkwidget.jar!/lang/ja-JP/
-locale linkwidget nl-NL jar:linkwidget.jar!/lang/nl-NL/
-locale linkwidget sk-SK jar:linkwidget.jar!/lang/sk-SK/
-locale linkwidget pt-BR jar:linkwidget.jar!/lang/pt-BR/
-locale linkwidget zh-TW jar:linkwidget.jar!/lang/zh-TW/
+locale linkwidget en    chrome/locale/en/
+locale linkwidget cs-CZ chrome/locale/cs-CZ/
+locale linkwidget de    chrome/locale/de/
+locale linkwidget es    chrome/locale/es/
+locale linkwidget fr-FR chrome/locale/fr-FR/
+locale linkwidget he-IL chrome/locale/he-IL/
+locale linkwidget it    chrome/locale/it/
+locale linkwidget ja-JP chrome/locale/ja-JP/
+locale linkwidget nl-NL chrome/locale/nl-NL/
+locale linkwidget sk-SK chrome/locale/sk-SK/
+locale linkwidget pt-BR chrome/locale/pt-BR/
+locale linkwidget zh-TW chrome/locale/zh-TW/

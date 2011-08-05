@@ -1,3 +1,1 @@
-zip -ur0 linkwidget.jar content/code.js content/options.xul content/overlay.xul \
-lang theme/buttons.png theme/linkwidget.css -x '*CVS*' -x '*~'
-zip -ur9 linkwidget.xpi linkwidget.jar defaults install.rdf chrome.manifest -x '*CVS*'
+zip -ur9 linkwidget.xpi chrome defaults install.rdf chrome.manifest -x '*CVS*'

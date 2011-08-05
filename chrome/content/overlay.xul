@@ -45,7 +45,7 @@ the terms of any one of the MPL, the GPL or the LGPL.
 <!DOCTYPE overlay SYSTEM "chrome://linkwidget/locale/linkwidget.dtd">
 
 <overlay id="linkWidgetOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-  <script type="application/x-javascript" src="code.js"/>
+  <script type="application/x-javascript" src="chrome://linkwidget/content/code.js"/>
 
   <popupset id="mainPopupSet">
     <tooltip id="linkwidget-tooltip" orient="vertical"
@@ -55,28 +55,28 @@ the terms of any one of the MPL, the GPL or the LGPL.
     </tooltip>
   </popupset>
 
-<keyset id="mainKeyset">
-  <key id="linkwidget-key-top" keycode="&keycode.top;" modifiers="&modifiers.top;"
-      oncommand="linkWidgetGo('top');"/>
-  <key id="linkwidget-key-up" keycode="&keycode.up;" modifiers="&modifiers.up;"
-      oncommand="linkWidgetGo('up');"/>
-  <key id="linkwidget-key-first" key="&key.first;" modifiers="&modifiers.first;"
-      oncommand="linkWidgetGo('first');"/>
-  <key id="linkwidget-key2-first" keycode="&keycode2.first;" modifiers="&modifiers2.first;"
-      oncommand="linkWidgetGo('first');"/>
-  <key id="linkwidget-key-prev" key="&key.prev;" modifiers="&modifiers.prev;"
-      oncommand="linkWidgetGo('prev');"/>
-  <key id="linkwidget-key2-prev" keycode="&keycode2.prev;" modifiers="&modifiers2.prev;"
-      oncommand="linkWidgetGo('prev');"/>
-  <key id="linkwidget-key-next" key="&key.next;" modifiers="&modifiers.next;"
-      oncommand="linkWidgetGo('next');"/>
-  <key id="linkwidget-key2-next" keycode="&keycode2.next;" modifiers="&modifiers2.next;"
-      oncommand="linkWidgetGo('next');"/>
-  <key id="linkwidget-key-last" key="&key.last;" modifiers="&modifiers.last;"
-      oncommand="linkWidgetGo('last');"/>
-  <key id="linkwidget-key2-last" keycode="&keycode2.last;" modifiers="&modifiers2.last;"
-      oncommand="linkWidgetGo('last');"/>
-</keyset>
+  <keyset id="mainKeyset">
+    <key id="linkwidget-key-top" keycode="&keycode.top;" modifiers="&modifiers.top;"
+        oncommand="linkWidgetGo('top');"/>
+    <key id="linkwidget-key-up" keycode="&keycode.up;" modifiers="&modifiers.up;"
+        oncommand="linkWidgetGo('up');"/>
+    <key id="linkwidget-key-first" key="&key.first;" modifiers="&modifiers.first;"
+        oncommand="linkWidgetGo('first');"/>
+    <key id="linkwidget-key2-first" keycode="&keycode2.first;" modifiers="&modifiers2.first;"
+        oncommand="linkWidgetGo('first');"/>
+    <key id="linkwidget-key-prev" key="&key.prev;" modifiers="&modifiers.prev;"
+        oncommand="linkWidgetGo('prev');"/>
+    <key id="linkwidget-key2-prev" keycode="&keycode2.prev;" modifiers="&modifiers2.prev;"
+        oncommand="linkWidgetGo('prev');"/>
+    <key id="linkwidget-key-next" key="&key.next;" modifiers="&modifiers.next;"
+        oncommand="linkWidgetGo('next');"/>
+    <key id="linkwidget-key2-next" keycode="&keycode2.next;" modifiers="&modifiers2.next;"
+        oncommand="linkWidgetGo('next');"/>
+    <key id="linkwidget-key-last" key="&key.last;" modifiers="&modifiers.last;"
+        oncommand="linkWidgetGo('last');"/>
+    <key id="linkwidget-key2-last" keycode="&keycode2.last;" modifiers="&modifiers2.last;"
+        oncommand="linkWidgetGo('last');"/>
+  </keyset>
 
   <toolbarbutton id="linkwidget-top" label="&top.label;" fallbackTooltipText="&top.tooltip;"
       type="menu-button" disabled="true" class="linkwidget-button toolbarbutton-1"/>

@@ -124,11 +124,11 @@ var LinkWidgetsExtension = {
           gBrowser.tabContainer.addEventListener(h, window[LinkWidgetsExtension.linkWidgetEventHandlers[h]], false); // 4.01+
       }
 
-          gBrowser.tabContainer.addEventListener('select', LinkWidgetsExtension.linkWidgetTabSelectedHandler, false);
+          gBrowser.tabContainer.addEventListener('pagehide', LinkWidgetsExtension.linkWidgetPageHideHandler, false);
+          gBrowser.tabContainer.addEventListener('pageshow', LinkWidgetsExtension.linkWidgetPageShowHandler, false);
+          gBrowser.tabContainer.addEventListener('select', LinkWidgetsExtension.linkWidgetTabSelectedHandler, false); // yes
           gBrowser.tabContainer.addEventListener('DOMLinkAdded', LinkWidgetsExtension.linkWidgetLinkAddedHandler, false);
-          gBrowser.tabContainer.addEventListener('pagehide', LinkWidgetsExtension.linkWidgetPageHideHandler, false)
-          gBrowser.tabContainer.addEventListener('DOMContentLoaded', LinkWidgetsExtension.linkWidgetPageLoadedHandler, false)
-          gBrowser.tabContainer.addEventListener('pageshow', LinkWidgetsExtension.linkWidgetPageShowHandler, false)
+          gBrowser.tabContainer.addEventListener('DOMContentLoaded', LinkWidgetsExtension.linkWidgetPageLoadedHandler, false);
 
 //      dump("lw :: linkWidgetDelayedStartup : for(var h in LinkWidgetsExtension.linkWidgetEventHandlers)\n");
       // replace the toolbar customisation callback
@@ -136,6 +136,7 @@ var LinkWidgetsExtension = {
         box._preLinkWidget_customizeDone = box.customizeDone;
         box.customizeDone = LinkWidgetsExtension.linkWidgetToolboxCustomizeDone;
 //      dump("lw :: linkWidgetDelayedStartup : box.customizeDone\n");
+      LinkWidgetsExtension.linkWidgetRefreshLinks(); // yyy - added
     },
 
     linkWidgetShutdown : function() {
@@ -193,7 +194,7 @@ var LinkWidgetsExtension = {
       LinkWidgetsExtension.linkWidgetButtons = {};
       for(var rel in LinkWidgetsExtension.linkWidgetButtonRels) {
         var elt = document.getElementById("linkwidget-"+rel);
-        dump("lw :: linkWidgetInitVisibleButtons | "+ rel +"\n");
+    //  dump("lw :: linkWidgetInitVisibleButtons | "+ rel +"\n");
         if(elt) LinkWidgetsExtension.linkWidgetButtons[rel] = initLinkWidgetButton(elt, rel);
       }
     },
@@ -208,6 +209,7 @@ var LinkWidgetsExtension = {
 
     // Really ought to delete/nullify doc.linkWidgetLinks on "close" (but not on "pagehide")
     linkWidgetPageHideHandler : function(event) {
+LinkWidgetsExtension.lw_dump('linkWidgetPageHideHandler');
       // Links like: <a href="..." onclick="this.style.display='none'">.....</a>
       // (the onclick handler could instead be on an ancestor of the link) lead to unload/pagehide
       // events with originalTarget==a text node.  So use ownerDocument (which is null for Documents)
@@ -216,11 +218,13 @@ var LinkWidgetsExtension = {
       // don't clear the links for unload/pagehide from a background tab, or from a subframe
       // If docShell is null accessing .contentDocument throws an exception
       if(!gBrowser.docShell || doc != gBrowser.contentDocument) return;
-      for each(var btn in LinkWidgetsExtension.linkWidgetButtons) btn.show(null);
+      for each(var btn in LinkWidgetsExtension.linkWidgetButtons) btn.show(null); // not a function [yet]
       if(LinkWidgetsExtension.linkWidgetMoreMenu) LinkWidgetsExtension.linkWidgetMoreMenu.disabled = true;
     },
 
     linkWidgetPageLoadedHandler : function(event) {
+LinkWidgetsExtension.lw_dump('linkWidgetPageLoadedHandler');
+//      LinkWidgetsExtension.linkWidgetRefreshLinks();
       const doc = event.originalTarget, win = doc.defaultView;
       if(win != win.top || doc.linkWidgetHasGuessedLinks) return;
     
@@ -251,7 +255,7 @@ var LinkWidgetsExtension = {
       LinkWidgetsExtension.lw_dump('linkWidgetTabSelectedHandler');
     //  let newTab = event.originalTarget;
       if(event.originalTarget.localName != "tabs") return;
-dump('if(event.originalTarget.localName != "tabs") return' + "\n");
+//dump('if(event.originalTarget.localName != "tabs") return' + "\n");
       LinkWidgetsExtension.linkWidgetRefreshLinks();
     },
 
@@ -267,15 +271,21 @@ dump('if(event.originalTarget.localName != "tabs") return' + "\n");
 
     linkWidgetRefreshLinks : function() {
     //alert('lWRL');
+LinkWidgetsExtension.lw_dump('linkWidgetRefreshLinks');
    //   for each(var btn in LinkWidgetsExtension.linkWidgetButtons) btn.show(null); // Error: btn.show is not a function
       if(LinkWidgetsExtension.linkWidgetMoreMenu) LinkWidgetsExtension.linkWidgetMoreMenu.disabled = true;
-    
+LinkWidgetsExtension.lw_dump('');
+
       const doc = content.document, links = doc.linkWidgetLinks;
+LinkWidgetsExtension.lw_dump(typeof links);
+
       if(!links) return;
+LinkWidgetsExtension.lw_dump('if(!links)');
     
       var enableMoreMenu = false;
       for(var rel in links) {
-        if(rel in LinkWidgetsExtension.linkWidgetButtons) LinkWidgetsExtension.linkWidgetButtons[rel].show(links[rel]);
+LinkWidgetsExtension.lw_dump('for(var rel in links)');
+        if(rel in LinkWidgetsExtension.linkWidgetButtons) LinkWidgetsExtension.linkWidgetButtons[rel].show(links[rel]); // ?
         else enableMoreMenu = true;
       }
       if(LinkWidgetsExtension.linkWidgetMoreMenu && enableMoreMenu) LinkWidgetsExtension.linkWidgetMoreMenu.disabled = false;

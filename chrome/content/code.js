@@ -282,7 +282,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler');
 
     linkWidgetRefreshLinks : function() {
     //alert('lWRL'); LinkWidgetsExtension.lw_dump('linkWidgetRefreshLinks');
-   //   for each(var btn in LinkWidgetsExtension.linkWidgetButtons) btn.show(null); // Error: btn.show is not a function
+      for each(var btn in LinkWidgetsExtension.linkWidgetButtons) btn.show(null); // Error: btn.show is not a function
       if(LinkWidgetsExtension.linkWidgetMoreMenu) LinkWidgetsExtension.linkWidgetMoreMenu.disabled = true;
  //LinkWidgetsExtension.lw_dump('.');
 
@@ -290,15 +290,15 @@ LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler');
 //LinkWidgetsExtension.lw_dump(typeof links);
 
       if(!links) return;
-LinkWidgetsExtension.lw_dump('if(!links)');
+//LinkWidgetsExtension.lw_dump('if(!links)');
     
       var enableMoreMenu = false;
       for(var rel in links) {
-LinkWidgetsExtension.lw_dump('for(var rel in links)');
+//LinkWidgetsExtension.lw_dump('for(var rel in links)');
 // Error: LinkWidgetsExtension.linkWidgetButtons[rel].show is not a function
-//        if(rel in LinkWidgetsExtension.linkWidgetButtons) LinkWidgetsExtension.linkWidgetButtons[rel].show(links[rel]); // ?
-//        else enableMoreMenu = true;
-enableMoreMenu = true;
+        if(rel in LinkWidgetsExtension.linkWidgetButtons) LinkWidgetsExtension.linkWidgetButtons[rel].show(links[rel]); // ?
+        else enableMoreMenu = true;
+//enableMoreMenu = true;
       }
       if(LinkWidgetsExtension.linkWidgetMoreMenu && enableMoreMenu) LinkWidgetsExtension.linkWidgetMoreMenu.disabled = false;
     },
@@ -327,17 +327,21 @@ enableMoreMenu = true;
     },
 
     linkWidgetOnMoreMenuShowing : function() {
+LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing');
       const linkmaps = content.document.linkWidgetLinks;
       // Update all existing views
       for(var rel in LinkWidgetsExtension.linkWidgetViews) LinkWidgetsExtension.linkWidgetViews[rel].show(linkmaps[rel] || null);
       // Create any new views that are needed
       for(rel in linkmaps) {
+LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | ' + rel);
         if(rel in LinkWidgetsExtension.linkWidgetViews || rel in LinkWidgetsExtension.linkWidgetButtons) continue;
+LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | continue' + '');
         var relNum = LinkWidgetsExtension.linkWidgetMenuOrdering[rel] || Infinity;
         var isMenu = rel in LinkWidgetsExtension.linkWidgetMenuRels;
         var item = LinkWidgetsExtension.linkWidgetViews[rel] =
           isMenu ? new LinkWidgetMenu(rel, relNum) : new LinkWidgetItem(rel, relNum);
         item.show(linkmaps[rel]);
+LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | ' + isMenu);
       }
     },
 
@@ -346,7 +350,7 @@ enableMoreMenu = true;
       if(!somethingChanged) return;
     
       LinkWidgetsExtension.linkWidgetInitMoreMenu();
-  //    for each(var btn in LinkWidgetsExtension.linkWidgetButtons) btn.show(null); // Error: btn.show is not a function
+      for each(var btn in LinkWidgetsExtension.linkWidgetButtons) btn.show(null); // Error: btn.show is not a function
       LinkWidgetsExtension.linkWidgetInitVisibleButtons();
       for(var rel in LinkWidgetsExtension.linkWidgetViews) {
         var item = LinkWidgetsExtension.linkWidgetViews[rel];
@@ -525,13 +529,13 @@ function linkWidgetGetLinkRels(relStr, revStr, mimetype, title) {
 }
 
 // a map from 2/3-letter lang codes to the langs' names in the current locale
-var linkWidgetLangaugeNames = null;
+var linkWidgetLanguageNames = null;
 
 // code is a language code, e.g. en, en-GB, es, fr-FR
 function linkWidgetGetLanguageName(code) {
-    if(!linkWidgetLangaugeNames) linkWidgetLangaugeNames =
+    if(!linkWidgetLanguageNames) linkWidgetLanguageNames =
       linkWidgetLoadStringBundle("chrome://global/locale/languageNames.properties");
-    const dict = linkWidgetLangaugeNames;
+    const dict = linkWidgetLanguageNames;
     if(code in dict) return dict[code];
     // if we have something like "en-GB", change to "English (GB)"
     var parts = code.match(/^(.{2,3})-(.*)$/);
@@ -697,7 +701,7 @@ function initLinkWidgetButton(elt, rel) {
 
   elt.addEventListener("DOMMouseScroll", LinkWidgetsExtension.linkWidgetMouseScrollHandler, false);
 
-  for(var i in LinkWidgetsExtension.linkWidgetButton) elt[i] = LinkWidgetsExtension.linkWidgetButton[i];
+  for(var i in linkWidgetButton) elt[i] = linkWidgetButton[i]; // reference following const
   var popup = elt.popup = document.createElement("menupopup");
   elt.appendChild(popup);
   popup.setAttribute("onpopupshowing", "return this.parentNode.buildMenu();");

@@ -124,11 +124,18 @@ var LinkWidgetsExtension = {
           gBrowser.tabContainer.addEventListener(h, window[LinkWidgetsExtension.linkWidgetEventHandlers[h]], false); // 4.01+
       }
 
-          gBrowser.tabContainer.addEventListener('pagehide', LinkWidgetsExtension.linkWidgetPageHideHandler, false);
+//        gBrowser.tabContainer.addEventListener('pagehide', LinkWidgetsExtension.linkWidgetPageHideHandler, false); // ?
           gBrowser.tabContainer.addEventListener('pageshow', LinkWidgetsExtension.linkWidgetPageShowHandler, false);
           gBrowser.tabContainer.addEventListener('select', LinkWidgetsExtension.linkWidgetTabSelectedHandler, false); // yes
           gBrowser.tabContainer.addEventListener('DOMLinkAdded', LinkWidgetsExtension.linkWidgetLinkAddedHandler, false);
-          gBrowser.tabContainer.addEventListener('DOMContentLoaded', LinkWidgetsExtension.linkWidgetPageLoadedHandler, false);
+//          gBrowser.tabContainer.addEventListener('DOMContentLoaded', LinkWidgetsExtension.linkWidgetPageLoadedHandler, false); // no
+
+
+//          gBrowser.addEventListener('pagehide', LinkWidgetsExtension.linkWidgetPageHideHandler, false);
+//          gBrowser.addEventListener('pageshow', LinkWidgetsExtension.linkWidgetPageShowHandler, false);
+//        gBrowser.tabContainer.addEventListener('select', LinkWidgetsExtension.linkWidgetTabSelectedHandler, false); // yes
+//          gBrowser.addEventListener('DOMLinkAdded', LinkWidgetsExtension.linkWidgetLinkAddedHandler, false);
+          gBrowser.addEventListener('DOMContentLoaded', LinkWidgetsExtension.linkWidgetPageLoadedHandler, false);
 
 //      dump("lw :: linkWidgetDelayedStartup : for(var h in LinkWidgetsExtension.linkWidgetEventHandlers)\n");
       // replace the toolbar customisation callback
@@ -200,6 +207,7 @@ var LinkWidgetsExtension = {
     },
 
     linkWidgetLinkAddedHandler : function(event) {
+LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler');
       var elt = event.originalTarget;
       var doc = elt.ownerDocument;
       if(!(elt instanceof HTMLLinkElement) || !elt.href || !(elt.rel || elt.rev)) return;
@@ -261,6 +269,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetPageLoadedHandler');
 
     // xxx isn't this too keen to refresh?
     linkWidgetPageShowHandler : function(event) {
+LinkWidgetsExtension.lw_dump('linkWidgetPageShowHandler');
       const doc = event.originalTarget;
       // Link guessing for things with no DOMContentLoaded (e.g. ImageDocument)
       if(!doc.linkWidgetHasGuessedLinks) LinkWidgetsExtension.linkWidgetPageLoadedHandler(event);
@@ -274,7 +283,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetPageLoadedHandler');
 LinkWidgetsExtension.lw_dump('linkWidgetRefreshLinks');
    //   for each(var btn in LinkWidgetsExtension.linkWidgetButtons) btn.show(null); // Error: btn.show is not a function
       if(LinkWidgetsExtension.linkWidgetMoreMenu) LinkWidgetsExtension.linkWidgetMoreMenu.disabled = true;
-LinkWidgetsExtension.lw_dump('');
+LinkWidgetsExtension.lw_dump('.');
 
       const doc = content.document, links = doc.linkWidgetLinks;
 LinkWidgetsExtension.lw_dump(typeof links);

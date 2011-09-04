@@ -93,39 +93,31 @@ var LinkWidgetsExtension = {
     linkWidgetStartup : function() {
       dump("lw :: linkWidgetStartup\n");
       window.removeEventListener("load", LinkWidgetsExtension.linkWidgetStartup, false);
-      dump("lw :: linkWidgetStartup : window.removeEventListener\n");
       LinkWidgetsExtension.linkWidgetStrings = linkWidgetLoadStringBundle(LinkWidgetsExtension.linkWidgetStrings);
-      dump("lw :: linkWidgetStartup : LinkWidgetsExtension.linkWidgetStrings\n");
       for(var i in LinkWidgetsExtension._linkWidgetMenuOrdering) LinkWidgetsExtension.linkWidgetMenuOrdering[LinkWidgetsExtension._linkWidgetMenuOrdering[i]] = (i-0) + 1;
-      dump("lw :: linkWidgetStartup : for(var i in LinkWidgetsExtension._linkWidgetMenuOrdering)\n");
-
       for each(i in LinkWidgetsExtension._linkWidgetMenuRels) LinkWidgetsExtension.linkWidgetMenuRels[i] = true;
-      dump("lw :: linkWidgetStartup : for(var i in LinkWidgetsExtension._linkWidgetMenuRels)\n");
-
       for each(i in LinkWidgetsExtension._linkWidgetButtonRels) LinkWidgetsExtension.linkWidgetButtonRels[i] = true;
-      dump("lw :: linkWidgetStartup : for each(i in LinkWidgetsExtension._linkWidgetButtonRels)\n");
-
       LinkWidgetsExtension.linkWidgetInitMoreMenu();
-      dump("lw :: linkWidgetStartup : LinkWidgetsExtension.linkWidgetInitMoreMenu()\n");
-
       LinkWidgetsExtension.linkWidgetInitVisibleButtons();
-      dump("lw :: linkWidgetStartup : LinkWidgetsExtension.linkWidgetInitVisibleButtons()\n");
-
       setTimeout(LinkWidgetsExtension.linkWidgetDelayedStartup, 1); // needs to happen after Fx's delayedStartup(); Fc?
     },
 
     linkWidgetDelayedStartup : function() {
       dump("lw :: linkWidgetDelayedStartup\n");
       LinkWidgetsExtension.linkWidgetLoadPrefs();
+//      dump("lw :: linkWidgetDelayedStartup | LinkWidgetsExtension.linkWidgetLoadPrefs\n");
       gPrefService.addObserver(LinkWidgetsExtension.linkWidgetPrefPrefix, LinkWidgetsExtension.linkWidgetPrefObserver, false);
+//      dump("lw :: linkWidgetDelayedStartup : gPrefService.addObserver\n");
       for(var h in LinkWidgetsExtension.linkWidgetEventHandlers) {
           gBrowser.addEventListener(h, window[LinkWidgetsExtension.linkWidgetEventHandlers[h]], false); // 3.6
           gBrowser.tabContainer.addEventListener(h, window[LinkWidgetsExtension.linkWidgetEventHandlers[h]], false); // 4.01+
       }
+      dump("lw :: linkWidgetDelayedStartup : for(var h in LinkWidgetsExtension.linkWidgetEventHandlers)\n");
       // replace the toolbar customisation callback
         var box = document.getElementById("navigator-toolbox");
         box._preLinkWidget_customizeDone = box.customizeDone;
         box.customizeDone = LinkWidgetsExtension.linkWidgetToolboxCustomizeDone;
+      dump("lw :: linkWidgetDelayedStartup : box.customizeDone\n");
     },
 
     linkWidgetShutdown : function() {
@@ -255,7 +247,7 @@ var LinkWidgetsExtension = {
 
     linkWidgetRefreshLinks : function() {
     //alert('lWRL');
-      for each(var btn in LinkWidgetsExtension.linkWidgetButtons) btn.show(null);
+   //   for each(var btn in LinkWidgetsExtension.linkWidgetButtons) btn.show(null); // Error: btn.show is not a function
       if(LinkWidgetsExtension.linkWidgetMoreMenu) LinkWidgetsExtension.linkWidgetMoreMenu.disabled = true;
     
       const doc = content.document, links = doc.linkWidgetLinks;
@@ -311,7 +303,7 @@ var LinkWidgetsExtension = {
       if(!somethingChanged) return;
     
       LinkWidgetsExtension.linkWidgetInitMoreMenu();
-      for each(var btn in LinkWidgetsExtension.linkWidgetButtons) btn.show(null);
+  //    for each(var btn in LinkWidgetsExtension.linkWidgetButtons) btn.show(null); // Error: btn.show is not a function
       LinkWidgetsExtension.linkWidgetInitVisibleButtons();
       for(var rel in LinkWidgetsExtension.linkWidgetViews) {
         var item = LinkWidgetsExtension.linkWidgetViews[rel];
@@ -648,33 +640,19 @@ const linkWidgetItemBase = {
 // Top, Up, First, Prev, Next, and Last menu-buttons
 // Hackery employed to disable the dropmarker if there is just one link.
 function initLinkWidgetButton(elt, rel) {
-  dump("lw :: initLinkWidgetButton\n");
-
   if(elt.alreadyInitialised) return elt;
-  dump("lw :: initLinkWidgetButton : if(elt.alreadyInitialised) return elt\n");
-
   elt.alreadyInitialised = true;
   elt.rel = rel;
   // to avoid repetitive XUL
   elt.onmouseover = LinkWidgetsExtension.linkWidgetMouseEnter;
-  dump("lw :: initLinkWidgetButton | LinkWidgetsExtension.linkWidgetMouseEnter\n");
-
   elt.onmouseout = LinkWidgetsExtension.linkWidgetMouseExit;
-  dump("lw :: initLinkWidgetButton | LinkWidgetsExtension.linkWidgetMouseExit\n");
-
   elt.onclick = LinkWidgetsExtension.linkWidgetItemClicked;
-  dump("lw :: initLinkWidgetButton | LinkWidgetsExtension.linkWidgetItemClicked\n");
-
   elt.oncontextmenu = LinkWidgetsExtension.linkWidgetButtonRightClicked;
-  dump("lw :: initLinkWidgetButton | LinkWidgetsExtension.linkWidgetButtonRightClicked\n");
-
   elt.setAttribute("oncommand", "LinkWidgetsExtension.linkWidgetLoadPage(event);"); // .oncommand does not exist
   elt.setAttribute("context", "");
   elt.setAttribute("tooltip", "linkwidget-tooltip");
-  dump("lw :: initLinkWidgetButton : elt.setAttribute\n");
 
  // elt.addEventListener("DOMMouseScroll", linkWidgetMouseScrollHandler, false);
-  dump("lw :: initLinkWidgetButton : elt.addEventListener\n");
 
   for(var i in LinkWidgetsExtension.linkWidgetButton) elt[i] = LinkWidgetsExtension.linkWidgetButton[i];
   var popup = elt.popup = document.createElement("menupopup");

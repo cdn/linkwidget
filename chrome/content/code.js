@@ -121,21 +121,19 @@ var LinkWidgetsExtension = {
 //        LinkWidgetsExtension.lw_dump('linkWidgetDelayedStartup | ' + h);
 //        LinkWidgetsExtension.lw_dump(LinkWidgetsExtension.linkWidgetEventHandlers[h]);
           gBrowser.addEventListener(h, window[LinkWidgetsExtension.linkWidgetEventHandlers[h]], false); // 3.6
-          gBrowser.tabContainer.addEventListener(h, window[LinkWidgetsExtension.linkWidgetEventHandlers[h]], false); // 4.01+
+          gBrowser.tabContainer.addEventListener(h, window[LinkWidgetsExtension.linkWidgetEventHandlers[h]], false); // 4.01+ -- ONLY some
       }
 
-//        gBrowser.tabContainer.addEventListener('pagehide', LinkWidgetsExtension.linkWidgetPageHideHandler, false); // ?
-          gBrowser.tabContainer.addEventListener('pageshow', LinkWidgetsExtension.linkWidgetPageShowHandler, false);
+//          gBrowser.tabContainer.addEventListener('pagehide', LinkWidgetsExtension.linkWidgetPageHideHandler, false); // no
+//        gBrowser.tabContainer.addEventListener('pageshow', LinkWidgetsExtension.linkWidgetPageShowHandler, false);
           gBrowser.tabContainer.addEventListener('select', LinkWidgetsExtension.linkWidgetTabSelectedHandler, false); // yes
-          gBrowser.tabContainer.addEventListener('DOMLinkAdded', LinkWidgetsExtension.linkWidgetLinkAddedHandler, false);
+          gBrowser.tabContainer.addEventListener('DOMLinkAdded', LinkWidgetsExtension.linkWidgetLinkAddedHandler, false); // yes
 //          gBrowser.tabContainer.addEventListener('DOMContentLoaded', LinkWidgetsExtension.linkWidgetPageLoadedHandler, false); // no
 
 
-//          gBrowser.addEventListener('pagehide', LinkWidgetsExtension.linkWidgetPageHideHandler, false);
-//          gBrowser.addEventListener('pageshow', LinkWidgetsExtension.linkWidgetPageShowHandler, false);
-//        gBrowser.tabContainer.addEventListener('select', LinkWidgetsExtension.linkWidgetTabSelectedHandler, false); // yes
-//          gBrowser.addEventListener('DOMLinkAdded', LinkWidgetsExtension.linkWidgetLinkAddedHandler, false);
-          gBrowser.addEventListener('DOMContentLoaded', LinkWidgetsExtension.linkWidgetPageLoadedHandler, false);
+          gBrowser.addEventListener('pagehide', LinkWidgetsExtension.linkWidgetPageHideHandler, false); // yes
+          gBrowser.addEventListener('pageshow', LinkWidgetsExtension.linkWidgetPageShowHandler, false); // yes
+          gBrowser.addEventListener('DOMContentLoaded', LinkWidgetsExtension.linkWidgetPageLoadedHandler, false); // yes
 
 //      dump("lw :: linkWidgetDelayedStartup : for(var h in LinkWidgetsExtension.linkWidgetEventHandlers)\n");
       // replace the toolbar customisation callback
@@ -143,18 +141,21 @@ var LinkWidgetsExtension = {
         box._preLinkWidget_customizeDone = box.customizeDone;
         box.customizeDone = LinkWidgetsExtension.linkWidgetToolboxCustomizeDone;
 //      dump("lw :: linkWidgetDelayedStartup : box.customizeDone\n");
-      LinkWidgetsExtension.linkWidgetRefreshLinks(); // yyy - added
+//      LinkWidgetsExtension.linkWidgetRefreshLinks(); // yyy - added
     },
 
     linkWidgetShutdown : function() {
+      LinkWidgetsExtension.lw_dump("linkWidgetShutdown");
       window.removeEventListener("unload", LinkWidgetsExtension.linkWidgetShutdown, false);
       for(var h in LinkWidgetsExtension.linkWidgetEventHandlers) {
           gBrowser.addEventListener(h, window[LinkWidgetsExtension.linkWidgetEventHandlers[h]], false);
+          gBrowser.tabContainer.addEventListener(h, window[LinkWidgetsExtension.linkWidgetEventHandlers[h]], false); // 4.01+ -- ONLY some
       }
       gPrefService.removeObserver(LinkWidgetsExtension.linkWidgetPrefPrefix, LinkWidgetsExtension.linkWidgetPrefObserver);
     },
 
     linkWidgetLoadPrefs : function() {
+      LinkWidgetsExtension.lw_dump("linkWidgetLoadPrefs");
       const branch = Components.classes["@mozilla.org/preferences-service;1"]
                              .getService(Components.interfaces.nsIPrefService)
                              .QueryInterface(Components.interfaces.nsIPrefBranch)
@@ -207,6 +208,7 @@ var LinkWidgetsExtension = {
     },
 
     linkWidgetLinkAddedHandler : function(event) {
+//
 LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler');
       var elt = event.originalTarget;
       var doc = elt.ownerDocument;
@@ -217,7 +219,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler');
 
     // Really ought to delete/nullify doc.linkWidgetLinks on "close" (but not on "pagehide")
     linkWidgetPageHideHandler : function(event) {
-LinkWidgetsExtension.lw_dump('linkWidgetPageHideHandler');
+//LinkWidgetsExtension.lw_dump('linkWidgetPageHideHandler');
       // Links like: <a href="..." onclick="this.style.display='none'">.....</a>
       // (the onclick handler could instead be on an ancestor of the link) lead to unload/pagehide
       // events with originalTarget==a text node.  So use ownerDocument (which is null for Documents)
@@ -231,7 +233,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetPageHideHandler');
     },
 
     linkWidgetPageLoadedHandler : function(event) {
-LinkWidgetsExtension.lw_dump('linkWidgetPageLoadedHandler');
+//LinkWidgetsExtension.lw_dump('linkWidgetPageLoadedHandler');
 //      LinkWidgetsExtension.linkWidgetRefreshLinks();
       const doc = event.originalTarget, win = doc.defaultView;
       if(win != win.top || doc.linkWidgetHasGuessedLinks) return;
@@ -260,7 +262,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetPageLoadedHandler');
     },
 
     linkWidgetTabSelectedHandler : function(event) {
-      LinkWidgetsExtension.lw_dump('linkWidgetTabSelectedHandler');
+//      LinkWidgetsExtension.lw_dump('linkWidgetTabSelectedHandler');
     //  let newTab = event.originalTarget;
       if(event.originalTarget.localName != "tabs") return;
 //dump('if(event.originalTarget.localName != "tabs") return' + "\n");
@@ -269,7 +271,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetPageLoadedHandler');
 
     // xxx isn't this too keen to refresh?
     linkWidgetPageShowHandler : function(event) {
-LinkWidgetsExtension.lw_dump('linkWidgetPageShowHandler');
+//LinkWidgetsExtension.lw_dump('linkWidgetPageShowHandler');
       const doc = event.originalTarget;
       // Link guessing for things with no DOMContentLoaded (e.g. ImageDocument)
       if(!doc.linkWidgetHasGuessedLinks) LinkWidgetsExtension.linkWidgetPageLoadedHandler(event);
@@ -279,14 +281,13 @@ LinkWidgetsExtension.lw_dump('linkWidgetPageShowHandler');
     },
 
     linkWidgetRefreshLinks : function() {
-    //alert('lWRL');
-LinkWidgetsExtension.lw_dump('linkWidgetRefreshLinks');
+    //alert('lWRL'); LinkWidgetsExtension.lw_dump('linkWidgetRefreshLinks');
    //   for each(var btn in LinkWidgetsExtension.linkWidgetButtons) btn.show(null); // Error: btn.show is not a function
       if(LinkWidgetsExtension.linkWidgetMoreMenu) LinkWidgetsExtension.linkWidgetMoreMenu.disabled = true;
-LinkWidgetsExtension.lw_dump('.');
+ //LinkWidgetsExtension.lw_dump('.');
 
       const doc = content.document, links = doc.linkWidgetLinks;
-LinkWidgetsExtension.lw_dump(typeof links);
+//LinkWidgetsExtension.lw_dump(typeof links);
 
       if(!links) return;
 LinkWidgetsExtension.lw_dump('if(!links)');
@@ -294,13 +295,16 @@ LinkWidgetsExtension.lw_dump('if(!links)');
       var enableMoreMenu = false;
       for(var rel in links) {
 LinkWidgetsExtension.lw_dump('for(var rel in links)');
-        if(rel in LinkWidgetsExtension.linkWidgetButtons) LinkWidgetsExtension.linkWidgetButtons[rel].show(links[rel]); // ?
-        else enableMoreMenu = true;
+// Error: LinkWidgetsExtension.linkWidgetButtons[rel].show is not a function
+//        if(rel in LinkWidgetsExtension.linkWidgetButtons) LinkWidgetsExtension.linkWidgetButtons[rel].show(links[rel]); // ?
+//        else enableMoreMenu = true;
+enableMoreMenu = true;
       }
       if(LinkWidgetsExtension.linkWidgetMoreMenu && enableMoreMenu) LinkWidgetsExtension.linkWidgetMoreMenu.disabled = false;
     },
 
     linkWidgetAddLinkForPage : function(url, txt, lang, media, doc, rels) {
+//LinkWidgetsExtension.lw_dump('linkWidgetAddLinkForPage');
       const link = new LinkWidgetLink(url, txt, lang, media);
       // put the link in a rel->[link] map on the document's XPCNativeWrapper
       var doclinks = doc.linkWidgetLinks || (doc.linkWidgetLinks = {});

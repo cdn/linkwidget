@@ -1,4 +1,4 @@
-content linkwidget chrome/content/ xpcnativewrappers=yes
+content linkwidget chrome/content/
 overlay chrome://browser/content/browser.xul chrome://linkwidget/content/overlay.xul
 
 skin  linkwidget classic/1.0 chrome/skin/classic/

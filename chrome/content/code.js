@@ -102,22 +102,40 @@ var LinkWidgetsExtension = {
       setTimeout(LinkWidgetsExtension.linkWidgetDelayedStartup, 1); // needs to happen after Fx's delayedStartup(); Fc?
     },
 
+      aConsoleService: Components.classes["@mozilla.org/consoleservice;1"].
+      getService(Components.interfaces.nsIConsoleService),
+ 
+    lw_dump : function(msg) {
+        msg = 'Link Widgets :: ' + msg;
+        this.aConsoleService.logStringMessage(msg);
+        dump(msg + "\n");
+      },
+
     linkWidgetDelayedStartup : function() {
-      dump("lw :: linkWidgetDelayedStartup\n");
+      LinkWidgetsExtension.lw_dump("linkWidgetDelayedStartup");
       LinkWidgetsExtension.linkWidgetLoadPrefs();
 //      dump("lw :: linkWidgetDelayedStartup | LinkWidgetsExtension.linkWidgetLoadPrefs\n");
       gPrefService.addObserver(LinkWidgetsExtension.linkWidgetPrefPrefix, LinkWidgetsExtension.linkWidgetPrefObserver, false);
 //      dump("lw :: linkWidgetDelayedStartup : gPrefService.addObserver\n");
       for(var h in LinkWidgetsExtension.linkWidgetEventHandlers) {
+//        LinkWidgetsExtension.lw_dump('linkWidgetDelayedStartup | ' + h);
+//        LinkWidgetsExtension.lw_dump(LinkWidgetsExtension.linkWidgetEventHandlers[h]);
           gBrowser.addEventListener(h, window[LinkWidgetsExtension.linkWidgetEventHandlers[h]], false); // 3.6
           gBrowser.tabContainer.addEventListener(h, window[LinkWidgetsExtension.linkWidgetEventHandlers[h]], false); // 4.01+
       }
-      dump("lw :: linkWidgetDelayedStartup : for(var h in LinkWidgetsExtension.linkWidgetEventHandlers)\n");
+
+          gBrowser.tabContainer.addEventListener('select', LinkWidgetsExtension.linkWidgetTabSelectedHandler, false);
+          gBrowser.tabContainer.addEventListener('DOMLinkAdded', LinkWidgetsExtension.linkWidgetLinkAddedHandler, false);
+          gBrowser.tabContainer.addEventListener('pagehide', LinkWidgetsExtension.linkWidgetPageHideHandler, false)
+          gBrowser.tabContainer.addEventListener('DOMContentLoaded', LinkWidgetsExtension.linkWidgetPageLoadedHandler, false)
+          gBrowser.tabContainer.addEventListener('pageshow', LinkWidgetsExtension.linkWidgetPageShowHandler, false)
+
+//      dump("lw :: linkWidgetDelayedStartup : for(var h in LinkWidgetsExtension.linkWidgetEventHandlers)\n");
       // replace the toolbar customisation callback
         var box = document.getElementById("navigator-toolbox");
         box._preLinkWidget_customizeDone = box.customizeDone;
         box.customizeDone = LinkWidgetsExtension.linkWidgetToolboxCustomizeDone;
-      dump("lw :: linkWidgetDelayedStartup : box.customizeDone\n");
+//      dump("lw :: linkWidgetDelayedStartup : box.customizeDone\n");
     },
 
     linkWidgetShutdown : function() {
@@ -230,8 +248,10 @@ var LinkWidgetsExtension = {
     },
 
     linkWidgetTabSelectedHandler : function(event) {
+      LinkWidgetsExtension.lw_dump('linkWidgetTabSelectedHandler');
     //  let newTab = event.originalTarget;
       if(event.originalTarget.localName != "tabs") return;
+dump('if(event.originalTarget.localName != "tabs") return' + "\n");
       LinkWidgetsExtension.linkWidgetRefreshLinks();
     },
 
@@ -652,7 +672,7 @@ function initLinkWidgetButton(elt, rel) {
   elt.setAttribute("context", "");
   elt.setAttribute("tooltip", "linkwidget-tooltip");
 
- // elt.addEventListener("DOMMouseScroll", linkWidgetMouseScrollHandler, false);
+  elt.addEventListener("DOMMouseScroll", LinkWidgetsExtension.linkWidgetMouseScrollHandler, false);
 
   for(var i in LinkWidgetsExtension.linkWidgetButton) elt[i] = LinkWidgetsExtension.linkWidgetButton[i];
   var popup = elt.popup = document.createElement("menupopup");

@@ -127,13 +127,14 @@ var LinkWidgetsExtension = {
 //          gBrowser.tabContainer.addEventListener('pagehide', LinkWidgetsExtension.linkWidgetPageHideHandler, false); // no
 //        gBrowser.tabContainer.addEventListener('pageshow', LinkWidgetsExtension.linkWidgetPageShowHandler, false);
           gBrowser.tabContainer.addEventListener('select', LinkWidgetsExtension.linkWidgetTabSelectedHandler, false); // yes
-          gBrowser.tabContainer.addEventListener('DOMLinkAdded', LinkWidgetsExtension.linkWidgetLinkAddedHandler, false); // yes
+//          gBrowser.tabContainer.addEventListener('DOMLinkAdded', LinkWidgetsExtension.linkWidgetLinkAddedHandler, false); // yes | no ?
 //          gBrowser.tabContainer.addEventListener('DOMContentLoaded', LinkWidgetsExtension.linkWidgetPageLoadedHandler, false); // no
 
 
           gBrowser.addEventListener('pagehide', LinkWidgetsExtension.linkWidgetPageHideHandler, false); // yes
           gBrowser.addEventListener('pageshow', LinkWidgetsExtension.linkWidgetPageShowHandler, false); // yes
           gBrowser.addEventListener('DOMContentLoaded', LinkWidgetsExtension.linkWidgetPageLoadedHandler, false); // yes
+          gBrowser.addEventListener('DOMLinkAdded', LinkWidgetsExtension.linkWidgetLinkAddedHandler, false); // also ?
 
 //      dump("lw :: linkWidgetDelayedStartup : for(var h in LinkWidgetsExtension.linkWidgetEventHandlers)\n");
       // replace the toolbar customisation callback
@@ -213,6 +214,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler');
       var elt = event.originalTarget;
       var doc = elt.ownerDocument;
       if(!(elt instanceof HTMLLinkElement) || !elt.href || !(elt.rel || elt.rev)) return;
+LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler !returned');
       var rels = linkWidgetGetLinkRels(elt.rel, elt.rev, elt.type, elt.title);
       if(rels) LinkWidgetsExtension.linkWidgetAddLinkForPage(elt.href, elt.title, elt.hreflang, elt.media, doc, rels);
     },
@@ -262,7 +264,8 @@ LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler');
     },
 
     linkWidgetTabSelectedHandler : function(event) {
-//      LinkWidgetsExtension.lw_dump('linkWidgetTabSelectedHandler');
+//
+      LinkWidgetsExtension.lw_dump('linkWidgetTabSelectedHandler');
     //  let newTab = event.originalTarget;
       if(event.originalTarget.localName != "tabs") return;
 //dump('if(event.originalTarget.localName != "tabs") return' + "\n");
@@ -304,7 +307,8 @@ LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler');
     },
 
     linkWidgetAddLinkForPage : function(url, txt, lang, media, doc, rels) {
-//LinkWidgetsExtension.lw_dump('linkWidgetAddLinkForPage');
+//
+LinkWidgetsExtension.lw_dump('linkWidgetAddLinkForPage');
       const link = new LinkWidgetLink(url, txt, lang, media);
       // put the link in a rel->[link] map on the document's XPCNativeWrapper
       var doclinks = doc.linkWidgetLinks || (doc.linkWidgetLinks = {});
@@ -495,6 +499,7 @@ const linkWidgetRevToRel = {
 };
 
 function linkWidgetGetLinkRels(relStr, revStr, mimetype, title) {
+LinkWidgetsExtension.lw_dump('linkWidgetGetLinkRels');
   // Ignore certain links
   if(LinkWidgetsExtension.linkWidgetRegexps.ignore_rels.test(relStr)) return null;
   // Ignore anything Firefox regards as an RSS/Atom-feed link

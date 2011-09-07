@@ -517,6 +517,25 @@ LinkWidgetsExtension.lw_dump('LinkWidgetsExtension.linkWidgetGetLinkRels');
   return haveRels ? rels : null;
 },
 
+linkWidgetLoadStringBundle : function (bundlePath) {
+  const strings = {};
+  try {
+    var bundle = Components.classes["@mozilla.org/intl/stringbundle;1"]
+                 .getService(Components.interfaces.nsIStringBundleService)
+                 .createBundle(bundlePath)
+                 .getSimpleEnumeration();
+  } catch(ex) {
+    return {};  // callers can all survive without
+  }
+
+  while(bundle.hasMoreElements()) {
+    var item = bundle.getNext().QueryInterface(Components.interfaces.nsIPropertyElement);
+    strings[item.key] = item.value;
+  }
+
+  return strings;
+},
+
 // a map from 2/3-letter lang codes to the langs' names in the current locale
 linkWidgetLanguageNames : null,
 
@@ -524,7 +543,7 @@ linkWidgetLanguageNames : null,
 linkWidgetGetLanguageName : function (code) {
     if(!linkWidgetLanguageNames) LinkWidgetsExtension.linkWidgetLanguageNames =
       LinkWidgetsExtension.linkWidgetLoadStringBundle("chrome://global/locale/languageNames.properties");
-    const dict = linkWidgetLanguageNames;
+    const dict = LinkWidgetsExtension.linkWidgetLanguageNames;
     if(code in dict) return dict[code];
     // if we have something like "en-GB", change to "English (GB)"
     var parts = code.match(/^(.{2,3})-(.*)$/);
@@ -619,66 +638,6 @@ window.addEventListener("unload", LinkWidgetsExtension.linkWidgetShutdown, false
 
 
 /*
-// null values mean that rel should be ignored
-const linkWidgetRelConversions = {
-  home: "top",
-  origin: "top",
-  start: "top",
-  parent: "up",
-  begin: "first",
-  child: "next",
-  previous: "prev",
-  end: "last",
-  contents: "toc",
-  nofollow: null, // blog thing
-  external: null, // used to mean "off-site link", mostly used for styling
-  prefetch: null,
-  sidebar: null
-};
-
-const linkWidgetRevToRel = {
-  made: "author",
-  next: "prev",
-  prev: "next",
-  previous: "next"
-};
-
-function linkWidgetGetLinkRels(relStr, revStr, mimetype, title) {
-LinkWidgetsExtension.lw_dump('linkWidgetGetLinkRels');
-  // Ignore certain links
-  if(LinkWidgetsExtension.linkWidgetRegexps.ignore_rels.test(relStr)) return null;
-  // Ignore anything Firefox regards as an RSS/Atom-feed link
-  if(relStr && /alternate/i.test(relStr)) {
-    // xxx have seen JS errors where "mimetype has no properties" (i.e., is null)
-    if(mimetype) { const type = mimetype.replace(/\s|;.* /g, "").toLowerCase(); }
-    const feedtype = /^application\/(?:rss|atom)\+xml$/;
-    const xmltype = /^(?:application|text)\/(?:rdf\+)?xml$/;
-    if(feedtype.test(type) || (xmltype.test(type) && /\brss\b/i.test(title))) return null;
-  }
-
-  const whitespace = /[ \t\f\r\n\u200B]+/; // per HTML4.01 spec
-  const rels = {};
-  var haveRels = false;
-  if(relStr) {
-    var relValues = relStr.split(whitespace);
-    for(var i = 0; i != relValues.length; i++) {
-      var rel = relValues[i].toLowerCase();
-      // this has to use "in", because the entries can be null (meaning "ignore")
-      rel = rel in linkWidgetRelConversions ? linkWidgetRelConversions[rel] : rel;
-      if(rel) rels[rel] = true, haveRels = true;
-    }
-  }
-  if(revStr) {
-    var revValues = revStr.split(whitespace);
-    for(i = 0; i < revValues.length; i++) {
-      rel = linkWidgetRevToRel[revValues[i].toLowerCase()] || null;
-      if(rel) rels[rel] = true, haveRels = true;
-    }
-  }
-  return haveRels ? rels : null;
-}
-
-*/
 // a map from 2/3-letter lang codes to the langs' names in the current locale
 var linkWidgetLanguageNames = null;
 
@@ -694,7 +653,7 @@ function linkWidgetGetLanguageName(code) {
     if(parts && parts[1] in dict) return dict[parts[1]]+" ("+parts[2]+")";
     return code;
 }
-/**/
+
 
 function linkWidgetLoadStringBundle(bundlePath) {
   const strings = {};
@@ -714,7 +673,7 @@ function linkWidgetLoadStringBundle(bundlePath) {
 
   return strings;
 }
-
+*/
 
 function LinkWidgetLink(url, title, lang, media) {
   this.url = url;
@@ -736,7 +695,7 @@ LinkWidgetLink.prototype = {
       if(this.media && !/\b(all|screen)\b/i.test(this.media)) longTitle += this.media + ": ";
       // XXX this produces stupid results if there is an hreflang present but no title
       // (gives "French: ", should be something like "French [language] version")
-      if(this.lang) longTitle += linkWidgetGetLanguageName(this.lang) + ": ";
+      if(this.lang) longTitle += LinkWidgetsExtension.linkWidgetGetLanguageName(this.lang) + ": ";
       if(this.title) longTitle += this.title;
       // the 'if' here is to ensure the long title isn't just the url
       else if(longTitle) longTitle += this.url;
@@ -799,6 +758,8 @@ function initLinkWidgetButton(elt, rel) {
 const linkWidgetButton = {
   __proto__: linkWidgetItemBase,
   numLinks: 0,
+
+//  init: function(elt, rel) {} // ?
 
   show: function(links) {
     const numLinks = this.numLinks = links ? links.length : 0

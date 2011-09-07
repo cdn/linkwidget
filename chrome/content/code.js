@@ -102,7 +102,7 @@ var LinkWidgetsExtension = {
     linkWidgetStartup : function() {
       LinkWidgetsExtension.lw_dump("linkWidgetStartup\n");
       window.removeEventListener("load", LinkWidgetsExtension.linkWidgetStartup, false);
-      LinkWidgetsExtension.linkWidgetStrings = linkWidgetLoadStringBundle(LinkWidgetsExtension.linkWidgetStrings);
+      LinkWidgetsExtension.linkWidgetStrings = LinkWidgetsExtension.linkWidgetLoadStringBundle(LinkWidgetsExtension.linkWidgetStrings);
       for(var i in LinkWidgetsExtension._linkWidgetMenuOrdering) LinkWidgetsExtension.linkWidgetMenuOrdering[LinkWidgetsExtension._linkWidgetMenuOrdering[i]] = (i-0) + 1;
       for each(i in LinkWidgetsExtension._linkWidgetMenuRels) LinkWidgetsExtension.linkWidgetMenuRels[i] = true;
       for each(i in LinkWidgetsExtension._linkWidgetButtonRels) LinkWidgetsExtension.linkWidgetButtonRels[i] = true;

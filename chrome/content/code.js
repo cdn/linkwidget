@@ -214,7 +214,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler');
       var doc = elt.ownerDocument;
       if(!(elt instanceof HTMLLinkElement) || !elt.href || !(elt.rel || elt.rev)) return;
 LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler !returned');
-      var rels = linkWidgetGetLinkRels(elt.rel, elt.rev, elt.type, elt.title);
+      var rels = LinkWidgetsExtension.getLinkRels(elt.rel, elt.rev, elt.type, elt.title);
       if(rels) LinkWidgetsExtension.linkWidgetAddLinkForPage(elt.href, elt.title, elt.hreflang, elt.media, doc, rels);
     },
 
@@ -461,18 +461,20 @@ revToRel : {
   previous: "next"
 },
 
-linkWidgetGetLinkRels : function (relStr, revStr, mimetype, title) {
-LinkWidgetsExtension.lw_dump('linkWidgetGetLinkRels');
+getLinkRels : function (relStr, revStr, mimetype, title) {
+LinkWidgetsExtension.lw_dump('getLinkRels');
   // Ignore certain links
   if(LinkWidgetsExtension.linkWidgetRegexps.ignore_rels.test(relStr)) return null;
   // Ignore anything Firefox regards as an RSS/Atom-feed link
   if(relStr && /alternate/i.test(relStr)) {
+LinkWidgetsExtension.lw_dump('getLinkRels : /alternate/');
     // xxx have seen JS errors where "mimetype has no properties" (i.e., is null)
     if(mimetype) { const type = mimetype.replace(/\s|;.*/g, "").toLowerCase(); }
     const feedtype = /^application\/(?:rss|atom)\+xml$/;
     const xmltype = /^(?:application|text)\/(?:rdf\+)?xml$/;
     if(feedtype.test(type) || (xmltype.test(type) && /\brss\b/i.test(title))) return null;
   }
+LinkWidgetsExtension.lw_dump('getLinkRels : !/alternate/');
 
   const whitespace = /[ \t\f\r\n\u200B]+/; // per HTML4.01 spec
   const rels = {};
@@ -517,50 +519,12 @@ guessUp : function (location) {
     return matches && /\./.test(matches[1]) ? prefix + matches[1] + "/" : null;
 }
 
-
-};
-
-window.addEventListener("load", LinkWidgetsExtension.linkWidgetStartup, false);
-window.addEventListener("unload", LinkWidgetsExtension.linkWidgetShutdown, false);
-
-
-function LinkWidgetLink(url, title, lang, media) {
-  this.url = url;
-  this.title = title || null;
-  this.lang = lang || null;
-  this.media = media || null;
-}
-LinkWidgetLink.prototype = {
-  _longTitle: null,
-
-  // this is only needed when showing a tooltip, or for items on the More menu, so we
-  // often won't use it at all, hence using a getter function
-  get longTitle() {
-    if(!this._longTitle) {
-      var longTitle = "";
-      // XXX: lookup more meaningful and localized version of media,
-      //   i.e. media="print" becomes "Printable" or some such
-      // XXX: use localized version of ":" separator
-      if(this.media && !/\b(all|screen)\b/i.test(this.media)) longTitle += this.media + ": ";
-      // XXX this produces stupid results if there is an hreflang present but no title
-      // (gives "French: ", should be something like "French [language] version")
-      if(this.lang) longTitle += linkWidgetGetLanguageName(this.lang) + ": ";
-      if(this.title) longTitle += this.title;
-      // the 'if' here is to ensure the long title isn't just the url
-      else if(longTitle) longTitle += this.url;
-      this._longTitle = longTitle;
-    }
-    return this._longTitle;
-  }
-};
-
-
 // a map from 2/3-letter lang codes to the langs' names in the current locale
-var linkWidgetLanguageNames = null;
+linkWidgetLanguageNames : null,
 
 // code is a language code, e.g. en, en-GB, es, fr-FR
-function linkWidgetGetLanguageName(code) {
-    if(!linkWidgetLanguageNames) linkWidgetLanguageNames =
+linkWidgetGetLanguageName : function (code) {
+    if(!LinkWidgetsExtension.linkWidgetLanguageNames) LinkWidgetsExtension.linkWidgetLanguageNames =
       linkWidgetLoadStringBundle("chrome://global/locale/languageNames.properties");
     const dict = linkWidgetLanguageNames;
     if(code in dict) return dict[code];
@@ -569,49 +533,7 @@ function linkWidgetGetLanguageName(code) {
     // xxx make the parentheses localizable
     if(parts && parts[1] in dict) return dict[parts[1]]+" ("+parts[2]+")";
     return code;
-}
-
-/*
-// arg is an nsIDOMLocation, with protocol of http(s) or ftp
-function linkWidgetGuessUp(location) {
-    const ignoreRE = LinkWidgetsExtension.linkWidgetRegexps.guess_up_skip;
-    const prefix = location.protocol + "//";
-    var host = location.host, path = location.pathname, path0 = path, matches, tail;
-    if(location.search && location.search!="?") return prefix + host + path;
-    if(path[path.length - 1] == "/") path = path.slice(0, path.length - 1);
-    // dig through path
-    while(path) {
-      matches = path.match(/^(.*)\/([^\/]*)$/);
-      if(!matches) break;
-      path = matches[1];
-      tail = matches[2];
-      if(path ? !ignoreRE.test(tail) : path0 != "/" && !ignoreRE.test(path0))
-        return prefix + location.host + path + "/";
-    }
-    // dig through subdomains
-    matches = host.match(/[^.]*\.(.*)/);
-    return matches && /\./.test(matches[1]) ? prefix + matches[1] + "/" : null;
-}
-*/
-
-function linkWidgetLoadStringBundle(bundlePath) {
-  const strings = {};
-  try {
-    var bundle = Components.classes["@mozilla.org/intl/stringbundle;1"]
-                 .getService(Components.interfaces.nsIStringBundleService)
-                 .createBundle(bundlePath)
-                 .getSimpleEnumeration();
-  } catch(ex) {
-    return {};  // callers can all survive without
-  }
-
-  while(bundle.hasMoreElements()) {
-    var item = bundle.getNext().QueryInterface(Components.interfaces.nsIPropertyElement);
-    strings[item.key] = item.value;
-  }
-
-  return strings;
-}
+},
 
 function linkWidgetGuessPrevNextLinksFromURL(doc, guessPrev, guessNext) {
     if(!guessPrev && !guessNext) return;
@@ -643,7 +565,7 @@ function linkWidgetGuessPrevNextLinksFromURL(doc, guessPrev, guessNext) {
       while(nxt.length < old.length) nxt = "0" + nxt;
       LinkWidgetsExtension.linkWidgetAddLinkForPage(pre + nxt + post, null, null, null, doc, { next: true });
     }
-}
+},
 
 function linkWidgetScanPageForLinks(doc) {
   const links = doc.links;
@@ -662,14 +584,14 @@ function linkWidgetScanPageForLinks(doc) {
         .replace("&gt;", ">")
         .replace(/\s+/g, " ")
         .replace(/^\s+|\s+$/g, "");
-    var rels = (link.rel || link.rev) && linkWidgetGetLinkRels(link.rel, link.rev);
+    var rels = (link.rel || link.rev) && LinkWidgetsExtension.getLinkRels(link.rel, link.rev);
     if(!rels) {
       var rel = linkWidgetGuessLinkRel(link, txt);
       if(rel) rels = {}, rels[rel] = true;
     }
     if(rels) LinkWidgetsExtension.linkWidgetAddLinkForPage(href, txt, link.hreflang, null, doc, rels);
   }
-}
+},
 
 
 // link is an <a href> link
@@ -688,6 +610,81 @@ function linkWidgetGuessLinkRel(link, txt) {
     if(LinkWidgetsExtension.linkWidgetRegexps.img_last.test(src)) return "last";
   }
   return null;
+}
+
+
+};
+
+window.addEventListener("load", LinkWidgetsExtension.linkWidgetStartup, false);
+window.addEventListener("unload", LinkWidgetsExtension.linkWidgetShutdown, false);
+
+
+function LinkWidgetLink(url, title, lang, media) {
+  this.url = url;
+  this.title = title || null;
+  this.lang = lang || null;
+  this.media = media || null;
+}
+LinkWidgetLink.prototype = {
+  _longTitle: null,
+
+  // this is only needed when showing a tooltip, or for items on the More menu, so we
+  // often won't use it at all, hence using a getter function
+  get longTitle() {
+    if(!this._longTitle) {
+      var longTitle = "";
+      // XXX: lookup more meaningful and localized version of media,
+      //   i.e. media="print" becomes "Printable" or some such
+      // XXX: use localized version of ":" separator
+      if(this.media && !/\b(all|screen)\b/i.test(this.media)) longTitle += this.media + ": ";
+      // XXX this produces stupid results if there is an hreflang present but no title
+      // (gives "French: ", should be something like "French [language] version")
+      if(this.lang) longTitle += LinkWidgetsExtension.linkWidgetGetLanguageName(this.lang) + ": ";
+      if(this.title) longTitle += this.title;
+      // the 'if' here is to ensure the long title isn't just the url
+      else if(longTitle) longTitle += this.url;
+      this._longTitle = longTitle;
+    }
+    return this._longTitle;
+  }
+};
+
+
+/*
+// a map from 2/3-letter lang codes to the langs' names in the current locale
+var linkWidgetLanguageNames = null;
+
+// code is a language code, e.g. en, en-GB, es, fr-FR
+function linkWidgetGetLanguageName(code) {
+    if(!linkWidgetLanguageNames) linkWidgetLanguageNames =
+      linkWidgetLoadStringBundle("chrome://global/locale/languageNames.properties");
+    const dict = linkWidgetLanguageNames;
+    if(code in dict) return dict[code];
+    // if we have something like "en-GB", change to "English (GB)"
+    var parts = code.match(/^(.{2,3})-(.*)$/);
+    // xxx make the parentheses localizable
+    if(parts && parts[1] in dict) return dict[parts[1]]+" ("+parts[2]+")";
+    return code;
+}
+*/
+
+function linkWidgetLoadStringBundle(bundlePath) {
+  const strings = {};
+  try {
+    var bundle = Components.classes["@mozilla.org/intl/stringbundle;1"]
+                 .getService(Components.interfaces.nsIStringBundleService)
+                 .createBundle(bundlePath)
+                 .getSimpleEnumeration();
+  } catch(ex) {
+    return {};  // callers can all survive without
+  }
+
+  while(bundle.hasMoreElements()) {
+    var item = bundle.getNext().QueryInterface(Components.interfaces.nsIPropertyElement);
+    strings[item.key] = item.value;
+  }
+
+  return strings;
 }
 
 

@@ -91,7 +91,6 @@ var LinkWidgetsExtension = {
     linkWidgetMorePopup : null,
 
     linkWidgetStartup : function() {
-      dump("lw :: linkWidgetStartup\n");
       window.removeEventListener("load", LinkWidgetsExtension.linkWidgetStartup, false);
       LinkWidgetsExtension.linkWidgetStrings = linkWidgetLoadStringBundle(LinkWidgetsExtension.linkWidgetStrings);
       for(var i in LinkWidgetsExtension._linkWidgetMenuOrdering) LinkWidgetsExtension.linkWidgetMenuOrdering[LinkWidgetsExtension._linkWidgetMenuOrdering[i]] = (i-0) + 1;
@@ -254,7 +253,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler !returned');
     
       if(!LinkWidgetsExtension.linkWidgetPrefGuessUpAndTopFromURL && isHTML) return;
       if(!links.up) {
-        var upUrl = linkWidgetGuessUp(loc);
+        var upUrl = LinkWidgetsExtension.guessUp(loc);
         if(upUrl) LinkWidgetsExtension.linkWidgetAddLinkForPage(upUrl, null, null, null, doc, {up: true});
       }
       if(!links.top) {
@@ -337,15 +336,15 @@ LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing');
       for(var rel in LinkWidgetsExtension.linkWidgetViews) LinkWidgetsExtension.linkWidgetViews[rel].show(linkmaps[rel] || null);
       // Create any new views that are needed
       for(rel in linkmaps) {
-LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | ' + rel);
+//LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | ' + rel);
         if(rel in LinkWidgetsExtension.linkWidgetViews || rel in LinkWidgetsExtension.linkWidgetButtons) continue;
-LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | continue' + '');
+//LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | continue' + '');
         var relNum = LinkWidgetsExtension.linkWidgetMenuOrdering[rel] || Infinity;
         var isMenu = rel in LinkWidgetsExtension.linkWidgetMenuRels;
         var item = LinkWidgetsExtension.linkWidgetViews[rel] =
           isMenu ? new LinkWidgetMenu(rel, relNum) : new LinkWidgetItem(rel, relNum);
         item.show(linkmaps[rel]);
-LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | ' + isMenu);
+//LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | ' + isMenu);
       }
     },
 
@@ -435,7 +434,89 @@ LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | ' + isMenu);
         gBrowser.loadURI(url);
     
       content.focus();
+    },
+
+
+// null values mean that rel should be ignored
+relConversions : {
+  home: "top",
+  origin: "top",
+  start: "top",
+  parent: "up",
+  begin: "first",
+  child: "next",
+  previous: "prev",
+  end: "last",
+  contents: "toc",
+  nofollow: null, // blog thing
+  external: null, // used to mean "off-site link", mostly used for styling
+  prefetch: null,
+  sidebar: null
+},
+
+revToRel : {
+  made: "author",
+  next: "prev",
+  prev: "next",
+  previous: "next"
+},
+
+linkWidgetGetLinkRels : function (relStr, revStr, mimetype, title) {
+LinkWidgetsExtension.lw_dump('linkWidgetGetLinkRels');
+  // Ignore certain links
+  if(LinkWidgetsExtension.linkWidgetRegexps.ignore_rels.test(relStr)) return null;
+  // Ignore anything Firefox regards as an RSS/Atom-feed link
+  if(relStr && /alternate/i.test(relStr)) {
+    // xxx have seen JS errors where "mimetype has no properties" (i.e., is null)
+    if(mimetype) { const type = mimetype.replace(/\s|;.*/g, "").toLowerCase(); }
+    const feedtype = /^application\/(?:rss|atom)\+xml$/;
+    const xmltype = /^(?:application|text)\/(?:rdf\+)?xml$/;
+    if(feedtype.test(type) || (xmltype.test(type) && /\brss\b/i.test(title))) return null;
+  }
+
+  const whitespace = /[ \t\f\r\n\u200B]+/; // per HTML4.01 spec
+  const rels = {};
+  var haveRels = false;
+  if(relStr) {
+    var relValues = relStr.split(whitespace);
+    for(var i = 0; i != relValues.length; i++) {
+      var rel = relValues[i].toLowerCase();
+      // this has to use "in", because the entries can be null (meaning "ignore")
+      rel = rel in LinkWidgetsExtension.relConversions ? LinkWidgetsExtension.relConversions[rel] : rel;
+      if(rel) rels[rel] = true, haveRels = true;
     }
+  }
+  if(revStr) {
+    var revValues = revStr.split(whitespace);
+    for(i = 0; i < revValues.length; i++) {
+      rel = LinkWidgetsExtension.revToRel[revValues[i].toLowerCase()] || null;
+      if(rel) rels[rel] = true, haveRels = true;
+    }
+  }
+  return haveRels ? rels : null;
+},
+
+// arg is an nsIDOMLocation, with protocol of http(s) or ftp
+guessUp : function (location) {
+    const ignoreRE = LinkWidgetsExtension.linkWidgetRegexps.guess_up_skip;
+    const prefix = location.protocol + "//";
+    var host = location.host, path = location.pathname, path0 = path, matches, tail;
+    if(location.search && location.search!="?") return prefix + host + path;
+    if(path[path.length - 1] == "/") path = path.slice(0, path.length - 1);
+    // dig through path
+    while(path) {
+      matches = path.match(/^(.*)\/([^\/]*)$/);
+      if(!matches) break;
+      path = matches[1];
+      tail = matches[2];
+      if(path ? !ignoreRE.test(tail) : path0 != "/" && !ignoreRE.test(path0))
+        return prefix + location.host + path + "/";
+    }
+    // dig through subdomains
+    matches = host.match(/[^.]*\.(.*)/);
+    return matches && /\./.test(matches[1]) ? prefix + matches[1] + "/" : null;
+}
+
 
 };
 
@@ -474,65 +555,6 @@ LinkWidgetLink.prototype = {
 };
 
 
-// null values mean that rel should be ignored
-const linkWidgetRelConversions = {
-  home: "top",
-  origin: "top",
-  start: "top",
-  parent: "up",
-  begin: "first",
-  child: "next",
-  previous: "prev",
-  end: "last",
-  contents: "toc",
-  nofollow: null, // blog thing
-  external: null, // used to mean "off-site link", mostly used for styling
-  prefetch: null,
-  sidebar: null
-};
-
-const linkWidgetRevToRel = {
-  made: "author",
-  next: "prev",
-  prev: "next",
-  previous: "next"
-};
-
-function linkWidgetGetLinkRels(relStr, revStr, mimetype, title) {
-LinkWidgetsExtension.lw_dump('linkWidgetGetLinkRels');
-  // Ignore certain links
-  if(LinkWidgetsExtension.linkWidgetRegexps.ignore_rels.test(relStr)) return null;
-  // Ignore anything Firefox regards as an RSS/Atom-feed link
-  if(relStr && /alternate/i.test(relStr)) {
-    // xxx have seen JS errors where "mimetype has no properties" (i.e., is null)
-    if(mimetype) { const type = mimetype.replace(/\s|;.*/g, "").toLowerCase(); }
-    const feedtype = /^application\/(?:rss|atom)\+xml$/;
-    const xmltype = /^(?:application|text)\/(?:rdf\+)?xml$/;
-    if(feedtype.test(type) || (xmltype.test(type) && /\brss\b/i.test(title))) return null;
-  }
-
-  const whitespace = /[ \t\f\r\n\u200B]+/; // per HTML4.01 spec
-  const rels = {};
-  var haveRels = false;
-  if(relStr) {
-    var relValues = relStr.split(whitespace);
-    for(var i = 0; i != relValues.length; i++) {
-      var rel = relValues[i].toLowerCase();
-      // this has to use "in", because the entries can be null (meaning "ignore")
-      rel = rel in linkWidgetRelConversions ? linkWidgetRelConversions[rel] : rel;
-      if(rel) rels[rel] = true, haveRels = true;
-    }
-  }
-  if(revStr) {
-    var revValues = revStr.split(whitespace);
-    for(i = 0; i < revValues.length; i++) {
-      rel = linkWidgetRevToRel[revValues[i].toLowerCase()] || null;
-      if(rel) rels[rel] = true, haveRels = true;
-    }
-  }
-  return haveRels ? rels : null;
-}
-
 // a map from 2/3-letter lang codes to the langs' names in the current locale
 var linkWidgetLanguageNames = null;
 
@@ -549,6 +571,7 @@ function linkWidgetGetLanguageName(code) {
     return code;
 }
 
+/*
 // arg is an nsIDOMLocation, with protocol of http(s) or ftp
 function linkWidgetGuessUp(location) {
     const ignoreRE = LinkWidgetsExtension.linkWidgetRegexps.guess_up_skip;
@@ -569,6 +592,7 @@ function linkWidgetGuessUp(location) {
     matches = host.match(/[^.]*\.(.*)/);
     return matches && /\./.test(matches[1]) ? prefix + matches[1] + "/" : null;
 }
+*/
 
 function linkWidgetLoadStringBundle(bundlePath) {
   const strings = {};

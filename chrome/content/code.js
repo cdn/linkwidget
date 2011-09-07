@@ -230,7 +230,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler | rels = LinkWidgetsExt
       // don't clear the links for unload/pagehide from a background tab, or from a subframe
       // If docShell is null accessing .contentDocument throws an exception
       if(!gBrowser.docShell || doc != gBrowser.contentDocument) return;
-      for each(var btn in LinkWidgetsExtension.linkWidgetButtons) btn.show(null); // not a function [yet]
+      for each(var btn in LinkWidgetsExtension.linkWidgetButtons) btn.show(null);
       if(LinkWidgetsExtension.linkWidgetMoreMenu) LinkWidgetsExtension.linkWidgetMoreMenu.disabled = true;
     },
 
@@ -285,7 +285,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler | rels = LinkWidgetsExt
 
     linkWidgetRefreshLinks : function() {
     //alert('lWRL'); LinkWidgetsExtension.lw_dump('linkWidgetRefreshLinks');
-      for each(var btn in LinkWidgetsExtension.linkWidgetButtons) btn.show(null); // Error: btn.show is not a function
+      for each(var btn in LinkWidgetsExtension.linkWidgetButtons) btn.show(null);
       if(LinkWidgetsExtension.linkWidgetMoreMenu) LinkWidgetsExtension.linkWidgetMoreMenu.disabled = true;
  //LinkWidgetsExtension.lw_dump('.');
 
@@ -337,15 +337,15 @@ LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing');
       for(var rel in LinkWidgetsExtension.linkWidgetViews) LinkWidgetsExtension.linkWidgetViews[rel].show(linkmaps[rel] || null);
       // Create any new views that are needed
       for(rel in linkmaps) {
-LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | ' + rel);
+//LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | ' + rel);
         if(rel in LinkWidgetsExtension.linkWidgetViews || rel in LinkWidgetsExtension.linkWidgetButtons) continue;
-LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | continue' + '');
+//LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | continue' + '');
         var relNum = LinkWidgetsExtension.linkWidgetMenuOrdering[rel] || Infinity;
         var isMenu = rel in LinkWidgetsExtension.linkWidgetMenuRels;
         var item = LinkWidgetsExtension.linkWidgetViews[rel] =
           isMenu ? new LinkWidgetMenu(rel, relNum) : new LinkWidgetItem(rel, relNum);
         item.show(linkmaps[rel]);
-LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | ' + isMenu);
+//LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | ' + isMenu);
       }
     },
 
@@ -354,7 +354,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | ' + isMenu);
       if(!somethingChanged) return;
     
       LinkWidgetsExtension.linkWidgetInitMoreMenu();
-      for each(var btn in LinkWidgetsExtension.linkWidgetButtons) btn.show(null); // Error: btn.show is not a function
+      for each(var btn in LinkWidgetsExtension.linkWidgetButtons) btn.show(null);
       LinkWidgetsExtension.linkWidgetInitVisibleButtons();
       for(var rel in LinkWidgetsExtension.linkWidgetViews) {
         var item = LinkWidgetsExtension.linkWidgetViews[rel];
@@ -636,44 +636,6 @@ guessPrevNextLinksFromURL : function (doc, guessPrev, guessNext) {
 window.addEventListener("load", LinkWidgetsExtension.linkWidgetStartup, false);
 window.addEventListener("unload", LinkWidgetsExtension.linkWidgetShutdown, false);
 
-
-/*
-// a map from 2/3-letter lang codes to the langs' names in the current locale
-var linkWidgetLanguageNames = null;
-
-// code is a language code, e.g. en, en-GB, es, fr-FR
-function linkWidgetGetLanguageName(code) {
-    if(!linkWidgetLanguageNames) linkWidgetLanguageNames =
-      linkWidgetLoadStringBundle("chrome://global/locale/languageNames.properties");
-    const dict = linkWidgetLanguageNames;
-    if(code in dict) return dict[code];
-    // if we have something like "en-GB", change to "English (GB)"
-    var parts = code.match(/^(.{2,3})-(.*)$/);
-    // xxx make the parentheses localizable
-    if(parts && parts[1] in dict) return dict[parts[1]]+" ("+parts[2]+")";
-    return code;
-}
-
-
-function linkWidgetLoadStringBundle(bundlePath) {
-  const strings = {};
-  try {
-    var bundle = Components.classes["@mozilla.org/intl/stringbundle;1"]
-                 .getService(Components.interfaces.nsIStringBundleService)
-                 .createBundle(bundlePath)
-                 .getSimpleEnumeration();
-  } catch(ex) {
-    return {};  // callers can all survive without
-  }
-
-  while(bundle.hasMoreElements()) {
-    var item = bundle.getNext().QueryInterface(Components.interfaces.nsIPropertyElement);
-    strings[item.key] = item.value;
-  }
-
-  return strings;
-}
-*/
 
 function LinkWidgetLink(url, title, lang, media) {
   this.url = url;

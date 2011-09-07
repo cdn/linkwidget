@@ -90,7 +90,17 @@ var LinkWidgetsExtension = {
     linkWidgetMoreMenu : null,
     linkWidgetMorePopup : null,
 
+    aConsoleService: Components.classes["@mozilla.org/consoleservice;1"].
+    getService(Components.interfaces.nsIConsoleService),
+ 
+    lw_dump : function(msg) {
+        msg = 'Link Widgets :: ' + msg;
+        this.aConsoleService.logStringMessage(msg);
+        dump(msg + "\n");
+    },
+
     linkWidgetStartup : function() {
+      LinkWidgetsExtension.lw_dump("linkWidgetStartup\n");
       window.removeEventListener("load", LinkWidgetsExtension.linkWidgetStartup, false);
       LinkWidgetsExtension.linkWidgetStrings = linkWidgetLoadStringBundle(LinkWidgetsExtension.linkWidgetStrings);
       for(var i in LinkWidgetsExtension._linkWidgetMenuOrdering) LinkWidgetsExtension.linkWidgetMenuOrdering[LinkWidgetsExtension._linkWidgetMenuOrdering[i]] = (i-0) + 1;
@@ -100,15 +110,6 @@ var LinkWidgetsExtension = {
       LinkWidgetsExtension.linkWidgetInitVisibleButtons();
       setTimeout(LinkWidgetsExtension.linkWidgetDelayedStartup, 1); // needs to happen after Fx's delayedStartup(); Fc?
     },
-
-      aConsoleService: Components.classes["@mozilla.org/consoleservice;1"].
-      getService(Components.interfaces.nsIConsoleService),
- 
-    lw_dump : function(msg) {
-        msg = 'Link Widgets :: ' + msg;
-        this.aConsoleService.logStringMessage(msg);
-        dump(msg + "\n");
-      },
 
     linkWidgetDelayedStartup : function() {
       LinkWidgetsExtension.lw_dump("linkWidgetDelayedStartup");
@@ -214,7 +215,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler');
       var doc = elt.ownerDocument;
       if(!(elt instanceof HTMLLinkElement) || !elt.href || !(elt.rel || elt.rev)) return;
 LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler !returned');
-      var rels = LinkWidgetsExtension.getLinkRels(elt.rel, elt.rev, elt.type, elt.title);
+      var rels = linkWidgetGetLinkRels(elt.rel, elt.rev, elt.type, elt.title);
       if(rels) LinkWidgetsExtension.linkWidgetAddLinkForPage(elt.href, elt.title, elt.hreflang, elt.media, doc, rels);
     },
 
@@ -253,7 +254,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler !returned');
     
       if(!LinkWidgetsExtension.linkWidgetPrefGuessUpAndTopFromURL && isHTML) return;
       if(!links.up) {
-        var upUrl = LinkWidgetsExtension.guessUp(loc);
+        var upUrl = linkWidgetGuessUp(loc);
         if(upUrl) LinkWidgetsExtension.linkWidgetAddLinkForPage(upUrl, null, null, null, doc, {up: true});
       }
       if(!links.top) {
@@ -336,15 +337,15 @@ LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing');
       for(var rel in LinkWidgetsExtension.linkWidgetViews) LinkWidgetsExtension.linkWidgetViews[rel].show(linkmaps[rel] || null);
       // Create any new views that are needed
       for(rel in linkmaps) {
-//LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | ' + rel);
+LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | ' + rel);
         if(rel in LinkWidgetsExtension.linkWidgetViews || rel in LinkWidgetsExtension.linkWidgetButtons) continue;
-//LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | continue' + '');
+LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | continue' + '');
         var relNum = LinkWidgetsExtension.linkWidgetMenuOrdering[rel] || Infinity;
         var isMenu = rel in LinkWidgetsExtension.linkWidgetMenuRels;
         var item = LinkWidgetsExtension.linkWidgetViews[rel] =
           isMenu ? new LinkWidgetMenu(rel, relNum) : new LinkWidgetItem(rel, relNum);
         item.show(linkmaps[rel]);
-//LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | ' + isMenu);
+LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | ' + isMenu);
       }
     },
 
@@ -434,11 +435,47 @@ LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing');
         gBrowser.loadURI(url);
     
       content.focus();
-    },
+    }
+
+};
+
+window.addEventListener("load", LinkWidgetsExtension.linkWidgetStartup, false);
+window.addEventListener("unload", LinkWidgetsExtension.linkWidgetShutdown, false);
+
+
+function LinkWidgetLink(url, title, lang, media) {
+  this.url = url;
+  this.title = title || null;
+  this.lang = lang || null;
+  this.media = media || null;
+}
+LinkWidgetLink.prototype = {
+  _longTitle: null,
+
+  // this is only needed when showing a tooltip, or for items on the More menu, so we
+  // often won't use it at all, hence using a getter function
+  get longTitle() {
+    if(!this._longTitle) {
+      var longTitle = "";
+      // XXX: lookup more meaningful and localized version of media,
+      //   i.e. media="print" becomes "Printable" or some such
+      // XXX: use localized version of ":" separator
+      if(this.media && !/\b(all|screen)\b/i.test(this.media)) longTitle += this.media + ": ";
+      // XXX this produces stupid results if there is an hreflang present but no title
+      // (gives "French: ", should be something like "French [language] version")
+      if(this.lang) longTitle += linkWidgetGetLanguageName(this.lang) + ": ";
+      if(this.title) longTitle += this.title;
+      // the 'if' here is to ensure the long title isn't just the url
+      else if(longTitle) longTitle += this.url;
+      this._longTitle = longTitle;
+    }
+    return this._longTitle;
+  }
+};
 
 
 // null values mean that rel should be ignored
-relConversions : {
+const linkWidgetRelConversions = {
   home: "top",
   origin: "top",
   start: "top",
@@ -452,29 +489,27 @@ relConversions : {
   external: null, // used to mean "off-site link", mostly used for styling
   prefetch: null,
   sidebar: null
-},
+};
 
-revToRel : {
+const linkWidgetRevToRel = {
   made: "author",
   next: "prev",
   prev: "next",
   previous: "next"
-},
+};
 
-getLinkRels : function (relStr, revStr, mimetype, title) {
-LinkWidgetsExtension.lw_dump('getLinkRels');
+function linkWidgetGetLinkRels(relStr, revStr, mimetype, title) {
+LinkWidgetsExtension.lw_dump('linkWidgetGetLinkRels');
   // Ignore certain links
   if(LinkWidgetsExtension.linkWidgetRegexps.ignore_rels.test(relStr)) return null;
   // Ignore anything Firefox regards as an RSS/Atom-feed link
   if(relStr && /alternate/i.test(relStr)) {
-LinkWidgetsExtension.lw_dump('getLinkRels : /alternate/');
     // xxx have seen JS errors where "mimetype has no properties" (i.e., is null)
     if(mimetype) { const type = mimetype.replace(/\s|;.*/g, "").toLowerCase(); }
     const feedtype = /^application\/(?:rss|atom)\+xml$/;
     const xmltype = /^(?:application|text)\/(?:rdf\+)?xml$/;
     if(feedtype.test(type) || (xmltype.test(type) && /\brss\b/i.test(title))) return null;
   }
-LinkWidgetsExtension.lw_dump('getLinkRels : !/alternate/');
 
   const whitespace = /[ \t\f\r\n\u200B]+/; // per HTML4.01 spec
   const rels = {};
@@ -484,22 +519,38 @@ LinkWidgetsExtension.lw_dump('getLinkRels : !/alternate/');
     for(var i = 0; i != relValues.length; i++) {
       var rel = relValues[i].toLowerCase();
       // this has to use "in", because the entries can be null (meaning "ignore")
-      rel = rel in LinkWidgetsExtension.relConversions ? LinkWidgetsExtension.relConversions[rel] : rel;
+      rel = rel in linkWidgetRelConversions ? linkWidgetRelConversions[rel] : rel;
       if(rel) rels[rel] = true, haveRels = true;
     }
   }
   if(revStr) {
     var revValues = revStr.split(whitespace);
     for(i = 0; i < revValues.length; i++) {
-      rel = LinkWidgetsExtension.revToRel[revValues[i].toLowerCase()] || null;
+      rel = linkWidgetRevToRel[revValues[i].toLowerCase()] || null;
       if(rel) rels[rel] = true, haveRels = true;
     }
   }
   return haveRels ? rels : null;
-},
+}
+
+// a map from 2/3-letter lang codes to the langs' names in the current locale
+var linkWidgetLanguageNames = null;
+
+// code is a language code, e.g. en, en-GB, es, fr-FR
+function linkWidgetGetLanguageName(code) {
+    if(!linkWidgetLanguageNames) linkWidgetLanguageNames =
+      linkWidgetLoadStringBundle("chrome://global/locale/languageNames.properties");
+    const dict = linkWidgetLanguageNames;
+    if(code in dict) return dict[code];
+    // if we have something like "en-GB", change to "English (GB)"
+    var parts = code.match(/^(.{2,3})-(.*)$/);
+    // xxx make the parentheses localizable
+    if(parts && parts[1] in dict) return dict[parts[1]]+" ("+parts[2]+")";
+    return code;
+}
 
 // arg is an nsIDOMLocation, with protocol of http(s) or ftp
-guessUp : function (location) {
+function linkWidgetGuessUp(location) {
     const ignoreRE = LinkWidgetsExtension.linkWidgetRegexps.guess_up_skip;
     const prefix = location.protocol + "//";
     var host = location.host, path = location.pathname, path0 = path, matches, tail;
@@ -519,21 +570,24 @@ guessUp : function (location) {
     return matches && /\./.test(matches[1]) ? prefix + matches[1] + "/" : null;
 }
 
-// a map from 2/3-letter lang codes to the langs' names in the current locale
-linkWidgetLanguageNames : null,
+function linkWidgetLoadStringBundle(bundlePath) {
+  const strings = {};
+  try {
+    var bundle = Components.classes["@mozilla.org/intl/stringbundle;1"]
+                 .getService(Components.interfaces.nsIStringBundleService)
+                 .createBundle(bundlePath)
+                 .getSimpleEnumeration();
+  } catch(ex) {
+    return {};  // callers can all survive without
+  }
 
-// code is a language code, e.g. en, en-GB, es, fr-FR
-linkWidgetGetLanguageName : function (code) {
-    if(!LinkWidgetsExtension.linkWidgetLanguageNames) LinkWidgetsExtension.linkWidgetLanguageNames =
-      linkWidgetLoadStringBundle("chrome://global/locale/languageNames.properties");
-    const dict = linkWidgetLanguageNames;
-    if(code in dict) return dict[code];
-    // if we have something like "en-GB", change to "English (GB)"
-    var parts = code.match(/^(.{2,3})-(.*)$/);
-    // xxx make the parentheses localizable
-    if(parts && parts[1] in dict) return dict[parts[1]]+" ("+parts[2]+")";
-    return code;
-},
+  while(bundle.hasMoreElements()) {
+    var item = bundle.getNext().QueryInterface(Components.interfaces.nsIPropertyElement);
+    strings[item.key] = item.value;
+  }
+
+  return strings;
+}
 
 function linkWidgetGuessPrevNextLinksFromURL(doc, guessPrev, guessNext) {
     if(!guessPrev && !guessNext) return;
@@ -565,7 +619,7 @@ function linkWidgetGuessPrevNextLinksFromURL(doc, guessPrev, guessNext) {
       while(nxt.length < old.length) nxt = "0" + nxt;
       LinkWidgetsExtension.linkWidgetAddLinkForPage(pre + nxt + post, null, null, null, doc, { next: true });
     }
-},
+}
 
 function linkWidgetScanPageForLinks(doc) {
   const links = doc.links;
@@ -584,14 +638,14 @@ function linkWidgetScanPageForLinks(doc) {
         .replace("&gt;", ">")
         .replace(/\s+/g, " ")
         .replace(/^\s+|\s+$/g, "");
-    var rels = (link.rel || link.rev) && LinkWidgetsExtension.getLinkRels(link.rel, link.rev);
+    var rels = (link.rel || link.rev) && linkWidgetGetLinkRels(link.rel, link.rev);
     if(!rels) {
       var rel = linkWidgetGuessLinkRel(link, txt);
       if(rel) rels = {}, rels[rel] = true;
     }
     if(rels) LinkWidgetsExtension.linkWidgetAddLinkForPage(href, txt, link.hreflang, null, doc, rels);
   }
-},
+}
 
 
 // link is an <a href> link
@@ -610,81 +664,6 @@ function linkWidgetGuessLinkRel(link, txt) {
     if(LinkWidgetsExtension.linkWidgetRegexps.img_last.test(src)) return "last";
   }
   return null;
-}
-
-
-};
-
-window.addEventListener("load", LinkWidgetsExtension.linkWidgetStartup, false);
-window.addEventListener("unload", LinkWidgetsExtension.linkWidgetShutdown, false);
-
-
-function LinkWidgetLink(url, title, lang, media) {
-  this.url = url;
-  this.title = title || null;
-  this.lang = lang || null;
-  this.media = media || null;
-}
-LinkWidgetLink.prototype = {
-  _longTitle: null,
-
-  // this is only needed when showing a tooltip, or for items on the More menu, so we
-  // often won't use it at all, hence using a getter function
-  get longTitle() {
-    if(!this._longTitle) {
-      var longTitle = "";
-      // XXX: lookup more meaningful and localized version of media,
-      //   i.e. media="print" becomes "Printable" or some such
-      // XXX: use localized version of ":" separator
-      if(this.media && !/\b(all|screen)\b/i.test(this.media)) longTitle += this.media + ": ";
-      // XXX this produces stupid results if there is an hreflang present but no title
-      // (gives "French: ", should be something like "French [language] version")
-      if(this.lang) longTitle += LinkWidgetsExtension.linkWidgetGetLanguageName(this.lang) + ": ";
-      if(this.title) longTitle += this.title;
-      // the 'if' here is to ensure the long title isn't just the url
-      else if(longTitle) longTitle += this.url;
-      this._longTitle = longTitle;
-    }
-    return this._longTitle;
-  }
-};
-
-
-/*
-// a map from 2/3-letter lang codes to the langs' names in the current locale
-var linkWidgetLanguageNames = null;
-
-// code is a language code, e.g. en, en-GB, es, fr-FR
-function linkWidgetGetLanguageName(code) {
-    if(!linkWidgetLanguageNames) linkWidgetLanguageNames =
-      linkWidgetLoadStringBundle("chrome://global/locale/languageNames.properties");
-    const dict = linkWidgetLanguageNames;
-    if(code in dict) return dict[code];
-    // if we have something like "en-GB", change to "English (GB)"
-    var parts = code.match(/^(.{2,3})-(.*)$/);
-    // xxx make the parentheses localizable
-    if(parts && parts[1] in dict) return dict[parts[1]]+" ("+parts[2]+")";
-    return code;
-}
-*/
-
-function linkWidgetLoadStringBundle(bundlePath) {
-  const strings = {};
-  try {
-    var bundle = Components.classes["@mozilla.org/intl/stringbundle;1"]
-                 .getService(Components.interfaces.nsIStringBundleService)
-                 .createBundle(bundlePath)
-                 .getSimpleEnumeration();
-  } catch(ex) {
-    return {};  // callers can all survive without
-  }
-
-  while(bundle.hasMoreElements()) {
-    var item = bundle.getNext().QueryInterface(Components.interfaces.nsIPropertyElement);
-    strings[item.key] = item.value;
-  }
-
-  return strings;
 }
 
 

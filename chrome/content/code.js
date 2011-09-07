@@ -199,7 +199,7 @@ var LinkWidgetsExtension = {
     },
 
     linkWidgetInitVisibleButtons : function() {
-      dump("lw :: linkWidgetInitVisibleButtons\n");
+      LinkWidgetsExtension.lw_dump("linkWidgetInitVisibleButtons");
       LinkWidgetsExtension.linkWidgetButtons = {};
       for(var rel in LinkWidgetsExtension.linkWidgetButtonRels) {
         var elt = document.getElementById("linkwidget-"+rel);
@@ -244,7 +244,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler !returned');
       const links = doc.linkWidgetLinks || (doc.linkWidgetLinks = {});
       const isHTML = doc instanceof HTMLDocument && !(doc instanceof ImageDocument);
     
-      if(LinkWidgetsExtension.linkWidgetPrefScanHyperlinks && isHTML) linkWidgetScanPageForLinks(doc);
+      if(LinkWidgetsExtension.linkWidgetPrefScanHyperlinks && isHTML) LinkWidgetsExtension.linkWidgetScanPageForLinks(doc);
     
       const loc = doc.location, protocol = loc.protocol;
       if(!/^(?:https?|ftp|file)\:$/.test(protocol)) return;
@@ -254,7 +254,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler !returned');
     
       if(!LinkWidgetsExtension.linkWidgetPrefGuessUpAndTopFromURL && isHTML) return;
       if(!links.up) {
-        var upUrl = linkWidgetGuessUp(loc);
+        var upUrl = LinkWidgetsExtension.guessUp(loc);
         if(upUrl) LinkWidgetsExtension.linkWidgetAddLinkForPage(upUrl, null, null, null, doc, {up: true});
       }
       if(!links.top) {
@@ -435,43 +435,153 @@ LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | ' + isMenu);
         gBrowser.loadURI(url);
     
       content.focus();
+    },
+
+    // arg is an nsIDOMLocation, with protocol of http(s) or ftp
+    guessUp : function (location) {
+        const ignoreRE = LinkWidgetsExtension.linkWidgetRegexps.guess_up_skip;
+        const prefix = location.protocol + "//";
+        var host = location.host, path = location.pathname, path0 = path, matches, tail;
+        if(location.search && location.search!="?") return prefix + host + path;
+        if(path[path.length - 1] == "/") path = path.slice(0, path.length - 1);
+        // dig through path
+        while(path) {
+          matches = path.match(/^(.*)\/([^\/]*)$/);
+          if(!matches) break;
+          path = matches[1];
+          tail = matches[2];
+          if(path ? !ignoreRE.test(tail) : path0 != "/" && !ignoreRE.test(path0))
+            return prefix + location.host + path + "/";
+        }
+        // dig through subdomains
+        matches = host.match(/[^.]*\.(.*)/);
+        return matches && /\./.test(matches[1]) ? prefix + matches[1] + "/" : null;
+    },
+
+    // null values mean that rel should be ignored
+    linkWidgetRelConversions : {
+      home: "top",
+      origin: "top",
+      start: "top",
+      parent: "up",
+      begin: "first",
+      child: "next",
+      previous: "prev",
+      end: "last",
+      contents: "toc",
+      nofollow: null, // blog thing
+      external: null, // used to mean "off-site link", mostly used for styling
+      prefetch: null,
+      sidebar: null
+    },
+
+    linkWidgetRevToRel : {
+      made: "author",
+      next: "prev",
+      prev: "next",
+      previous: "next"
+    },
+
+    linkWidgetGetLinkRels : function (relStr, revStr, mimetype, title) {
+LinkWidgetsExtension.lw_dump('linkWidgetGetLinkRels');
+  // Ignore certain links
+  if(LinkWidgetsExtension.linkWidgetRegexps.ignore_rels.test(relStr)) return null;
+  // Ignore anything Firefox regards as an RSS/Atom-feed link
+  if(relStr && /alternate/i.test(relStr)) {
+    // xxx have seen JS errors where "mimetype has no properties" (i.e., is null)
+    if(mimetype) { const type = mimetype.replace(/\s|;.*/g, "").toLowerCase(); }
+    const feedtype = /^application\/(?:rss|atom)\+xml$/;
+    const xmltype = /^(?:application|text)\/(?:rdf\+)?xml$/;
+    if(feedtype.test(type) || (xmltype.test(type) && /\brss\b/i.test(title))) return null;
+  }
+
+  const whitespace = /[ \t\f\r\n\u200B]+/; // per HTML4.01 spec
+  const rels = {};
+  var haveRels = false;
+  if(relStr) {
+    var relValues = relStr.split(whitespace);
+    for(var i = 0; i != relValues.length; i++) {
+      var rel = relValues[i].toLowerCase();
+      // this has to use "in", because the entries can be null (meaning "ignore")
+      rel = rel in linkWidgetRelConversions ? linkWidgetRelConversions[rel] : rel;
+      if(rel) rels[rel] = true, haveRels = true;
     }
+  }
+  if(revStr) {
+    var revValues = revStr.split(whitespace);
+    for(i = 0; i < revValues.length; i++) {
+      rel = linkWidgetRevToRel[revValues[i].toLowerCase()] || null;
+      if(rel) rels[rel] = true, haveRels = true;
+    }
+  }
+  return haveRels ? rels : null;
+},
+
+// a map from 2/3-letter lang codes to the langs' names in the current locale
+linkWidgetLanguageNames : null,
+
+// code is a language code, e.g. en, en-GB, es, fr-FR
+linkWidgetGetLanguageName : function (code) {
+    if(!linkWidgetLanguageNames) LinkWidgetsExtension.linkWidgetLanguageNames =
+      LinkWidgetsExtension.linkWidgetLoadStringBundle("chrome://global/locale/languageNames.properties");
+    const dict = linkWidgetLanguageNames;
+    if(code in dict) return dict[code];
+    // if we have something like "en-GB", change to "English (GB)"
+    var parts = code.match(/^(.{2,3})-(.*)$/);
+    // xxx make the parentheses localizable
+    if(parts && parts[1] in dict) return dict[parts[1]]+" ("+parts[2]+")";
+    return code;
+},
+
+linkWidgetScanPageForLinks : function (doc) {
+  const links = doc.links;
+  // The scanning blocks the UI, so we don't want to spend too long on it. Previously we'd block the
+  // UI for several seconds on http://antwrp.gsfc.nasa.gov/apod/archivepix.html (>3000 links)
+  const max = Math.min(links.length, 500);
+
+  for(var i = 0; i != max; ++i) {
+    var link = links[i], href = link.href;
+    if(!href || href.charAt(0)=='#') continue; // ignore internal links
+
+    var txt = link.innerHTML
+        .replace(/<[^>]+alt=(["'])(.*?)\1[^>]*>/ig, " $2 ") // keep alt attrs
+        .replace(/<[^>]*>/g, "") // drop tags + comments
+        .replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace(/\s+/g, " ")
+        .replace(/^\s+|\s+$/g, "");
+    var rels = (link.rel || link.rev) && linkWidgetGetLinkRels(link.rel, link.rev);
+    if(!rels) {
+      var rel = LinkWidgetsExtension.guessLinkRel(link, txt);
+      if(rel) rels = {}, rels[rel] = true;
+    }
+    if(rels) LinkWidgetsExtension.linkWidgetAddLinkForPage(href, txt, link.hreflang, null, doc, rels);
+  }
+},
+
+// link is an <a href> link
+guessLinkRel : function (link, txt) {
+  if(LinkWidgetsExtension.linkWidgetRegexps.next.test(txt)) return "next";
+  if(LinkWidgetsExtension.linkWidgetRegexps.prev.test(txt)) return "prev";
+  if(LinkWidgetsExtension.linkWidgetRegexps.first.test(txt)) return "first";
+  if(LinkWidgetsExtension.linkWidgetRegexps.last.test(txt)) return "last";
+  const imgs = link.getElementsByTagName("img"), num = imgs.length;
+  for(var i = 0; i != num; ++i) {
+    // guessing is more accurate on relative URLs, and .src is always absolute
+    var src = imgs[i].getAttribute("src");
+    if(LinkWidgetsExtension.linkWidgetRegexps.img_next.test(src)) return "next";
+    if(LinkWidgetsExtension.linkWidgetRegexps.img_prev.test(src)) return "prev";
+    if(LinkWidgetsExtension.linkWidgetRegexps.img_first.test(src)) return "first";
+    if(LinkWidgetsExtension.linkWidgetRegexps.img_last.test(src)) return "last";
+  }
+  return null;
+}
+
 
 };
 
 window.addEventListener("load", LinkWidgetsExtension.linkWidgetStartup, false);
 window.addEventListener("unload", LinkWidgetsExtension.linkWidgetShutdown, false);
-
-
-function LinkWidgetLink(url, title, lang, media) {
-  this.url = url;
-  this.title = title || null;
-  this.lang = lang || null;
-  this.media = media || null;
-}
-LinkWidgetLink.prototype = {
-  _longTitle: null,
-
-  // this is only needed when showing a tooltip, or for items on the More menu, so we
-  // often won't use it at all, hence using a getter function
-  get longTitle() {
-    if(!this._longTitle) {
-      var longTitle = "";
-      // XXX: lookup more meaningful and localized version of media,
-      //   i.e. media="print" becomes "Printable" or some such
-      // XXX: use localized version of ":" separator
-      if(this.media && !/\b(all|screen)\b/i.test(this.media)) longTitle += this.media + ": ";
-      // XXX this produces stupid results if there is an hreflang present but no title
-      // (gives "French: ", should be something like "French [language] version")
-      if(this.lang) longTitle += linkWidgetGetLanguageName(this.lang) + ": ";
-      if(this.title) longTitle += this.title;
-      // the 'if' here is to ensure the long title isn't just the url
-      else if(longTitle) longTitle += this.url;
-      this._longTitle = longTitle;
-    }
-    return this._longTitle;
-  }
-};
 
 
 // null values mean that rel should be ignored
@@ -533,6 +643,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetGetLinkRels');
   return haveRels ? rels : null;
 }
 
+/**/
 // a map from 2/3-letter lang codes to the langs' names in the current locale
 var linkWidgetLanguageNames = null;
 
@@ -548,27 +659,7 @@ function linkWidgetGetLanguageName(code) {
     if(parts && parts[1] in dict) return dict[parts[1]]+" ("+parts[2]+")";
     return code;
 }
-
-// arg is an nsIDOMLocation, with protocol of http(s) or ftp
-function linkWidgetGuessUp(location) {
-    const ignoreRE = LinkWidgetsExtension.linkWidgetRegexps.guess_up_skip;
-    const prefix = location.protocol + "//";
-    var host = location.host, path = location.pathname, path0 = path, matches, tail;
-    if(location.search && location.search!="?") return prefix + host + path;
-    if(path[path.length - 1] == "/") path = path.slice(0, path.length - 1);
-    // dig through path
-    while(path) {
-      matches = path.match(/^(.*)\/([^\/]*)$/);
-      if(!matches) break;
-      path = matches[1];
-      tail = matches[2];
-      if(path ? !ignoreRE.test(tail) : path0 != "/" && !ignoreRE.test(path0))
-        return prefix + location.host + path + "/";
-    }
-    // dig through subdomains
-    matches = host.match(/[^.]*\.(.*)/);
-    return matches && /\./.test(matches[1]) ? prefix + matches[1] + "/" : null;
-}
+/**/
 
 function linkWidgetLoadStringBundle(bundlePath) {
   const strings = {};
@@ -621,50 +712,37 @@ function linkWidgetGuessPrevNextLinksFromURL(doc, guessPrev, guessNext) {
     }
 }
 
-function linkWidgetScanPageForLinks(doc) {
-  const links = doc.links;
-  // The scanning blocks the UI, so we don't want to spend too long on it. Previously we'd block the
-  // UI for several seconds on http://antwrp.gsfc.nasa.gov/apod/archivepix.html (>3000 links)
-  const max = Math.min(links.length, 500);
 
-  for(var i = 0; i != max; ++i) {
-    var link = links[i], href = link.href;
-    if(!href || href.charAt(0)=='#') continue; // ignore internal links
 
-    var txt = link.innerHTML
-        .replace(/<[^>]+alt=(["'])(.*?)\1[^>]*>/ig, " $2 ") // keep alt attrs
-        .replace(/<[^>]*>/g, "") // drop tags + comments
-        .replace("&lt;", "<")
-        .replace("&gt;", ">")
-        .replace(/\s+/g, " ")
-        .replace(/^\s+|\s+$/g, "");
-    var rels = (link.rel || link.rev) && linkWidgetGetLinkRels(link.rel, link.rev);
-    if(!rels) {
-      var rel = linkWidgetGuessLinkRel(link, txt);
-      if(rel) rels = {}, rels[rel] = true;
+function LinkWidgetLink(url, title, lang, media) {
+  this.url = url;
+  this.title = title || null;
+  this.lang = lang || null;
+  this.media = media || null;
+}
+LinkWidgetLink.prototype = {
+  _longTitle: null,
+
+  // this is only needed when showing a tooltip, or for items on the More menu, so we
+  // often won't use it at all, hence using a getter function
+  get longTitle() {
+    if(!this._longTitle) {
+      var longTitle = "";
+      // XXX: lookup more meaningful and localized version of media,
+      //   i.e. media="print" becomes "Printable" or some such
+      // XXX: use localized version of ":" separator
+      if(this.media && !/\b(all|screen)\b/i.test(this.media)) longTitle += this.media + ": ";
+      // XXX this produces stupid results if there is an hreflang present but no title
+      // (gives "French: ", should be something like "French [language] version")
+      if(this.lang) longTitle += linkWidgetGetLanguageName(this.lang) + ": ";
+      if(this.title) longTitle += this.title;
+      // the 'if' here is to ensure the long title isn't just the url
+      else if(longTitle) longTitle += this.url;
+      this._longTitle = longTitle;
     }
-    if(rels) LinkWidgetsExtension.linkWidgetAddLinkForPage(href, txt, link.hreflang, null, doc, rels);
+    return this._longTitle;
   }
-}
-
-
-// link is an <a href> link
-function linkWidgetGuessLinkRel(link, txt) {
-  if(LinkWidgetsExtension.linkWidgetRegexps.next.test(txt)) return "next";
-  if(LinkWidgetsExtension.linkWidgetRegexps.prev.test(txt)) return "prev";
-  if(LinkWidgetsExtension.linkWidgetRegexps.first.test(txt)) return "first";
-  if(LinkWidgetsExtension.linkWidgetRegexps.last.test(txt)) return "last";
-  const imgs = link.getElementsByTagName("img"), num = imgs.length;
-  for(var i = 0; i != num; ++i) {
-    // guessing is more accurate on relative URLs, and .src is always absolute
-    var src = imgs[i].getAttribute("src");
-    if(LinkWidgetsExtension.linkWidgetRegexps.img_next.test(src)) return "next";
-    if(LinkWidgetsExtension.linkWidgetRegexps.img_prev.test(src)) return "prev";
-    if(LinkWidgetsExtension.linkWidgetRegexps.img_first.test(src)) return "first";
-    if(LinkWidgetsExtension.linkWidgetRegexps.img_last.test(src)) return "last";
-  }
-  return null;
-}
+};
 
 
 const linkWidgetItemBase = {

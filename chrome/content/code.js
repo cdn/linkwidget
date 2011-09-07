@@ -214,8 +214,8 @@ LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler');
       var elt = event.originalTarget;
       var doc = elt.ownerDocument;
       if(!(elt instanceof HTMLLinkElement) || !elt.href || !(elt.rel || elt.rev)) return;
-LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler !returned');
-      var rels = linkWidgetGetLinkRels(elt.rel, elt.rev, elt.type, elt.title);
+      var rels = LinkWidgetsExtension.linkWidgetGetLinkRels(elt.rel, elt.rev, elt.type, elt.title);
+LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler | rels = LinkWidgetsExtension.linkWidgetGetLinkRels(..)');
       if(rels) LinkWidgetsExtension.linkWidgetAddLinkForPage(elt.href, elt.title, elt.hreflang, elt.media, doc, rels);
     },
 
@@ -483,7 +483,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | ' + isMenu);
     },
 
     linkWidgetGetLinkRels : function (relStr, revStr, mimetype, title) {
-LinkWidgetsExtension.lw_dump('linkWidgetGetLinkRels');
+LinkWidgetsExtension.lw_dump('LinkWidgetsExtension.linkWidgetGetLinkRels');
   // Ignore certain links
   if(LinkWidgetsExtension.linkWidgetRegexps.ignore_rels.test(relStr)) return null;
   // Ignore anything Firefox regards as an RSS/Atom-feed link
@@ -503,7 +503,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetGetLinkRels');
     for(var i = 0; i != relValues.length; i++) {
       var rel = relValues[i].toLowerCase();
       // this has to use "in", because the entries can be null (meaning "ignore")
-      rel = rel in linkWidgetRelConversions ? linkWidgetRelConversions[rel] : rel;
+      rel = rel in LinkWidgetsExtension.linkWidgetRelConversions ? LinkWidgetsExtension.linkWidgetRelConversions[rel] : rel;
       if(rel) rels[rel] = true, haveRels = true;
     }
   }
@@ -534,6 +534,7 @@ linkWidgetGetLanguageName : function (code) {
 },
 
 linkWidgetScanPageForLinks : function (doc) {
+LinkWidgetsExtension.lw_dump('Scan');
   const links = doc.links;
   // The scanning blocks the UI, so we don't want to spend too long on it. Previously we'd block the
   // UI for several seconds on http://antwrp.gsfc.nasa.gov/apod/archivepix.html (>3000 links)
@@ -550,7 +551,7 @@ linkWidgetScanPageForLinks : function (doc) {
         .replace("&gt;", ">")
         .replace(/\s+/g, " ")
         .replace(/^\s+|\s+$/g, "");
-    var rels = (link.rel || link.rev) && linkWidgetGetLinkRels(link.rel, link.rev);
+    var rels = (link.rel || link.rev) && LinkWidgetsExtension.linkWidgetGetLinkRels(link.rel, link.rev);
     if(!rels) {
       var rel = LinkWidgetsExtension.guessLinkRel(link, txt);
       if(rel) rels = {}, rels[rel] = true;
@@ -561,6 +562,7 @@ linkWidgetScanPageForLinks : function (doc) {
 
 // link is an <a href> link
 guessLinkRel : function (link, txt) {
+LinkWidgetsExtension.lw_dump('guessLinkRel');
   if(LinkWidgetsExtension.linkWidgetRegexps.next.test(txt)) return "next";
   if(LinkWidgetsExtension.linkWidgetRegexps.prev.test(txt)) return "prev";
   if(LinkWidgetsExtension.linkWidgetRegexps.first.test(txt)) return "first";
@@ -616,6 +618,7 @@ window.addEventListener("load", LinkWidgetsExtension.linkWidgetStartup, false);
 window.addEventListener("unload", LinkWidgetsExtension.linkWidgetShutdown, false);
 
 
+/*
 // null values mean that rel should be ignored
 const linkWidgetRelConversions = {
   home: "top",
@@ -647,7 +650,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetGetLinkRels');
   // Ignore anything Firefox regards as an RSS/Atom-feed link
   if(relStr && /alternate/i.test(relStr)) {
     // xxx have seen JS errors where "mimetype has no properties" (i.e., is null)
-    if(mimetype) { const type = mimetype.replace(/\s|;.*/g, "").toLowerCase(); }
+    if(mimetype) { const type = mimetype.replace(/\s|;.* /g, "").toLowerCase(); }
     const feedtype = /^application\/(?:rss|atom)\+xml$/;
     const xmltype = /^(?:application|text)\/(?:rdf\+)?xml$/;
     if(feedtype.test(type) || (xmltype.test(type) && /\brss\b/i.test(title))) return null;
@@ -675,7 +678,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetGetLinkRels');
   return haveRels ? rels : null;
 }
 
-/**/
+*/
 // a map from 2/3-letter lang codes to the langs' names in the current locale
 var linkWidgetLanguageNames = null;
 

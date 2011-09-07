@@ -250,7 +250,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler !returned');
       if(!/^(?:https?|ftp|file)\:$/.test(protocol)) return;
     
       if(LinkWidgetsExtension.linkWidgetPrefGuessPrevAndNextFromURL || !isHTML)
-        linkWidgetGuessPrevNextLinksFromURL(doc, !links.prev, !links.next);
+        LinkWidgetsExtension.guessPrevNextLinksFromURL(doc, !links.prev, !links.next);
     
       if(!LinkWidgetsExtension.linkWidgetPrefGuessUpAndTopFromURL && isHTML) return;
       if(!links.up) {
@@ -575,6 +575,38 @@ guessLinkRel : function (link, txt) {
     if(LinkWidgetsExtension.linkWidgetRegexps.img_last.test(src)) return "last";
   }
   return null;
+},
+
+guessPrevNextLinksFromURL : function (doc, guessPrev, guessNext) {
+    if(!guessPrev && !guessNext) return;
+
+    function isDigit(c) { return ("0" <= c && c <= "9") }
+
+    const location = doc.location;
+    var url = location.href;
+    var min = location.host.length + location.protocol.length + 2; // 2 for "//"
+
+    var e, s;
+    for(e = url.length; e > min && !isDigit(url[e-1]); --e);
+    if(e==min) return;
+    for(s = e - 1; s > min && isDigit(url[s-1]); --s);
+    // avoid guessing "foo%21bar" as next from "foo%20bar" (i.e. "foo bar")
+    if(s && url[s-1] == "%") return;
+
+    var old = url.substring(s,e);
+    var num = parseInt(old, 10); // force base 10 because number could start with zeros
+
+    var pre = url.substring(0,s), post = url.substring(e);
+    if(guessPrev) {
+      var prv = ""+(num-1);
+      while(prv.length < old.length) prv = "0" + prv;
+      LinkWidgetsExtension.linkWidgetAddLinkForPage(pre + prv + post, null, null, null, doc, { prev: true });
+    }
+    if(guessNext) {
+      var nxt = ""+(num+1);
+      while(nxt.length < old.length) nxt = "0" + nxt;
+      LinkWidgetsExtension.linkWidgetAddLinkForPage(pre + nxt + post, null, null, null, doc, { next: true });
+    }
 }
 
 
@@ -679,39 +711,6 @@ function linkWidgetLoadStringBundle(bundlePath) {
 
   return strings;
 }
-
-function linkWidgetGuessPrevNextLinksFromURL(doc, guessPrev, guessNext) {
-    if(!guessPrev && !guessNext) return;
-
-    function isDigit(c) { return ("0" <= c && c <= "9") }
-
-    const location = doc.location;
-    var url = location.href;
-    var min = location.host.length + location.protocol.length + 2; // 2 for "//"
-
-    var e, s;
-    for(e = url.length; e > min && !isDigit(url[e-1]); --e);
-    if(e==min) return;
-    for(s = e - 1; s > min && isDigit(url[s-1]); --s);
-    // avoid guessing "foo%21bar" as next from "foo%20bar" (i.e. "foo bar")
-    if(s && url[s-1] == "%") return;
-
-    var old = url.substring(s,e);
-    var num = parseInt(old, 10); // force base 10 because number could start with zeros
-
-    var pre = url.substring(0,s), post = url.substring(e);
-    if(guessPrev) {
-      var prv = ""+(num-1);
-      while(prv.length < old.length) prv = "0" + prv;
-      LinkWidgetsExtension.linkWidgetAddLinkForPage(pre + prv + post, null, null, null, doc, { prev: true });
-    }
-    if(guessNext) {
-      var nxt = ""+(num+1);
-      while(nxt.length < old.length) nxt = "0" + nxt;
-      LinkWidgetsExtension.linkWidgetAddLinkForPage(pre + nxt + post, null, null, null, doc, { next: true });
-    }
-}
-
 
 
 function LinkWidgetLink(url, title, lang, media) {

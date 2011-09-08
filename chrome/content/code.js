@@ -116,8 +116,6 @@ var LinkWidgetCore = {
       LinkWidgetCore.loadPrefs();
       gPrefService.addObserver(LinkWidgetCore.prefPrefix, LinkWidgetCore.prefObserver, false);
       for(var h in LinkWidgetCore.eventHandlers) {
-//
-        LinkWidgetCore.lw_dump(LinkWidgetCore.eventHandlers[h]);
           gBrowser.addEventListener(h, window[LinkWidgetCore.eventHandlers[h]], false); // 3.6
           gBrowser.tabContainer.addEventListener(h, window[LinkWidgetCore.eventHandlers[h]], false); // 4.01+ -- ONLY some
       }
@@ -192,7 +190,7 @@ var LinkWidgetCore = {
     },
 
     initVisibleButtons : function() {
-      LinkWidgetCore.lw_dump("initVisibleButtons");
+//      LinkWidgetCore.lw_dump("initVisibleButtons");
       LinkWidgetCore.buttons = {};
       for(var rel in LinkWidgetCore.buttonRels) {
         var elt = document.getElementById("linkwidget-"+rel);
@@ -253,8 +251,7 @@ var LinkWidgetCore = {
     },
 
     tabSelectedHandler : function(event) {
-//
-      LinkWidgetCore.lw_dump('tabSelectedHandler');
+//      LinkWidgetCore.lw_dump('tabSelectedHandler');
     //  let newTab = event.originalTarget;
       if(event.originalTarget.localName != "tabs") return;
       LinkWidgetCore.refreshLinks();
@@ -289,9 +286,8 @@ var LinkWidgetCore = {
     },
 
     addLinkForPage : function(url, txt, lang, media, doc, rels) {
-//
-LinkWidgetCore.lw_dump('addLinkForPage');
-      const link = new LinkWidgetLink(url, txt, lang, media);
+//LinkWidgetCore.lw_dump('addLinkForPage');
+      const link = new LinkWidgetCore.link(url, txt, lang, media);
       // put the link in a rel->[link] map on the document's XPCNativeWrapper
       var doclinks = doc.linkWidgetLinks || (doc.linkWidgetLinks = {});
       for(var r in rels) {
@@ -462,7 +458,7 @@ LinkWidgetCore.lw_dump('addLinkForPage');
     },
 
     getLinkRels : function (relStr, revStr, mimetype, title) {
-LinkWidgetCore.lw_dump('LinkWidgetCore.getLinkRels');
+//LinkWidgetCore.lw_dump('LinkWidgetCore.getLinkRels');
   // Ignore certain links
   if(LinkWidgetCore.regexps.ignore_rels.test(relStr)) return null;
   // Ignore anything Firefox regards as an RSS/Atom-feed link
@@ -532,7 +528,7 @@ getLanguageName : function (code) {
 },
 
 scanPageForLinks : function (doc) {
-LinkWidgetCore.lw_dump('Scan');
+//LinkWidgetCore.lw_dump('scanPageForLinks');
   const links = doc.links;
   // The scanning blocks the UI, so we don't want to spend too long on it. Previously we'd block the
   // UI for several seconds on http://antwrp.gsfc.nasa.gov/apod/archivepix.html (>3000 links)
@@ -607,6 +603,37 @@ guessPrevNextLinksFromURL : function (doc, guessPrev, guessNext) {
       while(nxt.length < old.length) nxt = "0" + nxt;
       LinkWidgetCore.addLinkForPage(pre + nxt + post, null, null, null, doc, { next: true });
     }
+},
+
+/* this is where it gets stickier */
+link : function (url, title, lang, media) {
+  this.url = url;
+  this.title = title || null;
+  this.lang = lang || null;
+  this.media = media || null;
+},
+link.prototype = {
+  _longTitle: null,
+
+  // this is only needed when showing a tooltip, or for items on the More menu, so we
+  // often won't use it at all, hence using a getter function
+  get longTitle() {
+    if(!this._longTitle) {
+      var longTitle = "";
+      // XXX: lookup more meaningful and localized version of media,
+      //   i.e. media="print" becomes "Printable" or some such
+      // XXX: use localized version of ":" separator
+      if(this.media && !/\b(all|screen)\b/i.test(this.media)) longTitle += this.media + ": ";
+      // XXX this produces stupid results if there is an hreflang present but no title
+      // (gives "French: ", should be something like "French [language] version")
+      if(this.lang) longTitle += LinkWidgetCore.getLanguageName(this.lang) + ": ";
+      if(this.title) longTitle += this.title;
+      // the 'if' here is to ensure the long title isn't just the url
+      else if(longTitle) longTitle += this.url;
+      this._longTitle = longTitle;
+    }
+    return this._longTitle;
+  }
 }
 
 };

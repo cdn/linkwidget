@@ -60,18 +60,18 @@ var LinkWidgetCore = {
     },
 
     // rels which should always use a submenu of the More menu, even for a single item
-    linkWidgetMenuRels : {}, // rel -> true map
-    _linkWidgetMenuRels : ["chapter", "section", "subsection", "bookmark", "alternate"],
+    menuRels : {}, // rel -> true map
+    _menuRels : ["chapter", "section", "subsection", "bookmark", "alternate"],
     
     // known rels in the order they should appear on the More menu
-    linkWidgetMenuOrdering : {}, // rel -> int map
-    _linkWidgetMenuOrdering : [
+    menuOrdering : {}, // rel -> int map
+    _menuOrdering : [
       "top","up","first","prev","next","last","toc","chapter","section","subsection","appendix",
       "glossary","index","help","search","author","copyright","bookmark","alternate"
     ],
 
-    linkWidgetButtonRels : {}, // rel -> true map
-    _linkWidgetButtonRels : ["top","up","first","prev","next","last"],
+    buttonRels : {}, // rel -> true map
+    _buttonRels : ["top","up","first","prev","next","last"],
     
     linkWidgetEventHandlers : {
       "select": "LinkWidgetCore.linkWidgetTabSelectedHandler",
@@ -85,10 +85,10 @@ var LinkWidgetCore = {
     linkWidgetPrefGuessPrevAndNextFromURL : false,
     linkWidgetPrefScanHyperlinks : false,
     strings : "chrome://linkwidget/locale/main.strings",
-    linkWidgetButtons : {}, // rel -> <toolbarbutton> map
-    linkWidgetViews : {},   // rel -> view map, the views typically being a menu+menuitem
-    linkWidgetMoreMenu : null,
-    linkWidgetMorePopup : null,
+    buttons : {}, // rel -> <toolbarbutton> map
+    views : {},   // rel -> view map, the views typically being a menu+menuitem
+    moreMenu : null,
+    morePopup : null,
 
     aConsoleService: Components.classes["@mozilla.org/consoleservice;1"].
     getService(Components.interfaces.nsIConsoleService),
@@ -103,9 +103,9 @@ var LinkWidgetCore = {
       LinkWidgetCore.lw_dump("startup\n");
       window.removeEventListener("load", LinkWidgetCore.startup, false);
       LinkWidgetCore.strings = LinkWidgetCore.loadStringBundle(LinkWidgetCore.strings);
-      for(var i in LinkWidgetCore._linkWidgetMenuOrdering) LinkWidgetCore.linkWidgetMenuOrdering[LinkWidgetCore._linkWidgetMenuOrdering[i]] = (i-0) + 1;
-      for each(i in LinkWidgetCore._linkWidgetMenuRels) LinkWidgetCore.linkWidgetMenuRels[i] = true;
-      for each(i in LinkWidgetCore._linkWidgetButtonRels) LinkWidgetCore.linkWidgetButtonRels[i] = true;
+      for(var i in LinkWidgetCore._menuOrdering) LinkWidgetCore.menuOrdering[LinkWidgetCore._menuOrdering[i]] = (i-0) + 1;
+      for each(i in LinkWidgetCore._menuRels) LinkWidgetCore.menuRels[i] = true;
+      for each(i in LinkWidgetCore._buttonRels) LinkWidgetCore.buttonRels[i] = true;
       LinkWidgetCore.initMoreMenu();
       LinkWidgetCore.initVisibleButtons();
       setTimeout(LinkWidgetCore.linkWidgetDelayedStartup, 1); // needs to happen after Fx's delayedStartup(); Fc?
@@ -194,17 +194,17 @@ var LinkWidgetCore = {
     },
 
     initMoreMenu : function() {
-      LinkWidgetCore.linkWidgetMoreMenu = document.getElementById("linkwidget-more-menu");
-      LinkWidgetCore.linkWidgetMorePopup = document.getElementById("linkwidget-more-popup");
+      LinkWidgetCore.moreMenu = document.getElementById("linkwidget-more-menu");
+      LinkWidgetCore.morePopup = document.getElementById("linkwidget-more-popup");
     },
 
     initVisibleButtons : function() {
       LinkWidgetCore.lw_dump("initVisibleButtons");
-      LinkWidgetCore.linkWidgetButtons = {};
-      for(var rel in LinkWidgetCore.linkWidgetButtonRels) {
+      LinkWidgetCore.buttons = {};
+      for(var rel in LinkWidgetCore.buttonRels) {
         var elt = document.getElementById("linkwidget-"+rel);
     //  dump("lw :: initVisibleButtons | "+ rel +"\n");
-        if(elt) LinkWidgetCore.linkWidgetButtons[rel] = initLinkWidgetButton(elt, rel);
+        if(elt) LinkWidgetCore.buttons[rel] = initLinkWidgetButton(elt, rel);
       }
     },
 
@@ -230,8 +230,8 @@ LinkWidgetCore.lw_dump('linkAddedHandler | rels = LinkWidgetCore.getLinkRels(..)
       // don't clear the links for unload/pagehide from a background tab, or from a subframe
       // If docShell is null accessing .contentDocument throws an exception
       if(!gBrowser.docShell || doc != gBrowser.contentDocument) return;
-      for each(var btn in LinkWidgetCore.linkWidgetButtons) btn.show(null);
-      if(LinkWidgetCore.linkWidgetMoreMenu) LinkWidgetCore.linkWidgetMoreMenu.disabled = true;
+      for each(var btn in LinkWidgetCore.buttons) btn.show(null);
+      if(LinkWidgetCore.moreMenu) LinkWidgetCore.moreMenu.disabled = true;
     },
 
     pageLoadedHandler : function(event) {
@@ -285,8 +285,8 @@ LinkWidgetCore.lw_dump('linkAddedHandler | rels = LinkWidgetCore.getLinkRels(..)
 
     linkWidgetRefreshLinks : function() {
     //alert('lWRL'); LinkWidgetCore.lw_dump('linkWidgetRefreshLinks');
-      for each(var btn in LinkWidgetCore.linkWidgetButtons) btn.show(null);
-      if(LinkWidgetCore.linkWidgetMoreMenu) LinkWidgetCore.linkWidgetMoreMenu.disabled = true;
+      for each(var btn in LinkWidgetCore.buttons) btn.show(null);
+      if(LinkWidgetCore.moreMenu) LinkWidgetCore.moreMenu.disabled = true;
  //LinkWidgetCore.lw_dump('.');
 
       const doc = content.document, links = doc.linkWidgetLinks;
@@ -298,12 +298,11 @@ LinkWidgetCore.lw_dump('linkAddedHandler | rels = LinkWidgetCore.getLinkRels(..)
       var enableMoreMenu = false;
       for(var rel in links) {
 //LinkWidgetCore.lw_dump('for(var rel in links)');
-// Error: LinkWidgetCore.linkWidgetButtons[rel].show is not a function
-        if(rel in LinkWidgetCore.linkWidgetButtons) LinkWidgetCore.linkWidgetButtons[rel].show(links[rel]); // ?
+        if(rel in LinkWidgetCore.buttons) LinkWidgetCore.buttons[rel].show(links[rel]); // ?
         else enableMoreMenu = true;
 //enableMoreMenu = true;
       }
-      if(LinkWidgetCore.linkWidgetMoreMenu && enableMoreMenu) LinkWidgetCore.linkWidgetMoreMenu.disabled = false;
+      if(LinkWidgetCore.moreMenu && enableMoreMenu) LinkWidgetCore.moreMenu.disabled = false;
     },
 
     linkWidgetAddLinkForPage : function(url, txt, lang, media, doc, rels) {
@@ -324,25 +323,25 @@ LinkWidgetCore.lw_dump('linkWidgetAddLinkForPage');
       var enableMoreMenu = false;
       for(var rel in rels) {
         // buttons need updating immediately, but anything else can wait till the menu is showing
-        if(rel in LinkWidgetCore.linkWidgetButtons) LinkWidgetCore.linkWidgetButtons[rel].show(doclinks[rel]);
+        if(rel in LinkWidgetCore.buttons) LinkWidgetCore.buttons[rel].show(doclinks[rel]);
         else enableMoreMenu = true;
       }
-      if(LinkWidgetCore.linkWidgetMoreMenu && enableMoreMenu) LinkWidgetCore.linkWidgetMoreMenu.disabled = false;
+      if(LinkWidgetCore.moreMenu && enableMoreMenu) LinkWidgetCore.moreMenu.disabled = false;
     },
 
     onMoreMenuShowing : function() {
 LinkWidgetCore.lw_dump('onMoreMenuShowing');
       const linkmaps = content.document.linkWidgetLinks;
       // Update all existing views
-      for(var rel in LinkWidgetCore.linkWidgetViews) LinkWidgetCore.linkWidgetViews[rel].show(linkmaps[rel] || null);
+      for(var rel in LinkWidgetCore.views) LinkWidgetCore.views[rel].show(linkmaps[rel] || null);
       // Create any new views that are needed
       for(rel in linkmaps) {
 //LinkWidgetCore.lw_dump('onMoreMenuShowing | ' + rel);
-        if(rel in LinkWidgetCore.linkWidgetViews || rel in LinkWidgetCore.linkWidgetButtons) continue;
+        if(rel in LinkWidgetCore.views || rel in LinkWidgetCore.buttons) continue;
 //LinkWidgetCore.lw_dump('onMoreMenuShowing | continue' + '');
-        var relNum = LinkWidgetCore.linkWidgetMenuOrdering[rel] || Infinity;
-        var isMenu = rel in LinkWidgetCore.linkWidgetMenuRels;
-        var item = LinkWidgetCore.linkWidgetViews[rel] =
+        var relNum = LinkWidgetCore.menuOrdering[rel] || Infinity;
+        var isMenu = rel in LinkWidgetCore.menuRels;
+        var item = LinkWidgetCore.views[rel] =
           isMenu ? new LinkWidgetMenu(rel, relNum) : new LinkWidgetItem(rel, relNum);
         item.show(linkmaps[rel]);
 //LinkWidgetCore.lw_dump('onMoreMenuShowing | ' + isMenu);
@@ -354,17 +353,17 @@ LinkWidgetCore.lw_dump('onMoreMenuShowing');
       if(!somethingChanged) return;
     
       LinkWidgetCore.initMoreMenu();
-      for each(var btn in LinkWidgetCore.linkWidgetButtons) btn.show(null);
+      for each(var btn in LinkWidgetCore.buttons) btn.show(null);
       LinkWidgetCore.initVisibleButtons();
-      for(var rel in LinkWidgetCore.linkWidgetViews) {
-        var item = LinkWidgetCore.linkWidgetViews[rel];
-        if(!LinkWidgetCore.linkWidgetButtons[rel] && LinkWidgetCore.linkWidgetMoreMenu) continue;
+      for(var rel in LinkWidgetCore.views) {
+        var item = LinkWidgetCore.views[rel];
+        if(!LinkWidgetCore.buttons[rel] && LinkWidgetCore.moreMenu) continue;
         item.destroy();
-        delete LinkWidgetCore.linkWidgetViews[rel];
+        delete LinkWidgetCore.views[rel];
       }
       // Can end up incorrectly enabled if e.g. only the Top menuitem was active,
       // and that gets replaced by a button.
-      if(LinkWidgetCore.linkWidgetMoreMenu) LinkWidgetCore.linkWidgetMoreMenu.disabled = true;
+      if(LinkWidgetCore.moreMenu) LinkWidgetCore.moreMenu.disabled = true;
     
       LinkWidgetCore.linkWidgetRefreshLinks();
     },
@@ -400,7 +399,7 @@ LinkWidgetCore.lw_dump('onMoreMenuShowing');
       }
     },
 
-    linkWidgetButtonRightClicked : function(e) {
+    buttonRightClicked : function(e) {
       const t = e.target, ot = e.originalTarget;
       if(ot.localName=="toolbarbutton" && t.numLinks > 1) t.firstChild.showPopup();
     },
@@ -700,7 +699,7 @@ function initLinkWidgetButton(elt, rel) {
   elt.onmouseover = LinkWidgetCore.mouseEnter;
   elt.onmouseout = LinkWidgetCore.mouseExit;
   elt.onclick = LinkWidgetCore.itemClicked;
-  elt.oncontextmenu = LinkWidgetCore.linkWidgetButtonRightClicked;
+  elt.oncontextmenu = LinkWidgetCore.buttonRightClicked;
   elt.setAttribute("oncommand", "LinkWidgetCore.loadPage(event);"); // .oncommand does not exist
   elt.setAttribute("context", "");
   elt.setAttribute("tooltip", "linkwidget-tooltip");
@@ -799,7 +798,7 @@ LinkWidgetItem.prototype = {
     const rel = this.rel;
     const mi = this.menuitem = document.createElement("menuitem");
     const relStr = LinkWidgetCore.strings[rel] || rel;
-    const relclass = LinkWidgetCore.linkWidgetButtonRels[rel] ? " linkwidget-rel-"+rel : "";
+    const relclass = LinkWidgetCore.buttonRels[rel] ? " linkwidget-rel-"+rel : "";
     mi.className = "menuitem-iconic linkwidget-menuitem " + relclass;
     mi.setAttribute("label", relStr);
     const m = this.menu = document.createElement("menu");
@@ -813,7 +812,7 @@ LinkWidgetItem.prototype = {
     mi.relNum = m.relNum = this.relNum;
     m.appendChild(p);
     
-    const mpopup = LinkWidgetCore.linkWidgetMorePopup, kids = mpopup.childNodes, num = kids.length;
+    const mpopup = LinkWidgetCore.morePopup, kids = mpopup.childNodes, num = kids.length;
     var insertionpoint = null;
     if(this.relNum != Infinity && num != 0) {
       for(var i = 0, node = kids[i]; i < num && node.relNum < this.relNum; i += 2, node = kids[i]);

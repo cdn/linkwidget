@@ -49,7 +49,7 @@ the terms of any one of the MPL, the GPL or the LGPL.
 
   <popupset id="mainPopupSet">
     <tooltip id="linkwidget-tooltip" orient="vertical"
-        onpopupshowing="return LinkWidgetCore.linkWidgetFillTooltip(this, event);">
+        onpopupshowing="return LinkWidgetCore.fillTooltip(this, event);">
       <label id="linkwidget-tooltip-1"/>
       <label id="linkwidget-tooltip-2" crop="center"/>
     </tooltip>
@@ -57,25 +57,25 @@ the terms of any one of the MPL, the GPL or the LGPL.
 
   <keyset id="mainKeyset">
     <key id="linkwidget-key-top" keycode="&keycode.top;" modifiers="&modifiers.top;"
-        oncommand="LinkWidgetCore.linkWidgetGo('top');"/>
+        oncommand="LinkWidgetCore.go('top');"/>
     <key id="linkwidget-key-up" keycode="&keycode.up;" modifiers="&modifiers.up;"
-        oncommand="LinkWidgetCore.linkWidgetGo('up');"/>
+        oncommand="LinkWidgetCore.go('up');"/>
     <key id="linkwidget-key-first" key="&key.first;" modifiers="&modifiers.first;"
-        oncommand="LinkWidgetCore.linkWidgetGo('first');"/>
+        oncommand="LinkWidgetCore.go('first');"/>
     <key id="linkwidget-key2-first" keycode="&keycode2.first;" modifiers="&modifiers2.first;"
-        oncommand="LinkWidgetCore.linkWidgetGo('first');"/>
+        oncommand="LinkWidgetCore.go('first');"/>
     <key id="linkwidget-key-prev" key="&key.prev;" modifiers="&modifiers.prev;"
-        oncommand="LinkWidgetCore.linkWidgetGo('prev');"/>
+        oncommand="LinkWidgetCore.go('prev');"/>
     <key id="linkwidget-key2-prev" keycode="&keycode2.prev;" modifiers="&modifiers2.prev;"
-        oncommand="LinkWidgetCore.linkWidgetGo('prev');"/>
+        oncommand="LinkWidgetCore.go('prev');"/>
     <key id="linkwidget-key-next" key="&key.next;" modifiers="&modifiers.next;"
-        oncommand="LinkWidgetCore.linkWidgetGo('next');"/>
+        oncommand="LinkWidgetCore.go('next');"/>
     <key id="linkwidget-key2-next" keycode="&keycode2.next;" modifiers="&modifiers2.next;"
-        oncommand="LinkWidgetCore.linkWidgetGo('next');"/>
+        oncommand="LinkWidgetCore.go('next');"/>
     <key id="linkwidget-key-last" key="&key.last;" modifiers="&modifiers.last;"
-        oncommand="LinkWidgetCore.linkWidgetGo('last');"/>
+        oncommand="LinkWidgetCore.go('last');"/>
     <key id="linkwidget-key2-last" keycode="&keycode2.last;" modifiers="&modifiers2.last;"
-        oncommand="LinkWidgetCore.linkWidgetGo('last');"/>
+        oncommand="LinkWidgetCore.go('last');"/>
   </keyset>
 
   <toolbarbutton id="linkwidget-top" label="&top.label;" fallbackTooltipText="&top.tooltip;"
@@ -94,7 +94,7 @@ the terms of any one of the MPL, the GPL or the LGPL.
   <toolbarbutton id="linkwidget-more-menu" label="&more.label;" fallbackTooltipText="&more.tooltip;"
       type="menu" orient="" tooltip="linkwidget-tooltip" context="" disabled="true"
       class="linkwidget-button toolbarbutton-1"
-      oncommand="return LinkWidgetCore.linkWidgetLoadPage(event);" onclick="LinkWidgetCore.linkWidgetItemClicked(event);"
+      oncommand="return LinkWidgetCore.loadPage(event);" onclick="LinkWidgetCore.itemClicked(event);"
       onmouseover="LinkWidgetCore.mouseEnter(event);" onmouseout="LinkWidgetCore.mouseExit(event);"
       >
     <menupopup id="linkwidget-more-popup" onpopupshowing="LinkWidgetCore.onMoreMenuShowing();"/>

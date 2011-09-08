@@ -102,7 +102,7 @@ var LinkWidgetCore = {
     startup : function() {
       LinkWidgetCore.lw_dump("startup\n");
       window.removeEventListener("load", LinkWidgetCore.startup, false);
-      LinkWidgetCore.strings = LinkWidgetCore.linkWidgetLoadStringBundle(LinkWidgetCore.strings);
+      LinkWidgetCore.strings = LinkWidgetCore.loadStringBundle(LinkWidgetCore.strings);
       for(var i in LinkWidgetCore._linkWidgetMenuOrdering) LinkWidgetCore.linkWidgetMenuOrdering[LinkWidgetCore._linkWidgetMenuOrdering[i]] = (i-0) + 1;
       for each(i in LinkWidgetCore._linkWidgetMenuRels) LinkWidgetCore.linkWidgetMenuRels[i] = true;
       for each(i in LinkWidgetCore._linkWidgetButtonRels) LinkWidgetCore.linkWidgetButtonRels[i] = true;
@@ -113,8 +113,8 @@ var LinkWidgetCore = {
 
     linkWidgetDelayedStartup : function() {
       LinkWidgetCore.lw_dump("linkWidgetDelayedStartup");
-      LinkWidgetCore.linkWidgetLoadPrefs();
-//      dump("lw :: linkWidgetDelayedStartup | LinkWidgetCore.linkWidgetLoadPrefs\n");
+      LinkWidgetCore.loadPrefs();
+//      dump("lw :: linkWidgetDelayedStartup | LinkWidgetCore.loadPrefs\n");
       gPrefService.addObserver(LinkWidgetCore.linkWidgetPrefPrefix, LinkWidgetCore.linkWidgetPrefObserver, false);
 //      dump("lw :: linkWidgetDelayedStartup : gPrefService.addObserver\n");
       for(var h in LinkWidgetCore.linkWidgetEventHandlers) {
@@ -155,8 +155,8 @@ var LinkWidgetCore = {
       gPrefService.removeObserver(LinkWidgetCore.linkWidgetPrefPrefix, LinkWidgetCore.linkWidgetPrefObserver);
     },
 
-    linkWidgetLoadPrefs : function() {
-      LinkWidgetCore.lw_dump("linkWidgetLoadPrefs");
+    loadPrefs : function() {
+      LinkWidgetCore.lw_dump("loadPrefs");
       const branch = Components.classes["@mozilla.org/preferences-service;1"]
                              .getService(Components.interfaces.nsIPrefService)
                              .QueryInterface(Components.interfaces.nsIPrefBranch)
@@ -184,7 +184,7 @@ var LinkWidgetCore = {
       observe: function(subject, topic, data) {
     //    dump("lwpref: subject="+subject.root+" topic="+topic+" data="+data+"\n");
         // there're only three/four of them
-        LinkWidgetCore.linkWidgetLoadPrefs();
+        LinkWidgetCore.loadPrefs();
       }
     },
 
@@ -379,7 +379,7 @@ LinkWidgetCore.lw_dump('onMoreMenuShowing');
       XULBrowserWindow.setOverLink("", null);
     },
 
-    linkWidgetFillTooltip : function(tooltip, event) {
+    fillTooltip : function(tooltip, event) {
       const elt = document.tooltipNode, line1 = tooltip.firstChild, line2 = tooltip.lastChild;
       const text1 = elt.preferredTooltipText || elt.getAttribute("fallbackTooltipText");
       const text2 = elt.linkURL;
@@ -389,7 +389,7 @@ LinkWidgetCore.lw_dump('onMoreMenuShowing');
       return !(!text1 && !text2); // return a bool, not a string; [OR] == NAND ( !A !B )
     },
 
-    linkWidgetItemClicked : function(e) {
+    itemClicked : function(e) {
       if(e.button != 1) return;
       LinkWidgetCore.loadPage(e);
       // close any menus
@@ -421,7 +421,7 @@ LinkWidgetCore.lw_dump('onMoreMenuShowing');
       LinkWidgetCore.loadPageInCurrentBrowser(url);
     },
 
-    linkWidgetGo : function(rel) {
+    go : function(rel) {
       const links = content.document.linkWidgetLinks || {};
       if(!links[rel]) return;
       LinkWidgetCore.loadPageInCurrentBrowser(links[rel][0].url);
@@ -517,7 +517,7 @@ LinkWidgetCore.lw_dump('LinkWidgetCore.getLinkRels');
   return haveRels ? rels : null;
 },
 
-linkWidgetLoadStringBundle : function (bundlePath) {
+loadStringBundle : function (bundlePath) {
   const strings = {};
   try {
     var bundle = Components.classes["@mozilla.org/intl/stringbundle;1"]
@@ -542,7 +542,7 @@ languageNames : null,
 // code is a language code, e.g. en, en-GB, es, fr-FR
 getLanguageName : function (code) {
     if(!LinkWidgetCore.languageNames) LinkWidgetCore.languageNames =
-      LinkWidgetCore.linkWidgetLoadStringBundle("chrome://global/locale/languageNames.properties");
+      LinkWidgetCore.loadStringBundle("chrome://global/locale/languageNames.properties");
     const dict = LinkWidgetCore.languageNames;
     if(code in dict) return dict[code];
     // if we have something like "en-GB", change to "English (GB)"
@@ -699,7 +699,7 @@ function initLinkWidgetButton(elt, rel) {
   // to avoid repetitive XUL
   elt.onmouseover = LinkWidgetCore.mouseEnter;
   elt.onmouseout = LinkWidgetCore.mouseExit;
-  elt.onclick = LinkWidgetCore.linkWidgetItemClicked;
+  elt.onclick = LinkWidgetCore.itemClicked;
   elt.oncontextmenu = LinkWidgetCore.linkWidgetButtonRightClicked;
   elt.setAttribute("oncommand", "LinkWidgetCore.loadPage(event);"); // .oncommand does not exist
   elt.setAttribute("context", "");

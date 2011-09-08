@@ -287,7 +287,7 @@ var LinkWidgetCore = {
 
     addLinkForPage : function(url, txt, lang, media, doc, rels) {
 //LinkWidgetCore.lw_dump('addLinkForPage');
-      const link = new LinkWidgetCore.link(url, txt, lang, media);
+      const link = new LinkWidgetLink(url, txt, lang, media);
       // put the link in a rel->[link] map on the document's XPCNativeWrapper
       var doclinks = doc.linkWidgetLinks || (doc.linkWidgetLinks = {});
       for(var r in rels) {
@@ -603,7 +603,7 @@ guessPrevNextLinksFromURL : function (doc, guessPrev, guessNext) {
       while(nxt.length < old.length) nxt = "0" + nxt;
       LinkWidgetCore.addLinkForPage(pre + nxt + post, null, null, null, doc, { next: true });
     }
-}
+},
 
 
 };

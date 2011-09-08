@@ -95,7 +95,7 @@ var LinkWidgetCore = {
  
     lw_dump : function(msg) {
         msg = 'Link Widgets :: ' + msg;
-        this.aConsoleService.logStringMessage(msg);
+       // this.aConsoleService.logStringMessage(msg);
         dump(msg + "\n");
     },
 
@@ -116,40 +116,35 @@ var LinkWidgetCore = {
       LinkWidgetCore.loadPrefs();
 //      dump("lw :: delayedStartup | LinkWidgetCore.loadPrefs\n");
       gPrefService.addObserver(LinkWidgetCore.prefPrefix, LinkWidgetCore.prefObserver, false);
-//      dump("lw :: delayedStartup : gPrefService.addObserver\n");
       for(var h in LinkWidgetCore.eventHandlers) {
-//        LinkWidgetCore.lw_dump('delayedStartup | ' + h);
-//        LinkWidgetCore.lw_dump(LinkWidgetCore.eventHandlers[h]);
+//
+        LinkWidgetCore.lw_dump(LinkWidgetCore.eventHandlers[h]);
           gBrowser.addEventListener(h, window[LinkWidgetCore.eventHandlers[h]], false); // 3.6
           gBrowser.tabContainer.addEventListener(h, window[LinkWidgetCore.eventHandlers[h]], false); // 4.01+ -- ONLY some
       }
 
-//          gBrowser.tabContainer.addEventListener('pagehide', LinkWidgetCore.pageHideHandler, false); // no
 //        gBrowser.tabContainer.addEventListener('pageshow', LinkWidgetCore.pageShowHandler, false);
           gBrowser.tabContainer.addEventListener('select', LinkWidgetCore.tabSelectedHandler, false); // yes
-//          gBrowser.tabContainer.addEventListener('DOMLinkAdded', LinkWidgetCore.linkAddedHandler, false); // yes | no ?
-//          gBrowser.tabContainer.addEventListener('DOMContentLoaded', LinkWidgetCore.pageLoadedHandler, false); // no
 
+//          gBrowser.tabContainer.addEventListener('DOMLinkAdded', LinkWidgetCore.linkAddedHandler, false); // yes | no ?
 
           gBrowser.addEventListener('pagehide', LinkWidgetCore.pageHideHandler, false); // yes
           gBrowser.addEventListener('pageshow', LinkWidgetCore.pageShowHandler, false); // yes
           gBrowser.addEventListener('DOMContentLoaded', LinkWidgetCore.pageLoadedHandler, false); // yes
           gBrowser.addEventListener('DOMLinkAdded', LinkWidgetCore.linkAddedHandler, false); // also ?
 
-//      dump("lw :: delayedStartup : for(var h in LinkWidgetCore.eventHandlers)\n");
       // replace the toolbar customisation callback
         var box = document.getElementById("navigator-toolbox");
         box._preLinkWidget_customizeDone = box.customizeDone;
         box.customizeDone = LinkWidgetCore.toolboxCustomizeDone;
-//      dump("lw :: delayedStartup : box.customizeDone\n");
     },
 
     shutdown : function() {
-      LinkWidgetCore.lw_dump("shutdown");
+//      LinkWidgetCore.lw_dump("shutdown");
       window.removeEventListener("unload", LinkWidgetCore.shutdown, false);
       for(var h in LinkWidgetCore.eventHandlers) {
-          gBrowser.addEventListener(h, window[LinkWidgetCore.eventHandlers[h]], false);
-          gBrowser.tabContainer.addEventListener(h, window[LinkWidgetCore.eventHandlers[h]], false); // 4.01+ -- ONLY some
+          gBrowser.removeEventListener(h, window[LinkWidgetCore.eventHandlers[h]], false);
+          gBrowser.tabContainer.removeEventListener(h, window[LinkWidgetCore.eventHandlers[h]], false); // 4.01+ -- ONLY some
       }
       gPrefService.removeObserver(LinkWidgetCore.prefPrefix, LinkWidgetCore.prefObserver);
     },
@@ -202,19 +197,16 @@ var LinkWidgetCore = {
       LinkWidgetCore.buttons = {};
       for(var rel in LinkWidgetCore.buttonRels) {
         var elt = document.getElementById("linkwidget-"+rel);
-    //  dump("lw :: initVisibleButtons | "+ rel +"\n");
         if(elt) LinkWidgetCore.buttons[rel] = initLinkWidgetButton(elt, rel);
       }
     },
 
     linkAddedHandler : function(event) {
-//
-LinkWidgetCore.lw_dump('linkAddedHandler');
+//LinkWidgetCore.lw_dump('linkAddedHandler');
       var elt = event.originalTarget;
       var doc = elt.ownerDocument;
       if(!(elt instanceof HTMLLinkElement) || !elt.href || !(elt.rel || elt.rev)) return;
       var rels = LinkWidgetCore.getLinkRels(elt.rel, elt.rev, elt.type, elt.title);
-LinkWidgetCore.lw_dump('linkAddedHandler | rels = LinkWidgetCore.getLinkRels(..)');
       if(rels) LinkWidgetCore.addLinkForPage(elt.href, elt.title, elt.hreflang, elt.media, doc, rels);
     },
 
@@ -235,7 +227,6 @@ LinkWidgetCore.lw_dump('linkAddedHandler | rels = LinkWidgetCore.getLinkRels(..)
 
     pageLoadedHandler : function(event) {
 //LinkWidgetCore.lw_dump('pageLoadedHandler');
-//      LinkWidgetCore.refreshLinks();
       const doc = event.originalTarget, win = doc.defaultView;
       if(win != win.top || doc.linkWidgetHasGuessedLinks) return;
     
@@ -267,7 +258,6 @@ LinkWidgetCore.lw_dump('linkAddedHandler | rels = LinkWidgetCore.getLinkRels(..)
       LinkWidgetCore.lw_dump('tabSelectedHandler');
     //  let newTab = event.originalTarget;
       if(event.originalTarget.localName != "tabs") return;
-//dump('if(event.originalTarget.localName != "tabs") return' + "\n");
       LinkWidgetCore.refreshLinks();
     },
 
@@ -286,20 +276,15 @@ LinkWidgetCore.lw_dump('linkAddedHandler | rels = LinkWidgetCore.getLinkRels(..)
     //alert('lWRL'); LinkWidgetCore.lw_dump('refreshLinks');
       for each(var btn in LinkWidgetCore.buttons) btn.show(null);
       if(LinkWidgetCore.moreMenu) LinkWidgetCore.moreMenu.disabled = true;
- //LinkWidgetCore.lw_dump('.');
 
       const doc = content.document, links = doc.linkWidgetLinks;
-//LinkWidgetCore.lw_dump(typeof links);
 
       if(!links) return;
-//LinkWidgetCore.lw_dump('if(!links)');
     
       var enableMoreMenu = false;
       for(var rel in links) {
-//LinkWidgetCore.lw_dump('for(var rel in links)');
         if(rel in LinkWidgetCore.buttons) LinkWidgetCore.buttons[rel].show(links[rel]); // ?
         else enableMoreMenu = true;
-//enableMoreMenu = true;
       }
       if(LinkWidgetCore.moreMenu && enableMoreMenu) LinkWidgetCore.moreMenu.disabled = false;
     },
@@ -335,15 +320,12 @@ LinkWidgetCore.lw_dump('onMoreMenuShowing');
       for(var rel in LinkWidgetCore.views) LinkWidgetCore.views[rel].show(linkmaps[rel] || null);
       // Create any new views that are needed
       for(rel in linkmaps) {
-//LinkWidgetCore.lw_dump('onMoreMenuShowing | ' + rel);
         if(rel in LinkWidgetCore.views || rel in LinkWidgetCore.buttons) continue;
-//LinkWidgetCore.lw_dump('onMoreMenuShowing | continue' + '');
         var relNum = LinkWidgetCore.menuOrdering[rel] || Infinity;
         var isMenu = rel in LinkWidgetCore.menuRels;
         var item = LinkWidgetCore.views[rel] =
           isMenu ? new LinkWidgetMenu(rel, relNum) : new LinkWidgetItem(rel, relNum);
         item.show(linkmaps[rel]);
-//LinkWidgetCore.lw_dump('onMoreMenuShowing | ' + isMenu);
       }
     },
 

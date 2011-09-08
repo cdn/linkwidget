@@ -43,10 +43,10 @@ the terms of any one of the MPL, the GPL or the LGPL.
 
 var LinkWidgetCore = {
 
-    linkWidgetPrefPrefix : "extensions.linkwidget.",
+    prefPrefix : "extensions.linkwidget.",
 
     // Used in link-guessing. Populated from preferences with related names.
-    linkWidgetRegexps : {
+    regexps : {
       "ignore_rels": null,
       "guess_up_skip": null,
       "first": null,
@@ -73,17 +73,17 @@ var LinkWidgetCore = {
     buttonRels : {}, // rel -> true map
     _buttonRels : ["top","up","first","prev","next","last"],
     
-    linkWidgetEventHandlers : {
-      "select": "LinkWidgetCore.linkWidgetTabSelectedHandler",
+    eventHandlers : {
+      "select": "LinkWidgetCore.tabSelectedHandler",
       "DOMLinkAdded": "LinkWidgetCore.linkAddedHandler",
       "pagehide": "LinkWidgetCore.pageHideHandler",
       "DOMContentLoaded": "LinkWidgetCore.pageLoadedHandler",
       "pageshow": "LinkWidgetCore.pageShowHandler"
     },
 
-    linkWidgetPrefGuessUpAndTopFromURL : false,
-    linkWidgetPrefGuessPrevAndNextFromURL : false,
-    linkWidgetPrefScanHyperlinks : false,
+    prefGuessUpAndTopFromURL : false,
+    prefGuessPrevAndNextFromURL : false,
+    prefScanHyperlinks : false,
     strings : "chrome://linkwidget/locale/main.strings",
     buttons : {}, // rel -> <toolbarbutton> map
     views : {},   // rel -> view map, the views typically being a menu+menuitem
@@ -108,25 +108,25 @@ var LinkWidgetCore = {
       for each(i in LinkWidgetCore._buttonRels) LinkWidgetCore.buttonRels[i] = true;
       LinkWidgetCore.initMoreMenu();
       LinkWidgetCore.initVisibleButtons();
-      setTimeout(LinkWidgetCore.linkWidgetDelayedStartup, 1); // needs to happen after Fx's delayedStartup(); Fc?
+      setTimeout(LinkWidgetCore.delayedStartup, 1); // needs to happen after Fx's delayedStartup(); Fc?
     },
 
-    linkWidgetDelayedStartup : function() {
-      LinkWidgetCore.lw_dump("linkWidgetDelayedStartup");
+    delayedStartup : function() {
+      LinkWidgetCore.lw_dump("delayedStartup");
       LinkWidgetCore.loadPrefs();
-//      dump("lw :: linkWidgetDelayedStartup | LinkWidgetCore.loadPrefs\n");
-      gPrefService.addObserver(LinkWidgetCore.linkWidgetPrefPrefix, LinkWidgetCore.linkWidgetPrefObserver, false);
-//      dump("lw :: linkWidgetDelayedStartup : gPrefService.addObserver\n");
-      for(var h in LinkWidgetCore.linkWidgetEventHandlers) {
-//        LinkWidgetCore.lw_dump('linkWidgetDelayedStartup | ' + h);
-//        LinkWidgetCore.lw_dump(LinkWidgetCore.linkWidgetEventHandlers[h]);
-          gBrowser.addEventListener(h, window[LinkWidgetCore.linkWidgetEventHandlers[h]], false); // 3.6
-          gBrowser.tabContainer.addEventListener(h, window[LinkWidgetCore.linkWidgetEventHandlers[h]], false); // 4.01+ -- ONLY some
+//      dump("lw :: delayedStartup | LinkWidgetCore.loadPrefs\n");
+      gPrefService.addObserver(LinkWidgetCore.prefPrefix, LinkWidgetCore.prefObserver, false);
+//      dump("lw :: delayedStartup : gPrefService.addObserver\n");
+      for(var h in LinkWidgetCore.eventHandlers) {
+//        LinkWidgetCore.lw_dump('delayedStartup | ' + h);
+//        LinkWidgetCore.lw_dump(LinkWidgetCore.eventHandlers[h]);
+          gBrowser.addEventListener(h, window[LinkWidgetCore.eventHandlers[h]], false); // 3.6
+          gBrowser.tabContainer.addEventListener(h, window[LinkWidgetCore.eventHandlers[h]], false); // 4.01+ -- ONLY some
       }
 
 //          gBrowser.tabContainer.addEventListener('pagehide', LinkWidgetCore.pageHideHandler, false); // no
 //        gBrowser.tabContainer.addEventListener('pageshow', LinkWidgetCore.pageShowHandler, false);
-          gBrowser.tabContainer.addEventListener('select', LinkWidgetCore.linkWidgetTabSelectedHandler, false); // yes
+          gBrowser.tabContainer.addEventListener('select', LinkWidgetCore.tabSelectedHandler, false); // yes
 //          gBrowser.tabContainer.addEventListener('DOMLinkAdded', LinkWidgetCore.linkAddedHandler, false); // yes | no ?
 //          gBrowser.tabContainer.addEventListener('DOMContentLoaded', LinkWidgetCore.pageLoadedHandler, false); // no
 
@@ -136,23 +136,22 @@ var LinkWidgetCore = {
           gBrowser.addEventListener('DOMContentLoaded', LinkWidgetCore.pageLoadedHandler, false); // yes
           gBrowser.addEventListener('DOMLinkAdded', LinkWidgetCore.linkAddedHandler, false); // also ?
 
-//      dump("lw :: linkWidgetDelayedStartup : for(var h in LinkWidgetCore.linkWidgetEventHandlers)\n");
+//      dump("lw :: delayedStartup : for(var h in LinkWidgetCore.eventHandlers)\n");
       // replace the toolbar customisation callback
         var box = document.getElementById("navigator-toolbox");
         box._preLinkWidget_customizeDone = box.customizeDone;
-        box.customizeDone = LinkWidgetCore.linkWidgetToolboxCustomizeDone;
-//      dump("lw :: linkWidgetDelayedStartup : box.customizeDone\n");
-//      LinkWidgetCore.linkWidgetRefreshLinks(); // yyy - added
+        box.customizeDone = LinkWidgetCore.toolboxCustomizeDone;
+//      dump("lw :: delayedStartup : box.customizeDone\n");
     },
 
     shutdown : function() {
       LinkWidgetCore.lw_dump("shutdown");
       window.removeEventListener("unload", LinkWidgetCore.shutdown, false);
-      for(var h in LinkWidgetCore.linkWidgetEventHandlers) {
-          gBrowser.addEventListener(h, window[LinkWidgetCore.linkWidgetEventHandlers[h]], false);
-          gBrowser.tabContainer.addEventListener(h, window[LinkWidgetCore.linkWidgetEventHandlers[h]], false); // 4.01+ -- ONLY some
+      for(var h in LinkWidgetCore.eventHandlers) {
+          gBrowser.addEventListener(h, window[LinkWidgetCore.eventHandlers[h]], false);
+          gBrowser.tabContainer.addEventListener(h, window[LinkWidgetCore.eventHandlers[h]], false); // 4.01+ -- ONLY some
       }
-      gPrefService.removeObserver(LinkWidgetCore.linkWidgetPrefPrefix, LinkWidgetCore.linkWidgetPrefObserver);
+      gPrefService.removeObserver(LinkWidgetCore.prefPrefix, LinkWidgetCore.prefObserver);
     },
 
     loadPrefs : function() {
@@ -160,27 +159,27 @@ var LinkWidgetCore = {
       const branch = Components.classes["@mozilla.org/preferences-service;1"]
                              .getService(Components.interfaces.nsIPrefService)
                              .QueryInterface(Components.interfaces.nsIPrefBranch)
-                             .getBranch(LinkWidgetCore.linkWidgetPrefPrefix);
-      //  const branch = gPrefService.getBranch(LinkWidgetCore.linkWidgetPrefPrefix);
-      LinkWidgetCore.linkWidgetPrefScanHyperlinks = branch.getBoolPref("scanHyperlinks");
-      LinkWidgetCore.linkWidgetPrefGuessUpAndTopFromURL = branch.getBoolPref("guessUpAndTopFromURL");
-      LinkWidgetCore.linkWidgetPrefGuessPrevAndNextFromURL = branch.getBoolPref("guessPrevAndNextFromURL");
+                             .getBranch(LinkWidgetCore.prefPrefix);
+      //  const branch = gPrefService.getBranch(LinkWidgetCore.prefPrefix);
+      LinkWidgetCore.prefScanHyperlinks = branch.getBoolPref("scanHyperlinks");
+      LinkWidgetCore.prefGuessUpAndTopFromURL = branch.getBoolPref("guessUpAndTopFromURL");
+      LinkWidgetCore.prefGuessPrevAndNextFromURL = branch.getBoolPref("guessPrevAndNextFromURL");
       // Isn't retrieving unicode strings from the pref service fun?
       const nsIStr = Components.interfaces.nsISupportsString;
-      for(var prefname in LinkWidgetCore.linkWidgetRegexps) {
+      for(var prefname in LinkWidgetCore.regexps) {
         var raw = branch.getComplexValue("regexp." + prefname, nsIStr).data;
         // RegExpr throws an exception if the string isn't a valid regexp pattern
         try {
-          LinkWidgetCore.linkWidgetRegexps[prefname] = new RegExp(raw, "i");
+          LinkWidgetCore.regexps[prefname] = new RegExp(raw, "i");
         } catch(e) {
           Components.utils.reportError(e);
           // A regexp that can never match (since multiline flag not set)
-          LinkWidgetCore.linkWidgetRegexps[prefname] = /$ /;
+          LinkWidgetCore.regexps[prefname] = /$ /;
         }
       }
     },
 
-    linkWidgetPrefObserver : {
+    prefObserver : {
       observe: function(subject, topic, data) {
     //    dump("lwpref: subject="+subject.root+" topic="+topic+" data="+data+"\n");
         // there're only three/four of them
@@ -216,7 +215,7 @@ LinkWidgetCore.lw_dump('linkAddedHandler');
       if(!(elt instanceof HTMLLinkElement) || !elt.href || !(elt.rel || elt.rev)) return;
       var rels = LinkWidgetCore.getLinkRels(elt.rel, elt.rev, elt.type, elt.title);
 LinkWidgetCore.lw_dump('linkAddedHandler | rels = LinkWidgetCore.getLinkRels(..)');
-      if(rels) LinkWidgetCore.linkWidgetAddLinkForPage(elt.href, elt.title, elt.hreflang, elt.media, doc, rels);
+      if(rels) LinkWidgetCore.addLinkForPage(elt.href, elt.title, elt.hreflang, elt.media, doc, rels);
     },
 
     // Really ought to delete/nullify doc.linkWidgetLinks on "close" (but not on "pagehide")
@@ -236,7 +235,7 @@ LinkWidgetCore.lw_dump('linkAddedHandler | rels = LinkWidgetCore.getLinkRels(..)
 
     pageLoadedHandler : function(event) {
 //LinkWidgetCore.lw_dump('pageLoadedHandler');
-//      LinkWidgetCore.linkWidgetRefreshLinks();
+//      LinkWidgetCore.refreshLinks();
       const doc = event.originalTarget, win = doc.defaultView;
       if(win != win.top || doc.linkWidgetHasGuessedLinks) return;
     
@@ -244,32 +243,32 @@ LinkWidgetCore.lw_dump('linkAddedHandler | rels = LinkWidgetCore.getLinkRels(..)
       const links = doc.linkWidgetLinks || (doc.linkWidgetLinks = {});
       const isHTML = doc instanceof HTMLDocument && !(doc instanceof ImageDocument);
     
-      if(LinkWidgetCore.linkWidgetPrefScanHyperlinks && isHTML) LinkWidgetCore.scanPageForLinks(doc);
+      if(LinkWidgetCore.prefScanHyperlinks && isHTML) LinkWidgetCore.scanPageForLinks(doc);
     
       const loc = doc.location, protocol = loc.protocol;
       if(!/^(?:https?|ftp|file)\:$/.test(protocol)) return;
     
-      if(LinkWidgetCore.linkWidgetPrefGuessPrevAndNextFromURL || !isHTML)
+      if(LinkWidgetCore.prefGuessPrevAndNextFromURL || !isHTML)
         LinkWidgetCore.guessPrevNextLinksFromURL(doc, !links.prev, !links.next);
     
-      if(!LinkWidgetCore.linkWidgetPrefGuessUpAndTopFromURL && isHTML) return;
+      if(!LinkWidgetCore.prefGuessUpAndTopFromURL && isHTML) return;
       if(!links.up) {
         var upUrl = LinkWidgetCore.guessUp(loc);
-        if(upUrl) LinkWidgetCore.linkWidgetAddLinkForPage(upUrl, null, null, null, doc, {up: true});
+        if(upUrl) LinkWidgetCore.addLinkForPage(upUrl, null, null, null, doc, {up: true});
       }
       if(!links.top) {
         var topUrl = protocol + "//" + loc.host + "/"
-        LinkWidgetCore.linkWidgetAddLinkForPage(topUrl, null, null, null, doc, {top: true});
+        LinkWidgetCore.addLinkForPage(topUrl, null, null, null, doc, {top: true});
       }
     },
 
-    linkWidgetTabSelectedHandler : function(event) {
+    tabSelectedHandler : function(event) {
 //
-      LinkWidgetCore.lw_dump('linkWidgetTabSelectedHandler');
+      LinkWidgetCore.lw_dump('tabSelectedHandler');
     //  let newTab = event.originalTarget;
       if(event.originalTarget.localName != "tabs") return;
 //dump('if(event.originalTarget.localName != "tabs") return' + "\n");
-      LinkWidgetCore.linkWidgetRefreshLinks();
+      LinkWidgetCore.refreshLinks();
     },
 
     // xxx isn't this too keen to refresh?
@@ -280,11 +279,11 @@ LinkWidgetCore.lw_dump('linkAddedHandler | rels = LinkWidgetCore.getLinkRels(..)
       if(!doc.linkWidgetHasGuessedLinks) LinkWidgetCore.pageLoadedHandler(event);
       // If docShell is null accessing .contentDocument throws an exception
       if(!gBrowser.docShell || doc != gBrowser.contentDocument) return;
-      LinkWidgetCore.linkWidgetRefreshLinks();
+      LinkWidgetCore.refreshLinks();
     },
 
-    linkWidgetRefreshLinks : function() {
-    //alert('lWRL'); LinkWidgetCore.lw_dump('linkWidgetRefreshLinks');
+    refreshLinks : function() {
+    //alert('lWRL'); LinkWidgetCore.lw_dump('refreshLinks');
       for each(var btn in LinkWidgetCore.buttons) btn.show(null);
       if(LinkWidgetCore.moreMenu) LinkWidgetCore.moreMenu.disabled = true;
  //LinkWidgetCore.lw_dump('.');
@@ -305,9 +304,9 @@ LinkWidgetCore.lw_dump('linkAddedHandler | rels = LinkWidgetCore.getLinkRels(..)
       if(LinkWidgetCore.moreMenu && enableMoreMenu) LinkWidgetCore.moreMenu.disabled = false;
     },
 
-    linkWidgetAddLinkForPage : function(url, txt, lang, media, doc, rels) {
+    addLinkForPage : function(url, txt, lang, media, doc, rels) {
 //
-LinkWidgetCore.lw_dump('linkWidgetAddLinkForPage');
+LinkWidgetCore.lw_dump('addLinkForPage');
       const link = new LinkWidgetLink(url, txt, lang, media);
       // put the link in a rel->[link] map on the document's XPCNativeWrapper
       var doclinks = doc.linkWidgetLinks || (doc.linkWidgetLinks = {});
@@ -348,7 +347,7 @@ LinkWidgetCore.lw_dump('onMoreMenuShowing');
       }
     },
 
-    linkWidgetToolboxCustomizeDone : function(somethingChanged) {
+    toolboxCustomizeDone : function(somethingChanged) {
       this._preLinkWidget_customizeDone(somethingChanged);
       if(!somethingChanged) return;
     
@@ -365,7 +364,7 @@ LinkWidgetCore.lw_dump('onMoreMenuShowing');
       // and that gets replaced by a button.
       if(LinkWidgetCore.moreMenu) LinkWidgetCore.moreMenu.disabled = true;
     
-      LinkWidgetCore.linkWidgetRefreshLinks();
+      LinkWidgetCore.refreshLinks();
     },
 
     mouseEnter : function(e) {
@@ -438,7 +437,7 @@ LinkWidgetCore.lw_dump('onMoreMenuShowing');
 
     // arg is an nsIDOMLocation, with protocol of http(s) or ftp
     guessUp : function (location) {
-        const ignoreRE = LinkWidgetCore.linkWidgetRegexps.guess_up_skip;
+        const ignoreRE = LinkWidgetCore.regexps.guess_up_skip;
         const prefix = location.protocol + "//";
         var host = location.host, path = location.pathname, path0 = path, matches, tail;
         if(location.search && location.search!="?") return prefix + host + path;
@@ -458,7 +457,7 @@ LinkWidgetCore.lw_dump('onMoreMenuShowing');
     },
 
     // null values mean that rel should be ignored
-    linkWidgetRelConversions : {
+    relConversions : {
       home: "top",
       origin: "top",
       start: "top",
@@ -474,7 +473,7 @@ LinkWidgetCore.lw_dump('onMoreMenuShowing');
       sidebar: null
     },
 
-    linkWidgetRevToRel : {
+    revToRel : {
       made: "author",
       next: "prev",
       prev: "next",
@@ -484,7 +483,7 @@ LinkWidgetCore.lw_dump('onMoreMenuShowing');
     getLinkRels : function (relStr, revStr, mimetype, title) {
 LinkWidgetCore.lw_dump('LinkWidgetCore.getLinkRels');
   // Ignore certain links
-  if(LinkWidgetCore.linkWidgetRegexps.ignore_rels.test(relStr)) return null;
+  if(LinkWidgetCore.regexps.ignore_rels.test(relStr)) return null;
   // Ignore anything Firefox regards as an RSS/Atom-feed link
   if(relStr && /alternate/i.test(relStr)) {
     // xxx have seen JS errors where "mimetype has no properties" (i.e., is null)
@@ -502,14 +501,14 @@ LinkWidgetCore.lw_dump('LinkWidgetCore.getLinkRels');
     for(var i = 0; i != relValues.length; i++) {
       var rel = relValues[i].toLowerCase();
       // this has to use "in", because the entries can be null (meaning "ignore")
-      rel = rel in LinkWidgetCore.linkWidgetRelConversions ? LinkWidgetCore.linkWidgetRelConversions[rel] : rel;
+      rel = rel in LinkWidgetCore.relConversions ? LinkWidgetCore.relConversions[rel] : rel;
       if(rel) rels[rel] = true, haveRels = true;
     }
   }
   if(revStr) {
     var revValues = revStr.split(whitespace);
     for(i = 0; i < revValues.length; i++) {
-      rel = linkWidgetRevToRel[revValues[i].toLowerCase()] || null;
+      rel = revToRel[revValues[i].toLowerCase()] || null;
       if(rel) rels[rel] = true, haveRels = true;
     }
   }
@@ -574,25 +573,25 @@ LinkWidgetCore.lw_dump('Scan');
       var rel = LinkWidgetCore.guessLinkRel(link, txt);
       if(rel) rels = {}, rels[rel] = true;
     }
-    if(rels) LinkWidgetCore.linkWidgetAddLinkForPage(href, txt, link.hreflang, null, doc, rels);
+    if(rels) LinkWidgetCore.addLinkForPage(href, txt, link.hreflang, null, doc, rels);
   }
 },
 
 // link is an <a href> link
 guessLinkRel : function (link, txt) {
 LinkWidgetCore.lw_dump('guessLinkRel');
-  if(LinkWidgetCore.linkWidgetRegexps.next.test(txt)) return "next";
-  if(LinkWidgetCore.linkWidgetRegexps.prev.test(txt)) return "prev";
-  if(LinkWidgetCore.linkWidgetRegexps.first.test(txt)) return "first";
-  if(LinkWidgetCore.linkWidgetRegexps.last.test(txt)) return "last";
+  if(LinkWidgetCore.regexps.next.test(txt)) return "next";
+  if(LinkWidgetCore.regexps.prev.test(txt)) return "prev";
+  if(LinkWidgetCore.regexps.first.test(txt)) return "first";
+  if(LinkWidgetCore.regexps.last.test(txt)) return "last";
   const imgs = link.getElementsByTagName("img"), num = imgs.length;
   for(var i = 0; i != num; ++i) {
     // guessing is more accurate on relative URLs, and .src is always absolute
     var src = imgs[i].getAttribute("src");
-    if(LinkWidgetCore.linkWidgetRegexps.img_next.test(src)) return "next";
-    if(LinkWidgetCore.linkWidgetRegexps.img_prev.test(src)) return "prev";
-    if(LinkWidgetCore.linkWidgetRegexps.img_first.test(src)) return "first";
-    if(LinkWidgetCore.linkWidgetRegexps.img_last.test(src)) return "last";
+    if(LinkWidgetCore.regexps.img_next.test(src)) return "next";
+    if(LinkWidgetCore.regexps.img_prev.test(src)) return "prev";
+    if(LinkWidgetCore.regexps.img_first.test(src)) return "first";
+    if(LinkWidgetCore.regexps.img_last.test(src)) return "last";
   }
   return null;
 },
@@ -620,12 +619,12 @@ guessPrevNextLinksFromURL : function (doc, guessPrev, guessNext) {
     if(guessPrev) {
       var prv = ""+(num-1);
       while(prv.length < old.length) prv = "0" + prv;
-      LinkWidgetCore.linkWidgetAddLinkForPage(pre + prv + post, null, null, null, doc, { prev: true });
+      LinkWidgetCore.addLinkForPage(pre + prv + post, null, null, null, doc, { prev: true });
     }
     if(guessNext) {
       var nxt = ""+(num+1);
       while(nxt.length < old.length) nxt = "0" + nxt;
-      LinkWidgetCore.linkWidgetAddLinkForPage(pre + nxt + post, null, null, null, doc, { next: true });
+      LinkWidgetCore.addLinkForPage(pre + nxt + post, null, null, null, doc, { next: true });
     }
 }
 

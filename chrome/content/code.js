@@ -41,7 +41,7 @@ the terms of any one of the MPL, the GPL or the LGPL.
 
 ***** END LICENSE BLOCK ***** */
 
-var LinkWidgetsExtension = {
+var LinkWidgetCore = {
 
     linkWidgetPrefPrefix : "extensions.linkwidget.",
 
@@ -74,11 +74,11 @@ var LinkWidgetsExtension = {
     _linkWidgetButtonRels : ["top","up","first","prev","next","last"],
     
     linkWidgetEventHandlers : {
-      "select": "LinkWidgetsExtension.linkWidgetTabSelectedHandler",
-      "DOMLinkAdded": "LinkWidgetsExtension.linkWidgetLinkAddedHandler",
-      "pagehide": "LinkWidgetsExtension.linkWidgetPageHideHandler",
-      "DOMContentLoaded": "LinkWidgetsExtension.linkWidgetPageLoadedHandler",
-      "pageshow": "LinkWidgetsExtension.linkWidgetPageShowHandler"
+      "select": "LinkWidgetCore.linkWidgetTabSelectedHandler",
+      "DOMLinkAdded": "LinkWidgetCore.linkAddedHandler",
+      "pagehide": "LinkWidgetCore.linkWidgetPageHideHandler",
+      "DOMContentLoaded": "LinkWidgetCore.linkWidgetPageLoadedHandler",
+      "pageshow": "LinkWidgetCore.linkWidgetPageShowHandler"
     },
 
     linkWidgetPrefGuessUpAndTopFromURL : false,
@@ -100,82 +100,82 @@ var LinkWidgetsExtension = {
     },
 
     linkWidgetStartup : function() {
-      LinkWidgetsExtension.lw_dump("linkWidgetStartup\n");
-      window.removeEventListener("load", LinkWidgetsExtension.linkWidgetStartup, false);
-      LinkWidgetsExtension.linkWidgetStrings = LinkWidgetsExtension.linkWidgetLoadStringBundle(LinkWidgetsExtension.linkWidgetStrings);
-      for(var i in LinkWidgetsExtension._linkWidgetMenuOrdering) LinkWidgetsExtension.linkWidgetMenuOrdering[LinkWidgetsExtension._linkWidgetMenuOrdering[i]] = (i-0) + 1;
-      for each(i in LinkWidgetsExtension._linkWidgetMenuRels) LinkWidgetsExtension.linkWidgetMenuRels[i] = true;
-      for each(i in LinkWidgetsExtension._linkWidgetButtonRels) LinkWidgetsExtension.linkWidgetButtonRels[i] = true;
-      LinkWidgetsExtension.linkWidgetInitMoreMenu();
-      LinkWidgetsExtension.linkWidgetInitVisibleButtons();
-      setTimeout(LinkWidgetsExtension.linkWidgetDelayedStartup, 1); // needs to happen after Fx's delayedStartup(); Fc?
+      LinkWidgetCore.lw_dump("linkWidgetStartup\n");
+      window.removeEventListener("load", LinkWidgetCore.linkWidgetStartup, false);
+      LinkWidgetCore.linkWidgetStrings = LinkWidgetCore.linkWidgetLoadStringBundle(LinkWidgetCore.linkWidgetStrings);
+      for(var i in LinkWidgetCore._linkWidgetMenuOrdering) LinkWidgetCore.linkWidgetMenuOrdering[LinkWidgetCore._linkWidgetMenuOrdering[i]] = (i-0) + 1;
+      for each(i in LinkWidgetCore._linkWidgetMenuRels) LinkWidgetCore.linkWidgetMenuRels[i] = true;
+      for each(i in LinkWidgetCore._linkWidgetButtonRels) LinkWidgetCore.linkWidgetButtonRels[i] = true;
+      LinkWidgetCore.initMoreMenu();
+      LinkWidgetCore.initVisibleButtons();
+      setTimeout(LinkWidgetCore.linkWidgetDelayedStartup, 1); // needs to happen after Fx's delayedStartup(); Fc?
     },
 
     linkWidgetDelayedStartup : function() {
-      LinkWidgetsExtension.lw_dump("linkWidgetDelayedStartup");
-      LinkWidgetsExtension.linkWidgetLoadPrefs();
-//      dump("lw :: linkWidgetDelayedStartup | LinkWidgetsExtension.linkWidgetLoadPrefs\n");
-      gPrefService.addObserver(LinkWidgetsExtension.linkWidgetPrefPrefix, LinkWidgetsExtension.linkWidgetPrefObserver, false);
+      LinkWidgetCore.lw_dump("linkWidgetDelayedStartup");
+      LinkWidgetCore.linkWidgetLoadPrefs();
+//      dump("lw :: linkWidgetDelayedStartup | LinkWidgetCore.linkWidgetLoadPrefs\n");
+      gPrefService.addObserver(LinkWidgetCore.linkWidgetPrefPrefix, LinkWidgetCore.linkWidgetPrefObserver, false);
 //      dump("lw :: linkWidgetDelayedStartup : gPrefService.addObserver\n");
-      for(var h in LinkWidgetsExtension.linkWidgetEventHandlers) {
-//        LinkWidgetsExtension.lw_dump('linkWidgetDelayedStartup | ' + h);
-//        LinkWidgetsExtension.lw_dump(LinkWidgetsExtension.linkWidgetEventHandlers[h]);
-          gBrowser.addEventListener(h, window[LinkWidgetsExtension.linkWidgetEventHandlers[h]], false); // 3.6
-          gBrowser.tabContainer.addEventListener(h, window[LinkWidgetsExtension.linkWidgetEventHandlers[h]], false); // 4.01+ -- ONLY some
+      for(var h in LinkWidgetCore.linkWidgetEventHandlers) {
+//        LinkWidgetCore.lw_dump('linkWidgetDelayedStartup | ' + h);
+//        LinkWidgetCore.lw_dump(LinkWidgetCore.linkWidgetEventHandlers[h]);
+          gBrowser.addEventListener(h, window[LinkWidgetCore.linkWidgetEventHandlers[h]], false); // 3.6
+          gBrowser.tabContainer.addEventListener(h, window[LinkWidgetCore.linkWidgetEventHandlers[h]], false); // 4.01+ -- ONLY some
       }
 
-//          gBrowser.tabContainer.addEventListener('pagehide', LinkWidgetsExtension.linkWidgetPageHideHandler, false); // no
-//        gBrowser.tabContainer.addEventListener('pageshow', LinkWidgetsExtension.linkWidgetPageShowHandler, false);
-          gBrowser.tabContainer.addEventListener('select', LinkWidgetsExtension.linkWidgetTabSelectedHandler, false); // yes
-//          gBrowser.tabContainer.addEventListener('DOMLinkAdded', LinkWidgetsExtension.linkWidgetLinkAddedHandler, false); // yes | no ?
-//          gBrowser.tabContainer.addEventListener('DOMContentLoaded', LinkWidgetsExtension.linkWidgetPageLoadedHandler, false); // no
+//          gBrowser.tabContainer.addEventListener('pagehide', LinkWidgetCore.linkWidgetPageHideHandler, false); // no
+//        gBrowser.tabContainer.addEventListener('pageshow', LinkWidgetCore.linkWidgetPageShowHandler, false);
+          gBrowser.tabContainer.addEventListener('select', LinkWidgetCore.linkWidgetTabSelectedHandler, false); // yes
+//          gBrowser.tabContainer.addEventListener('DOMLinkAdded', LinkWidgetCore.linkAddedHandler, false); // yes | no ?
+//          gBrowser.tabContainer.addEventListener('DOMContentLoaded', LinkWidgetCore.linkWidgetPageLoadedHandler, false); // no
 
 
-          gBrowser.addEventListener('pagehide', LinkWidgetsExtension.linkWidgetPageHideHandler, false); // yes
-          gBrowser.addEventListener('pageshow', LinkWidgetsExtension.linkWidgetPageShowHandler, false); // yes
-          gBrowser.addEventListener('DOMContentLoaded', LinkWidgetsExtension.linkWidgetPageLoadedHandler, false); // yes
-          gBrowser.addEventListener('DOMLinkAdded', LinkWidgetsExtension.linkWidgetLinkAddedHandler, false); // also ?
+          gBrowser.addEventListener('pagehide', LinkWidgetCore.linkWidgetPageHideHandler, false); // yes
+          gBrowser.addEventListener('pageshow', LinkWidgetCore.linkWidgetPageShowHandler, false); // yes
+          gBrowser.addEventListener('DOMContentLoaded', LinkWidgetCore.linkWidgetPageLoadedHandler, false); // yes
+          gBrowser.addEventListener('DOMLinkAdded', LinkWidgetCore.linkAddedHandler, false); // also ?
 
-//      dump("lw :: linkWidgetDelayedStartup : for(var h in LinkWidgetsExtension.linkWidgetEventHandlers)\n");
+//      dump("lw :: linkWidgetDelayedStartup : for(var h in LinkWidgetCore.linkWidgetEventHandlers)\n");
       // replace the toolbar customisation callback
         var box = document.getElementById("navigator-toolbox");
         box._preLinkWidget_customizeDone = box.customizeDone;
-        box.customizeDone = LinkWidgetsExtension.linkWidgetToolboxCustomizeDone;
+        box.customizeDone = LinkWidgetCore.linkWidgetToolboxCustomizeDone;
 //      dump("lw :: linkWidgetDelayedStartup : box.customizeDone\n");
-//      LinkWidgetsExtension.linkWidgetRefreshLinks(); // yyy - added
+//      LinkWidgetCore.linkWidgetRefreshLinks(); // yyy - added
     },
 
     linkWidgetShutdown : function() {
-      LinkWidgetsExtension.lw_dump("linkWidgetShutdown");
-      window.removeEventListener("unload", LinkWidgetsExtension.linkWidgetShutdown, false);
-      for(var h in LinkWidgetsExtension.linkWidgetEventHandlers) {
-          gBrowser.addEventListener(h, window[LinkWidgetsExtension.linkWidgetEventHandlers[h]], false);
-          gBrowser.tabContainer.addEventListener(h, window[LinkWidgetsExtension.linkWidgetEventHandlers[h]], false); // 4.01+ -- ONLY some
+      LinkWidgetCore.lw_dump("linkWidgetShutdown");
+      window.removeEventListener("unload", LinkWidgetCore.linkWidgetShutdown, false);
+      for(var h in LinkWidgetCore.linkWidgetEventHandlers) {
+          gBrowser.addEventListener(h, window[LinkWidgetCore.linkWidgetEventHandlers[h]], false);
+          gBrowser.tabContainer.addEventListener(h, window[LinkWidgetCore.linkWidgetEventHandlers[h]], false); // 4.01+ -- ONLY some
       }
-      gPrefService.removeObserver(LinkWidgetsExtension.linkWidgetPrefPrefix, LinkWidgetsExtension.linkWidgetPrefObserver);
+      gPrefService.removeObserver(LinkWidgetCore.linkWidgetPrefPrefix, LinkWidgetCore.linkWidgetPrefObserver);
     },
 
     linkWidgetLoadPrefs : function() {
-      LinkWidgetsExtension.lw_dump("linkWidgetLoadPrefs");
+      LinkWidgetCore.lw_dump("linkWidgetLoadPrefs");
       const branch = Components.classes["@mozilla.org/preferences-service;1"]
                              .getService(Components.interfaces.nsIPrefService)
                              .QueryInterface(Components.interfaces.nsIPrefBranch)
-                             .getBranch(LinkWidgetsExtension.linkWidgetPrefPrefix);
-      //  const branch = gPrefService.getBranch(LinkWidgetsExtension.linkWidgetPrefPrefix);
-      LinkWidgetsExtension.linkWidgetPrefScanHyperlinks = branch.getBoolPref("scanHyperlinks");
-      LinkWidgetsExtension.linkWidgetPrefGuessUpAndTopFromURL = branch.getBoolPref("guessUpAndTopFromURL");
-      LinkWidgetsExtension.linkWidgetPrefGuessPrevAndNextFromURL = branch.getBoolPref("guessPrevAndNextFromURL");
+                             .getBranch(LinkWidgetCore.linkWidgetPrefPrefix);
+      //  const branch = gPrefService.getBranch(LinkWidgetCore.linkWidgetPrefPrefix);
+      LinkWidgetCore.linkWidgetPrefScanHyperlinks = branch.getBoolPref("scanHyperlinks");
+      LinkWidgetCore.linkWidgetPrefGuessUpAndTopFromURL = branch.getBoolPref("guessUpAndTopFromURL");
+      LinkWidgetCore.linkWidgetPrefGuessPrevAndNextFromURL = branch.getBoolPref("guessPrevAndNextFromURL");
       // Isn't retrieving unicode strings from the pref service fun?
       const nsIStr = Components.interfaces.nsISupportsString;
-      for(var prefname in LinkWidgetsExtension.linkWidgetRegexps) {
+      for(var prefname in LinkWidgetCore.linkWidgetRegexps) {
         var raw = branch.getComplexValue("regexp." + prefname, nsIStr).data;
         // RegExpr throws an exception if the string isn't a valid regexp pattern
         try {
-          LinkWidgetsExtension.linkWidgetRegexps[prefname] = new RegExp(raw, "i");
+          LinkWidgetCore.linkWidgetRegexps[prefname] = new RegExp(raw, "i");
         } catch(e) {
           Components.utils.reportError(e);
           // A regexp that can never match (since multiline flag not set)
-          LinkWidgetsExtension.linkWidgetRegexps[prefname] = /$ /;
+          LinkWidgetCore.linkWidgetRegexps[prefname] = /$ /;
         }
       }
     },
@@ -184,44 +184,44 @@ var LinkWidgetsExtension = {
       observe: function(subject, topic, data) {
     //    dump("lwpref: subject="+subject.root+" topic="+topic+" data="+data+"\n");
         // there're only three/four of them
-        LinkWidgetsExtension.linkWidgetLoadPrefs();
+        LinkWidgetCore.linkWidgetLoadPrefs();
       }
     },
 
     // Used to make the page scroll when the mouse-wheel is used on one of our buttons
-    linkWidgetMouseScrollHandler : function(event) {
+    mouseScrollHandler : function(event) {
       content.scrollBy(0, event.detail);
     },
 
-    linkWidgetInitMoreMenu : function() {
-      LinkWidgetsExtension.linkWidgetMoreMenu = document.getElementById("linkwidget-more-menu");
-      LinkWidgetsExtension.linkWidgetMorePopup = document.getElementById("linkwidget-more-popup");
+    initMoreMenu : function() {
+      LinkWidgetCore.linkWidgetMoreMenu = document.getElementById("linkwidget-more-menu");
+      LinkWidgetCore.linkWidgetMorePopup = document.getElementById("linkwidget-more-popup");
     },
 
-    linkWidgetInitVisibleButtons : function() {
-      LinkWidgetsExtension.lw_dump("linkWidgetInitVisibleButtons");
-      LinkWidgetsExtension.linkWidgetButtons = {};
-      for(var rel in LinkWidgetsExtension.linkWidgetButtonRels) {
+    initVisibleButtons : function() {
+      LinkWidgetCore.lw_dump("initVisibleButtons");
+      LinkWidgetCore.linkWidgetButtons = {};
+      for(var rel in LinkWidgetCore.linkWidgetButtonRels) {
         var elt = document.getElementById("linkwidget-"+rel);
-    //  dump("lw :: linkWidgetInitVisibleButtons | "+ rel +"\n");
-        if(elt) LinkWidgetsExtension.linkWidgetButtons[rel] = initLinkWidgetButton(elt, rel);
+    //  dump("lw :: initVisibleButtons | "+ rel +"\n");
+        if(elt) LinkWidgetCore.linkWidgetButtons[rel] = initLinkWidgetButton(elt, rel);
       }
     },
 
-    linkWidgetLinkAddedHandler : function(event) {
+    linkAddedHandler : function(event) {
 //
-LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler');
+LinkWidgetCore.lw_dump('linkAddedHandler');
       var elt = event.originalTarget;
       var doc = elt.ownerDocument;
       if(!(elt instanceof HTMLLinkElement) || !elt.href || !(elt.rel || elt.rev)) return;
-      var rels = LinkWidgetsExtension.linkWidgetGetLinkRels(elt.rel, elt.rev, elt.type, elt.title);
-LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler | rels = LinkWidgetsExtension.linkWidgetGetLinkRels(..)');
-      if(rels) LinkWidgetsExtension.linkWidgetAddLinkForPage(elt.href, elt.title, elt.hreflang, elt.media, doc, rels);
+      var rels = LinkWidgetCore.linkWidgetGetLinkRels(elt.rel, elt.rev, elt.type, elt.title);
+LinkWidgetCore.lw_dump('linkAddedHandler | rels = LinkWidgetCore.linkWidgetGetLinkRels(..)');
+      if(rels) LinkWidgetCore.linkWidgetAddLinkForPage(elt.href, elt.title, elt.hreflang, elt.media, doc, rels);
     },
 
     // Really ought to delete/nullify doc.linkWidgetLinks on "close" (but not on "pagehide")
     linkWidgetPageHideHandler : function(event) {
-//LinkWidgetsExtension.lw_dump('linkWidgetPageHideHandler');
+//LinkWidgetCore.lw_dump('linkWidgetPageHideHandler');
       // Links like: <a href="..." onclick="this.style.display='none'">.....</a>
       // (the onclick handler could instead be on an ancestor of the link) lead to unload/pagehide
       // events with originalTarget==a text node.  So use ownerDocument (which is null for Documents)
@@ -230,13 +230,13 @@ LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler | rels = LinkWidgetsExt
       // don't clear the links for unload/pagehide from a background tab, or from a subframe
       // If docShell is null accessing .contentDocument throws an exception
       if(!gBrowser.docShell || doc != gBrowser.contentDocument) return;
-      for each(var btn in LinkWidgetsExtension.linkWidgetButtons) btn.show(null);
-      if(LinkWidgetsExtension.linkWidgetMoreMenu) LinkWidgetsExtension.linkWidgetMoreMenu.disabled = true;
+      for each(var btn in LinkWidgetCore.linkWidgetButtons) btn.show(null);
+      if(LinkWidgetCore.linkWidgetMoreMenu) LinkWidgetCore.linkWidgetMoreMenu.disabled = true;
     },
 
     linkWidgetPageLoadedHandler : function(event) {
-//LinkWidgetsExtension.lw_dump('linkWidgetPageLoadedHandler');
-//      LinkWidgetsExtension.linkWidgetRefreshLinks();
+//LinkWidgetCore.lw_dump('linkWidgetPageLoadedHandler');
+//      LinkWidgetCore.linkWidgetRefreshLinks();
       const doc = event.originalTarget, win = doc.defaultView;
       if(win != win.top || doc.linkWidgetHasGuessedLinks) return;
     
@@ -244,71 +244,71 @@ LinkWidgetsExtension.lw_dump('linkWidgetLinkAddedHandler | rels = LinkWidgetsExt
       const links = doc.linkWidgetLinks || (doc.linkWidgetLinks = {});
       const isHTML = doc instanceof HTMLDocument && !(doc instanceof ImageDocument);
     
-      if(LinkWidgetsExtension.linkWidgetPrefScanHyperlinks && isHTML) LinkWidgetsExtension.linkWidgetScanPageForLinks(doc);
+      if(LinkWidgetCore.linkWidgetPrefScanHyperlinks && isHTML) LinkWidgetCore.linkWidgetScanPageForLinks(doc);
     
       const loc = doc.location, protocol = loc.protocol;
       if(!/^(?:https?|ftp|file)\:$/.test(protocol)) return;
     
-      if(LinkWidgetsExtension.linkWidgetPrefGuessPrevAndNextFromURL || !isHTML)
-        LinkWidgetsExtension.guessPrevNextLinksFromURL(doc, !links.prev, !links.next);
+      if(LinkWidgetCore.linkWidgetPrefGuessPrevAndNextFromURL || !isHTML)
+        LinkWidgetCore.guessPrevNextLinksFromURL(doc, !links.prev, !links.next);
     
-      if(!LinkWidgetsExtension.linkWidgetPrefGuessUpAndTopFromURL && isHTML) return;
+      if(!LinkWidgetCore.linkWidgetPrefGuessUpAndTopFromURL && isHTML) return;
       if(!links.up) {
-        var upUrl = LinkWidgetsExtension.guessUp(loc);
-        if(upUrl) LinkWidgetsExtension.linkWidgetAddLinkForPage(upUrl, null, null, null, doc, {up: true});
+        var upUrl = LinkWidgetCore.guessUp(loc);
+        if(upUrl) LinkWidgetCore.linkWidgetAddLinkForPage(upUrl, null, null, null, doc, {up: true});
       }
       if(!links.top) {
         var topUrl = protocol + "//" + loc.host + "/"
-        LinkWidgetsExtension.linkWidgetAddLinkForPage(topUrl, null, null, null, doc, {top: true});
+        LinkWidgetCore.linkWidgetAddLinkForPage(topUrl, null, null, null, doc, {top: true});
       }
     },
 
     linkWidgetTabSelectedHandler : function(event) {
 //
-      LinkWidgetsExtension.lw_dump('linkWidgetTabSelectedHandler');
+      LinkWidgetCore.lw_dump('linkWidgetTabSelectedHandler');
     //  let newTab = event.originalTarget;
       if(event.originalTarget.localName != "tabs") return;
 //dump('if(event.originalTarget.localName != "tabs") return' + "\n");
-      LinkWidgetsExtension.linkWidgetRefreshLinks();
+      LinkWidgetCore.linkWidgetRefreshLinks();
     },
 
     // xxx isn't this too keen to refresh?
     linkWidgetPageShowHandler : function(event) {
-//LinkWidgetsExtension.lw_dump('linkWidgetPageShowHandler');
+//LinkWidgetCore.lw_dump('linkWidgetPageShowHandler');
       const doc = event.originalTarget;
       // Link guessing for things with no DOMContentLoaded (e.g. ImageDocument)
-      if(!doc.linkWidgetHasGuessedLinks) LinkWidgetsExtension.linkWidgetPageLoadedHandler(event);
+      if(!doc.linkWidgetHasGuessedLinks) LinkWidgetCore.linkWidgetPageLoadedHandler(event);
       // If docShell is null accessing .contentDocument throws an exception
       if(!gBrowser.docShell || doc != gBrowser.contentDocument) return;
-      LinkWidgetsExtension.linkWidgetRefreshLinks();
+      LinkWidgetCore.linkWidgetRefreshLinks();
     },
 
     linkWidgetRefreshLinks : function() {
-    //alert('lWRL'); LinkWidgetsExtension.lw_dump('linkWidgetRefreshLinks');
-      for each(var btn in LinkWidgetsExtension.linkWidgetButtons) btn.show(null);
-      if(LinkWidgetsExtension.linkWidgetMoreMenu) LinkWidgetsExtension.linkWidgetMoreMenu.disabled = true;
- //LinkWidgetsExtension.lw_dump('.');
+    //alert('lWRL'); LinkWidgetCore.lw_dump('linkWidgetRefreshLinks');
+      for each(var btn in LinkWidgetCore.linkWidgetButtons) btn.show(null);
+      if(LinkWidgetCore.linkWidgetMoreMenu) LinkWidgetCore.linkWidgetMoreMenu.disabled = true;
+ //LinkWidgetCore.lw_dump('.');
 
       const doc = content.document, links = doc.linkWidgetLinks;
-//LinkWidgetsExtension.lw_dump(typeof links);
+//LinkWidgetCore.lw_dump(typeof links);
 
       if(!links) return;
-//LinkWidgetsExtension.lw_dump('if(!links)');
+//LinkWidgetCore.lw_dump('if(!links)');
     
       var enableMoreMenu = false;
       for(var rel in links) {
-//LinkWidgetsExtension.lw_dump('for(var rel in links)');
-// Error: LinkWidgetsExtension.linkWidgetButtons[rel].show is not a function
-        if(rel in LinkWidgetsExtension.linkWidgetButtons) LinkWidgetsExtension.linkWidgetButtons[rel].show(links[rel]); // ?
+//LinkWidgetCore.lw_dump('for(var rel in links)');
+// Error: LinkWidgetCore.linkWidgetButtons[rel].show is not a function
+        if(rel in LinkWidgetCore.linkWidgetButtons) LinkWidgetCore.linkWidgetButtons[rel].show(links[rel]); // ?
         else enableMoreMenu = true;
 //enableMoreMenu = true;
       }
-      if(LinkWidgetsExtension.linkWidgetMoreMenu && enableMoreMenu) LinkWidgetsExtension.linkWidgetMoreMenu.disabled = false;
+      if(LinkWidgetCore.linkWidgetMoreMenu && enableMoreMenu) LinkWidgetCore.linkWidgetMoreMenu.disabled = false;
     },
 
     linkWidgetAddLinkForPage : function(url, txt, lang, media, doc, rels) {
 //
-LinkWidgetsExtension.lw_dump('linkWidgetAddLinkForPage');
+LinkWidgetCore.lw_dump('linkWidgetAddLinkForPage');
       const link = new LinkWidgetLink(url, txt, lang, media);
       // put the link in a rel->[link] map on the document's XPCNativeWrapper
       var doclinks = doc.linkWidgetLinks || (doc.linkWidgetLinks = {});
@@ -324,28 +324,28 @@ LinkWidgetsExtension.lw_dump('linkWidgetAddLinkForPage');
       var enableMoreMenu = false;
       for(var rel in rels) {
         // buttons need updating immediately, but anything else can wait till the menu is showing
-        if(rel in LinkWidgetsExtension.linkWidgetButtons) LinkWidgetsExtension.linkWidgetButtons[rel].show(doclinks[rel]);
+        if(rel in LinkWidgetCore.linkWidgetButtons) LinkWidgetCore.linkWidgetButtons[rel].show(doclinks[rel]);
         else enableMoreMenu = true;
       }
-      if(LinkWidgetsExtension.linkWidgetMoreMenu && enableMoreMenu) LinkWidgetsExtension.linkWidgetMoreMenu.disabled = false;
+      if(LinkWidgetCore.linkWidgetMoreMenu && enableMoreMenu) LinkWidgetCore.linkWidgetMoreMenu.disabled = false;
     },
 
     linkWidgetOnMoreMenuShowing : function() {
-LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing');
+LinkWidgetCore.lw_dump('linkWidgetOnMoreMenuShowing');
       const linkmaps = content.document.linkWidgetLinks;
       // Update all existing views
-      for(var rel in LinkWidgetsExtension.linkWidgetViews) LinkWidgetsExtension.linkWidgetViews[rel].show(linkmaps[rel] || null);
+      for(var rel in LinkWidgetCore.linkWidgetViews) LinkWidgetCore.linkWidgetViews[rel].show(linkmaps[rel] || null);
       // Create any new views that are needed
       for(rel in linkmaps) {
-//LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | ' + rel);
-        if(rel in LinkWidgetsExtension.linkWidgetViews || rel in LinkWidgetsExtension.linkWidgetButtons) continue;
-//LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | continue' + '');
-        var relNum = LinkWidgetsExtension.linkWidgetMenuOrdering[rel] || Infinity;
-        var isMenu = rel in LinkWidgetsExtension.linkWidgetMenuRels;
-        var item = LinkWidgetsExtension.linkWidgetViews[rel] =
+//LinkWidgetCore.lw_dump('linkWidgetOnMoreMenuShowing | ' + rel);
+        if(rel in LinkWidgetCore.linkWidgetViews || rel in LinkWidgetCore.linkWidgetButtons) continue;
+//LinkWidgetCore.lw_dump('linkWidgetOnMoreMenuShowing | continue' + '');
+        var relNum = LinkWidgetCore.linkWidgetMenuOrdering[rel] || Infinity;
+        var isMenu = rel in LinkWidgetCore.linkWidgetMenuRels;
+        var item = LinkWidgetCore.linkWidgetViews[rel] =
           isMenu ? new LinkWidgetMenu(rel, relNum) : new LinkWidgetItem(rel, relNum);
         item.show(linkmaps[rel]);
-//LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing | ' + isMenu);
+//LinkWidgetCore.lw_dump('linkWidgetOnMoreMenuShowing | ' + isMenu);
       }
     },
 
@@ -353,28 +353,28 @@ LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing');
       this._preLinkWidget_customizeDone(somethingChanged);
       if(!somethingChanged) return;
     
-      LinkWidgetsExtension.linkWidgetInitMoreMenu();
-      for each(var btn in LinkWidgetsExtension.linkWidgetButtons) btn.show(null);
-      LinkWidgetsExtension.linkWidgetInitVisibleButtons();
-      for(var rel in LinkWidgetsExtension.linkWidgetViews) {
-        var item = LinkWidgetsExtension.linkWidgetViews[rel];
-        if(!LinkWidgetsExtension.linkWidgetButtons[rel] && LinkWidgetsExtension.linkWidgetMoreMenu) continue;
+      LinkWidgetCore.initMoreMenu();
+      for each(var btn in LinkWidgetCore.linkWidgetButtons) btn.show(null);
+      LinkWidgetCore.initVisibleButtons();
+      for(var rel in LinkWidgetCore.linkWidgetViews) {
+        var item = LinkWidgetCore.linkWidgetViews[rel];
+        if(!LinkWidgetCore.linkWidgetButtons[rel] && LinkWidgetCore.linkWidgetMoreMenu) continue;
         item.destroy();
-        delete LinkWidgetsExtension.linkWidgetViews[rel];
+        delete LinkWidgetCore.linkWidgetViews[rel];
       }
       // Can end up incorrectly enabled if e.g. only the Top menuitem was active,
       // and that gets replaced by a button.
-      if(LinkWidgetsExtension.linkWidgetMoreMenu) LinkWidgetsExtension.linkWidgetMoreMenu.disabled = true;
+      if(LinkWidgetCore.linkWidgetMoreMenu) LinkWidgetCore.linkWidgetMoreMenu.disabled = true;
     
-      LinkWidgetsExtension.linkWidgetRefreshLinks();
+      LinkWidgetCore.linkWidgetRefreshLinks();
     },
 
-    linkWidgetMouseEnter : function(e) {
+    mouseEnter : function(e) {
       const t = e.target;
       XULBrowserWindow.setOverLink(t.linkURL || "", null);
     },
 
-    linkWidgetMouseExit : function(e) {
+    mouseExit : function(e) {
       const t = e.target;
       XULBrowserWindow.setOverLink("", null);
     },
@@ -391,7 +391,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing');
 
     linkWidgetItemClicked : function(e) {
       if(e.button != 1) return;
-      LinkWidgetsExtension.linkWidgetLoadPage(e);
+      LinkWidgetCore.loadPage(e);
       // close any menus
       var p = e.target;
       while(p.localName!="toolbarbutton") {
@@ -405,7 +405,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing');
       if(ot.localName=="toolbarbutton" && t.numLinks > 1) t.firstChild.showPopup();
     },
 
-    linkWidgetLoadPage : function(e) {
+    loadPage : function(e) {
       const url = e.target.linkURL;
       const sourceURL = content.document.documentURI; // ?
       const button = e.type=="command" ? 0 : e.button;
@@ -418,16 +418,16 @@ LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing');
        const didHandleClick = handleLinkClick(fakeEvent, url, null);
        if(didHandleClick || button != 0) return;
       }
-      LinkWidgetsExtension.linkWidgetLoadPageInCurrentBrowser(url);
+      LinkWidgetCore.loadPageInCurrentBrowser(url);
     },
 
     linkWidgetGo : function(rel) {
       const links = content.document.linkWidgetLinks || {};
       if(!links[rel]) return;
-      LinkWidgetsExtension.linkWidgetLoadPageInCurrentBrowser(links[rel][0].url);
+      LinkWidgetCore.loadPageInCurrentBrowser(links[rel][0].url);
     },
 
-    linkWidgetLoadPageInCurrentBrowser : function(url) {
+    loadPageInCurrentBrowser : function(url) {
       // urlSecurityCheck wanted a URL-as-string for Fx 2.0, but an nsIPrincipal on trunk
     
         if(gBrowser.contentPrincipal) urlSecurityCheck(url, gBrowser.contentPrincipal);
@@ -439,7 +439,7 @@ LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing');
 
     // arg is an nsIDOMLocation, with protocol of http(s) or ftp
     guessUp : function (location) {
-        const ignoreRE = LinkWidgetsExtension.linkWidgetRegexps.guess_up_skip;
+        const ignoreRE = LinkWidgetCore.linkWidgetRegexps.guess_up_skip;
         const prefix = location.protocol + "//";
         var host = location.host, path = location.pathname, path0 = path, matches, tail;
         if(location.search && location.search!="?") return prefix + host + path;
@@ -483,9 +483,9 @@ LinkWidgetsExtension.lw_dump('linkWidgetOnMoreMenuShowing');
     },
 
     linkWidgetGetLinkRels : function (relStr, revStr, mimetype, title) {
-LinkWidgetsExtension.lw_dump('LinkWidgetsExtension.linkWidgetGetLinkRels');
+LinkWidgetCore.lw_dump('LinkWidgetCore.linkWidgetGetLinkRels');
   // Ignore certain links
-  if(LinkWidgetsExtension.linkWidgetRegexps.ignore_rels.test(relStr)) return null;
+  if(LinkWidgetCore.linkWidgetRegexps.ignore_rels.test(relStr)) return null;
   // Ignore anything Firefox regards as an RSS/Atom-feed link
   if(relStr && /alternate/i.test(relStr)) {
     // xxx have seen JS errors where "mimetype has no properties" (i.e., is null)
@@ -503,7 +503,7 @@ LinkWidgetsExtension.lw_dump('LinkWidgetsExtension.linkWidgetGetLinkRels');
     for(var i = 0; i != relValues.length; i++) {
       var rel = relValues[i].toLowerCase();
       // this has to use "in", because the entries can be null (meaning "ignore")
-      rel = rel in LinkWidgetsExtension.linkWidgetRelConversions ? LinkWidgetsExtension.linkWidgetRelConversions[rel] : rel;
+      rel = rel in LinkWidgetCore.linkWidgetRelConversions ? LinkWidgetCore.linkWidgetRelConversions[rel] : rel;
       if(rel) rels[rel] = true, haveRels = true;
     }
   }
@@ -541,9 +541,9 @@ linkWidgetLanguageNames : null,
 
 // code is a language code, e.g. en, en-GB, es, fr-FR
 linkWidgetGetLanguageName : function (code) {
-    if(!linkWidgetLanguageNames) LinkWidgetsExtension.linkWidgetLanguageNames =
-      LinkWidgetsExtension.linkWidgetLoadStringBundle("chrome://global/locale/languageNames.properties");
-    const dict = LinkWidgetsExtension.linkWidgetLanguageNames;
+    if(!linkWidgetLanguageNames) LinkWidgetCore.linkWidgetLanguageNames =
+      LinkWidgetCore.linkWidgetLoadStringBundle("chrome://global/locale/languageNames.properties");
+    const dict = LinkWidgetCore.linkWidgetLanguageNames;
     if(code in dict) return dict[code];
     // if we have something like "en-GB", change to "English (GB)"
     var parts = code.match(/^(.{2,3})-(.*)$/);
@@ -553,7 +553,7 @@ linkWidgetGetLanguageName : function (code) {
 },
 
 linkWidgetScanPageForLinks : function (doc) {
-LinkWidgetsExtension.lw_dump('Scan');
+LinkWidgetCore.lw_dump('Scan');
   const links = doc.links;
   // The scanning blocks the UI, so we don't want to spend too long on it. Previously we'd block the
   // UI for several seconds on http://antwrp.gsfc.nasa.gov/apod/archivepix.html (>3000 links)
@@ -570,30 +570,30 @@ LinkWidgetsExtension.lw_dump('Scan');
         .replace("&gt;", ">")
         .replace(/\s+/g, " ")
         .replace(/^\s+|\s+$/g, "");
-    var rels = (link.rel || link.rev) && LinkWidgetsExtension.linkWidgetGetLinkRels(link.rel, link.rev);
+    var rels = (link.rel || link.rev) && LinkWidgetCore.linkWidgetGetLinkRels(link.rel, link.rev);
     if(!rels) {
-      var rel = LinkWidgetsExtension.guessLinkRel(link, txt);
+      var rel = LinkWidgetCore.guessLinkRel(link, txt);
       if(rel) rels = {}, rels[rel] = true;
     }
-    if(rels) LinkWidgetsExtension.linkWidgetAddLinkForPage(href, txt, link.hreflang, null, doc, rels);
+    if(rels) LinkWidgetCore.linkWidgetAddLinkForPage(href, txt, link.hreflang, null, doc, rels);
   }
 },
 
 // link is an <a href> link
 guessLinkRel : function (link, txt) {
-LinkWidgetsExtension.lw_dump('guessLinkRel');
-  if(LinkWidgetsExtension.linkWidgetRegexps.next.test(txt)) return "next";
-  if(LinkWidgetsExtension.linkWidgetRegexps.prev.test(txt)) return "prev";
-  if(LinkWidgetsExtension.linkWidgetRegexps.first.test(txt)) return "first";
-  if(LinkWidgetsExtension.linkWidgetRegexps.last.test(txt)) return "last";
+LinkWidgetCore.lw_dump('guessLinkRel');
+  if(LinkWidgetCore.linkWidgetRegexps.next.test(txt)) return "next";
+  if(LinkWidgetCore.linkWidgetRegexps.prev.test(txt)) return "prev";
+  if(LinkWidgetCore.linkWidgetRegexps.first.test(txt)) return "first";
+  if(LinkWidgetCore.linkWidgetRegexps.last.test(txt)) return "last";
   const imgs = link.getElementsByTagName("img"), num = imgs.length;
   for(var i = 0; i != num; ++i) {
     // guessing is more accurate on relative URLs, and .src is always absolute
     var src = imgs[i].getAttribute("src");
-    if(LinkWidgetsExtension.linkWidgetRegexps.img_next.test(src)) return "next";
-    if(LinkWidgetsExtension.linkWidgetRegexps.img_prev.test(src)) return "prev";
-    if(LinkWidgetsExtension.linkWidgetRegexps.img_first.test(src)) return "first";
-    if(LinkWidgetsExtension.linkWidgetRegexps.img_last.test(src)) return "last";
+    if(LinkWidgetCore.linkWidgetRegexps.img_next.test(src)) return "next";
+    if(LinkWidgetCore.linkWidgetRegexps.img_prev.test(src)) return "prev";
+    if(LinkWidgetCore.linkWidgetRegexps.img_first.test(src)) return "first";
+    if(LinkWidgetCore.linkWidgetRegexps.img_last.test(src)) return "last";
   }
   return null;
 },
@@ -621,20 +621,20 @@ guessPrevNextLinksFromURL : function (doc, guessPrev, guessNext) {
     if(guessPrev) {
       var prv = ""+(num-1);
       while(prv.length < old.length) prv = "0" + prv;
-      LinkWidgetsExtension.linkWidgetAddLinkForPage(pre + prv + post, null, null, null, doc, { prev: true });
+      LinkWidgetCore.linkWidgetAddLinkForPage(pre + prv + post, null, null, null, doc, { prev: true });
     }
     if(guessNext) {
       var nxt = ""+(num+1);
       while(nxt.length < old.length) nxt = "0" + nxt;
-      LinkWidgetsExtension.linkWidgetAddLinkForPage(pre + nxt + post, null, null, null, doc, { next: true });
+      LinkWidgetCore.linkWidgetAddLinkForPage(pre + nxt + post, null, null, null, doc, { next: true });
     }
 }
 
 
 };
 
-window.addEventListener("load", LinkWidgetsExtension.linkWidgetStartup, false);
-window.addEventListener("unload", LinkWidgetsExtension.linkWidgetShutdown, false);
+window.addEventListener("load", LinkWidgetCore.linkWidgetStartup, false);
+window.addEventListener("unload", LinkWidgetCore.linkWidgetShutdown, false);
 
 
 function LinkWidgetLink(url, title, lang, media) {
@@ -657,7 +657,7 @@ LinkWidgetLink.prototype = {
       if(this.media && !/\b(all|screen)\b/i.test(this.media)) longTitle += this.media + ": ";
       // XXX this produces stupid results if there is an hreflang present but no title
       // (gives "French: ", should be something like "French [language] version")
-      if(this.lang) longTitle += LinkWidgetsExtension.linkWidgetGetLanguageName(this.lang) + ": ";
+      if(this.lang) longTitle += LinkWidgetCore.linkWidgetGetLanguageName(this.lang) + ": ";
       if(this.title) longTitle += this.title;
       // the 'if' here is to ensure the long title isn't just the url
       else if(longTitle) longTitle += this.url;
@@ -697,15 +697,15 @@ function initLinkWidgetButton(elt, rel) {
   elt.alreadyInitialised = true;
   elt.rel = rel;
   // to avoid repetitive XUL
-  elt.onmouseover = LinkWidgetsExtension.linkWidgetMouseEnter;
-  elt.onmouseout = LinkWidgetsExtension.linkWidgetMouseExit;
-  elt.onclick = LinkWidgetsExtension.linkWidgetItemClicked;
-  elt.oncontextmenu = LinkWidgetsExtension.linkWidgetButtonRightClicked;
-  elt.setAttribute("oncommand", "LinkWidgetsExtension.linkWidgetLoadPage(event);"); // .oncommand does not exist
+  elt.onmouseover = LinkWidgetCore.mouseEnter;
+  elt.onmouseout = LinkWidgetCore.mouseExit;
+  elt.onclick = LinkWidgetCore.linkWidgetItemClicked;
+  elt.oncontextmenu = LinkWidgetCore.linkWidgetButtonRightClicked;
+  elt.setAttribute("oncommand", "LinkWidgetCore.loadPage(event);"); // .oncommand does not exist
   elt.setAttribute("context", "");
   elt.setAttribute("tooltip", "linkwidget-tooltip");
 
-  elt.addEventListener("DOMMouseScroll", LinkWidgetsExtension.linkWidgetMouseScrollHandler, false);
+  elt.addEventListener("DOMMouseScroll", LinkWidgetCore.mouseScrollHandler, false);
 
   for(var i in linkWidgetButton) elt[i] = linkWidgetButton[i]; // reference following const
   var popup = elt.popup = document.createElement("menupopup");
@@ -798,12 +798,12 @@ LinkWidgetItem.prototype = {
   createElements: function() {
     const rel = this.rel;
     const mi = this.menuitem = document.createElement("menuitem");
-    const relStr = LinkWidgetsExtension.linkWidgetStrings[rel] || rel;
-    const relclass = LinkWidgetsExtension.linkWidgetButtonRels[rel] ? " linkwidget-rel-"+rel : "";
+    const relStr = LinkWidgetCore.linkWidgetStrings[rel] || rel;
+    const relclass = LinkWidgetCore.linkWidgetButtonRels[rel] ? " linkwidget-rel-"+rel : "";
     mi.className = "menuitem-iconic linkwidget-menuitem " + relclass;
     mi.setAttribute("label", relStr);
     const m = this.menu = document.createElement("menu");
-    m.setAttribute("label", LinkWidgetsExtension.linkWidgetStrings["2"+rel] || relStr);
+    m.setAttribute("label", LinkWidgetCore.linkWidgetStrings["2"+rel] || relStr);
     m.hidden = true;
     m.className = "menu-iconic linkwidget-menu" + relclass;
     const p = this.popup = document.createElement("menupopup");
@@ -813,7 +813,7 @@ LinkWidgetItem.prototype = {
     mi.relNum = m.relNum = this.relNum;
     m.appendChild(p);
     
-    const mpopup = LinkWidgetsExtension.linkWidgetMorePopup, kids = mpopup.childNodes, num = kids.length;
+    const mpopup = LinkWidgetCore.linkWidgetMorePopup, kids = mpopup.childNodes, num = kids.length;
     var insertionpoint = null;
     if(this.relNum != Infinity && num != 0) {
       for(var i = 0, node = kids[i]; i < num && node.relNum < this.relNum; i += 2, node = kids[i]);

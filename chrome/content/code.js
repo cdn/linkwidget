@@ -84,7 +84,7 @@ var LinkWidgetCore = {
     linkWidgetPrefGuessUpAndTopFromURL : false,
     linkWidgetPrefGuessPrevAndNextFromURL : false,
     linkWidgetPrefScanHyperlinks : false,
-    linkWidgetStrings : "chrome://linkwidget/locale/main.strings",
+    strings : "chrome://linkwidget/locale/main.strings",
     linkWidgetButtons : {}, // rel -> <toolbarbutton> map
     linkWidgetViews : {},   // rel -> view map, the views typically being a menu+menuitem
     linkWidgetMoreMenu : null,
@@ -99,10 +99,10 @@ var LinkWidgetCore = {
         dump(msg + "\n");
     },
 
-    linkWidgetStartup : function() {
-      LinkWidgetCore.lw_dump("linkWidgetStartup\n");
-      window.removeEventListener("load", LinkWidgetCore.linkWidgetStartup, false);
-      LinkWidgetCore.linkWidgetStrings = LinkWidgetCore.linkWidgetLoadStringBundle(LinkWidgetCore.linkWidgetStrings);
+    startup : function() {
+      LinkWidgetCore.lw_dump("startup\n");
+      window.removeEventListener("load", LinkWidgetCore.startup, false);
+      LinkWidgetCore.strings = LinkWidgetCore.linkWidgetLoadStringBundle(LinkWidgetCore.strings);
       for(var i in LinkWidgetCore._linkWidgetMenuOrdering) LinkWidgetCore.linkWidgetMenuOrdering[LinkWidgetCore._linkWidgetMenuOrdering[i]] = (i-0) + 1;
       for each(i in LinkWidgetCore._linkWidgetMenuRels) LinkWidgetCore.linkWidgetMenuRels[i] = true;
       for each(i in LinkWidgetCore._linkWidgetButtonRels) LinkWidgetCore.linkWidgetButtonRels[i] = true;
@@ -145,9 +145,9 @@ var LinkWidgetCore = {
 //      LinkWidgetCore.linkWidgetRefreshLinks(); // yyy - added
     },
 
-    linkWidgetShutdown : function() {
-      LinkWidgetCore.lw_dump("linkWidgetShutdown");
-      window.removeEventListener("unload", LinkWidgetCore.linkWidgetShutdown, false);
+    shutdown : function() {
+      LinkWidgetCore.lw_dump("shutdown");
+      window.removeEventListener("unload", LinkWidgetCore.shutdown, false);
       for(var h in LinkWidgetCore.linkWidgetEventHandlers) {
           gBrowser.addEventListener(h, window[LinkWidgetCore.linkWidgetEventHandlers[h]], false);
           gBrowser.tabContainer.addEventListener(h, window[LinkWidgetCore.linkWidgetEventHandlers[h]], false); // 4.01+ -- ONLY some
@@ -214,8 +214,8 @@ LinkWidgetCore.lw_dump('linkAddedHandler');
       var elt = event.originalTarget;
       var doc = elt.ownerDocument;
       if(!(elt instanceof HTMLLinkElement) || !elt.href || !(elt.rel || elt.rev)) return;
-      var rels = LinkWidgetCore.linkWidgetGetLinkRels(elt.rel, elt.rev, elt.type, elt.title);
-LinkWidgetCore.lw_dump('linkAddedHandler | rels = LinkWidgetCore.linkWidgetGetLinkRels(..)');
+      var rels = LinkWidgetCore.getLinkRels(elt.rel, elt.rev, elt.type, elt.title);
+LinkWidgetCore.lw_dump('linkAddedHandler | rels = LinkWidgetCore.getLinkRels(..)');
       if(rels) LinkWidgetCore.linkWidgetAddLinkForPage(elt.href, elt.title, elt.hreflang, elt.media, doc, rels);
     },
 
@@ -244,7 +244,7 @@ LinkWidgetCore.lw_dump('linkAddedHandler | rels = LinkWidgetCore.linkWidgetGetLi
       const links = doc.linkWidgetLinks || (doc.linkWidgetLinks = {});
       const isHTML = doc instanceof HTMLDocument && !(doc instanceof ImageDocument);
     
-      if(LinkWidgetCore.linkWidgetPrefScanHyperlinks && isHTML) LinkWidgetCore.linkWidgetScanPageForLinks(doc);
+      if(LinkWidgetCore.linkWidgetPrefScanHyperlinks && isHTML) LinkWidgetCore.scanPageForLinks(doc);
     
       const loc = doc.location, protocol = loc.protocol;
       if(!/^(?:https?|ftp|file)\:$/.test(protocol)) return;
@@ -330,22 +330,22 @@ LinkWidgetCore.lw_dump('linkWidgetAddLinkForPage');
       if(LinkWidgetCore.linkWidgetMoreMenu && enableMoreMenu) LinkWidgetCore.linkWidgetMoreMenu.disabled = false;
     },
 
-    linkWidgetOnMoreMenuShowing : function() {
-LinkWidgetCore.lw_dump('linkWidgetOnMoreMenuShowing');
+    onMoreMenuShowing : function() {
+LinkWidgetCore.lw_dump('onMoreMenuShowing');
       const linkmaps = content.document.linkWidgetLinks;
       // Update all existing views
       for(var rel in LinkWidgetCore.linkWidgetViews) LinkWidgetCore.linkWidgetViews[rel].show(linkmaps[rel] || null);
       // Create any new views that are needed
       for(rel in linkmaps) {
-//LinkWidgetCore.lw_dump('linkWidgetOnMoreMenuShowing | ' + rel);
+//LinkWidgetCore.lw_dump('onMoreMenuShowing | ' + rel);
         if(rel in LinkWidgetCore.linkWidgetViews || rel in LinkWidgetCore.linkWidgetButtons) continue;
-//LinkWidgetCore.lw_dump('linkWidgetOnMoreMenuShowing | continue' + '');
+//LinkWidgetCore.lw_dump('onMoreMenuShowing | continue' + '');
         var relNum = LinkWidgetCore.linkWidgetMenuOrdering[rel] || Infinity;
         var isMenu = rel in LinkWidgetCore.linkWidgetMenuRels;
         var item = LinkWidgetCore.linkWidgetViews[rel] =
           isMenu ? new LinkWidgetMenu(rel, relNum) : new LinkWidgetItem(rel, relNum);
         item.show(linkmaps[rel]);
-//LinkWidgetCore.lw_dump('linkWidgetOnMoreMenuShowing | ' + isMenu);
+//LinkWidgetCore.lw_dump('onMoreMenuShowing | ' + isMenu);
       }
     },
 
@@ -482,8 +482,8 @@ LinkWidgetCore.lw_dump('linkWidgetOnMoreMenuShowing');
       previous: "next"
     },
 
-    linkWidgetGetLinkRels : function (relStr, revStr, mimetype, title) {
-LinkWidgetCore.lw_dump('LinkWidgetCore.linkWidgetGetLinkRels');
+    getLinkRels : function (relStr, revStr, mimetype, title) {
+LinkWidgetCore.lw_dump('LinkWidgetCore.getLinkRels');
   // Ignore certain links
   if(LinkWidgetCore.linkWidgetRegexps.ignore_rels.test(relStr)) return null;
   // Ignore anything Firefox regards as an RSS/Atom-feed link
@@ -540,7 +540,7 @@ linkWidgetLoadStringBundle : function (bundlePath) {
 languageNames : null,
 
 // code is a language code, e.g. en, en-GB, es, fr-FR
-linkWidgetGetLanguageName : function (code) {
+getLanguageName : function (code) {
     if(!LinkWidgetCore.languageNames) LinkWidgetCore.languageNames =
       LinkWidgetCore.linkWidgetLoadStringBundle("chrome://global/locale/languageNames.properties");
     const dict = LinkWidgetCore.languageNames;
@@ -552,7 +552,7 @@ linkWidgetGetLanguageName : function (code) {
     return code;
 },
 
-linkWidgetScanPageForLinks : function (doc) {
+scanPageForLinks : function (doc) {
 LinkWidgetCore.lw_dump('Scan');
   const links = doc.links;
   // The scanning blocks the UI, so we don't want to spend too long on it. Previously we'd block the
@@ -570,7 +570,7 @@ LinkWidgetCore.lw_dump('Scan');
         .replace("&gt;", ">")
         .replace(/\s+/g, " ")
         .replace(/^\s+|\s+$/g, "");
-    var rels = (link.rel || link.rev) && LinkWidgetCore.linkWidgetGetLinkRels(link.rel, link.rev);
+    var rels = (link.rel || link.rev) && LinkWidgetCore.getLinkRels(link.rel, link.rev);
     if(!rels) {
       var rel = LinkWidgetCore.guessLinkRel(link, txt);
       if(rel) rels = {}, rels[rel] = true;
@@ -633,8 +633,8 @@ guessPrevNextLinksFromURL : function (doc, guessPrev, guessNext) {
 
 };
 
-window.addEventListener("load", LinkWidgetCore.linkWidgetStartup, false);
-window.addEventListener("unload", LinkWidgetCore.linkWidgetShutdown, false);
+window.addEventListener("load", LinkWidgetCore.startup, false);
+window.addEventListener("unload", LinkWidgetCore.shutdown, false);
 
 
 function LinkWidgetLink(url, title, lang, media) {
@@ -657,7 +657,7 @@ LinkWidgetLink.prototype = {
       if(this.media && !/\b(all|screen)\b/i.test(this.media)) longTitle += this.media + ": ";
       // XXX this produces stupid results if there is an hreflang present but no title
       // (gives "French: ", should be something like "French [language] version")
-      if(this.lang) longTitle += LinkWidgetCore.linkWidgetGetLanguageName(this.lang) + ": ";
+      if(this.lang) longTitle += LinkWidgetCore.getLanguageName(this.lang) + ": ";
       if(this.title) longTitle += this.title;
       // the 'if' here is to ensure the long title isn't just the url
       else if(longTitle) longTitle += this.url;
@@ -798,12 +798,12 @@ LinkWidgetItem.prototype = {
   createElements: function() {
     const rel = this.rel;
     const mi = this.menuitem = document.createElement("menuitem");
-    const relStr = LinkWidgetCore.linkWidgetStrings[rel] || rel;
+    const relStr = LinkWidgetCore.strings[rel] || rel;
     const relclass = LinkWidgetCore.linkWidgetButtonRels[rel] ? " linkwidget-rel-"+rel : "";
     mi.className = "menuitem-iconic linkwidget-menuitem " + relclass;
     mi.setAttribute("label", relStr);
     const m = this.menu = document.createElement("menu");
-    m.setAttribute("label", LinkWidgetCore.linkWidgetStrings["2"+rel] || relStr);
+    m.setAttribute("label", LinkWidgetCore.strings["2"+rel] || relStr);
     m.hidden = true;
     m.className = "menu-iconic linkwidget-menu" + relclass;
     const p = this.popup = document.createElement("menupopup");

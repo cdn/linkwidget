@@ -97,7 +97,7 @@ the terms of any one of the MPL, the GPL or the LGPL.
       oncommand="return LinkWidgetCore.linkWidgetLoadPage(event);" onclick="LinkWidgetCore.linkWidgetItemClicked(event);"
       onmouseover="LinkWidgetCore.mouseEnter(event);" onmouseout="LinkWidgetCore.mouseExit(event);"
       >
-    <menupopup id="linkwidget-more-popup" onpopupshowing="LinkWidgetCore.linkWidgetOnMoreMenuShowing();"/>
+    <menupopup id="linkwidget-more-popup" onpopupshowing="LinkWidgetCore.onMoreMenuShowing();"/>
   </toolbarbutton>
 
 <toolbarpalette id="BrowserToolbarPalette">

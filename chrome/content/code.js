@@ -76,9 +76,9 @@ var LinkWidgetCore = {
     linkWidgetEventHandlers : {
       "select": "LinkWidgetCore.linkWidgetTabSelectedHandler",
       "DOMLinkAdded": "LinkWidgetCore.linkAddedHandler",
-      "pagehide": "LinkWidgetCore.linkWidgetPageHideHandler",
-      "DOMContentLoaded": "LinkWidgetCore.linkWidgetPageLoadedHandler",
-      "pageshow": "LinkWidgetCore.linkWidgetPageShowHandler"
+      "pagehide": "LinkWidgetCore.pageHideHandler",
+      "DOMContentLoaded": "LinkWidgetCore.pageLoadedHandler",
+      "pageshow": "LinkWidgetCore.pageShowHandler"
     },
 
     linkWidgetPrefGuessUpAndTopFromURL : false,
@@ -124,16 +124,16 @@ var LinkWidgetCore = {
           gBrowser.tabContainer.addEventListener(h, window[LinkWidgetCore.linkWidgetEventHandlers[h]], false); // 4.01+ -- ONLY some
       }
 
-//          gBrowser.tabContainer.addEventListener('pagehide', LinkWidgetCore.linkWidgetPageHideHandler, false); // no
-//        gBrowser.tabContainer.addEventListener('pageshow', LinkWidgetCore.linkWidgetPageShowHandler, false);
+//          gBrowser.tabContainer.addEventListener('pagehide', LinkWidgetCore.pageHideHandler, false); // no
+//        gBrowser.tabContainer.addEventListener('pageshow', LinkWidgetCore.pageShowHandler, false);
           gBrowser.tabContainer.addEventListener('select', LinkWidgetCore.linkWidgetTabSelectedHandler, false); // yes
 //          gBrowser.tabContainer.addEventListener('DOMLinkAdded', LinkWidgetCore.linkAddedHandler, false); // yes | no ?
-//          gBrowser.tabContainer.addEventListener('DOMContentLoaded', LinkWidgetCore.linkWidgetPageLoadedHandler, false); // no
+//          gBrowser.tabContainer.addEventListener('DOMContentLoaded', LinkWidgetCore.pageLoadedHandler, false); // no
 
 
-          gBrowser.addEventListener('pagehide', LinkWidgetCore.linkWidgetPageHideHandler, false); // yes
-          gBrowser.addEventListener('pageshow', LinkWidgetCore.linkWidgetPageShowHandler, false); // yes
-          gBrowser.addEventListener('DOMContentLoaded', LinkWidgetCore.linkWidgetPageLoadedHandler, false); // yes
+          gBrowser.addEventListener('pagehide', LinkWidgetCore.pageHideHandler, false); // yes
+          gBrowser.addEventListener('pageshow', LinkWidgetCore.pageShowHandler, false); // yes
+          gBrowser.addEventListener('DOMContentLoaded', LinkWidgetCore.pageLoadedHandler, false); // yes
           gBrowser.addEventListener('DOMLinkAdded', LinkWidgetCore.linkAddedHandler, false); // also ?
 
 //      dump("lw :: linkWidgetDelayedStartup : for(var h in LinkWidgetCore.linkWidgetEventHandlers)\n");
@@ -220,8 +220,8 @@ LinkWidgetCore.lw_dump('linkAddedHandler | rels = LinkWidgetCore.linkWidgetGetLi
     },
 
     // Really ought to delete/nullify doc.linkWidgetLinks on "close" (but not on "pagehide")
-    linkWidgetPageHideHandler : function(event) {
-//LinkWidgetCore.lw_dump('linkWidgetPageHideHandler');
+    pageHideHandler : function(event) {
+//LinkWidgetCore.lw_dump('pageHideHandler');
       // Links like: <a href="..." onclick="this.style.display='none'">.....</a>
       // (the onclick handler could instead be on an ancestor of the link) lead to unload/pagehide
       // events with originalTarget==a text node.  So use ownerDocument (which is null for Documents)
@@ -234,8 +234,8 @@ LinkWidgetCore.lw_dump('linkAddedHandler | rels = LinkWidgetCore.linkWidgetGetLi
       if(LinkWidgetCore.linkWidgetMoreMenu) LinkWidgetCore.linkWidgetMoreMenu.disabled = true;
     },
 
-    linkWidgetPageLoadedHandler : function(event) {
-//LinkWidgetCore.lw_dump('linkWidgetPageLoadedHandler');
+    pageLoadedHandler : function(event) {
+//LinkWidgetCore.lw_dump('pageLoadedHandler');
 //      LinkWidgetCore.linkWidgetRefreshLinks();
       const doc = event.originalTarget, win = doc.defaultView;
       if(win != win.top || doc.linkWidgetHasGuessedLinks) return;
@@ -273,11 +273,11 @@ LinkWidgetCore.lw_dump('linkAddedHandler | rels = LinkWidgetCore.linkWidgetGetLi
     },
 
     // xxx isn't this too keen to refresh?
-    linkWidgetPageShowHandler : function(event) {
-//LinkWidgetCore.lw_dump('linkWidgetPageShowHandler');
+    pageShowHandler : function(event) {
+//LinkWidgetCore.lw_dump('pageShowHandler');
       const doc = event.originalTarget;
       // Link guessing for things with no DOMContentLoaded (e.g. ImageDocument)
-      if(!doc.linkWidgetHasGuessedLinks) LinkWidgetCore.linkWidgetPageLoadedHandler(event);
+      if(!doc.linkWidgetHasGuessedLinks) LinkWidgetCore.pageLoadedHandler(event);
       // If docShell is null accessing .contentDocument throws an exception
       if(!gBrowser.docShell || doc != gBrowser.contentDocument) return;
       LinkWidgetCore.linkWidgetRefreshLinks();
@@ -537,13 +537,13 @@ linkWidgetLoadStringBundle : function (bundlePath) {
 },
 
 // a map from 2/3-letter lang codes to the langs' names in the current locale
-linkWidgetLanguageNames : null,
+languageNames : null,
 
 // code is a language code, e.g. en, en-GB, es, fr-FR
 linkWidgetGetLanguageName : function (code) {
-    if(!linkWidgetLanguageNames) LinkWidgetCore.linkWidgetLanguageNames =
+    if(!LinkWidgetCore.languageNames) LinkWidgetCore.languageNames =
       LinkWidgetCore.linkWidgetLoadStringBundle("chrome://global/locale/languageNames.properties");
-    const dict = LinkWidgetCore.linkWidgetLanguageNames;
+    const dict = LinkWidgetCore.languageNames;
     if(code in dict) return dict[code];
     // if we have something like "en-GB", change to "English (GB)"
     var parts = code.match(/^(.{2,3})-(.*)$/);

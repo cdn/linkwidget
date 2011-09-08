@@ -95,7 +95,7 @@ the terms of any one of the MPL, the GPL or the LGPL.
       type="menu" orient="" tooltip="linkwidget-tooltip" context="" disabled="true"
       class="linkwidget-button toolbarbutton-1"
       oncommand="return LinkWidgetCore.linkWidgetLoadPage(event);" onclick="LinkWidgetCore.linkWidgetItemClicked(event);"
-      onmouseover="LinkWidgetCore.linkWidgetMouseEnter(event);" onmouseout="LinkWidgetCore.linkWidgetMouseExit(event);"
+      onmouseover="LinkWidgetCore.mouseEnter(event);" onmouseout="LinkWidgetCore.mouseExit(event);"
       >
     <menupopup id="linkwidget-more-popup" onpopupshowing="LinkWidgetCore.linkWidgetOnMoreMenuShowing();"/>
   </toolbarbutton>

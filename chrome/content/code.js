@@ -101,8 +101,8 @@ var LinkWidgetCore = {
 
     startup : function() {
       LinkWidgetCore.lw_dump("startup\n");
-      window.removeEventListener("load", LinkWidgetCore.startup, false);
-      LinkWidgetCore.strings = LinkWidgetCore.loadStringBundle(LinkWidgetCore.strings);
+      window.removeEventListener("load", LinkWidgetCore.startup, false); // this. ?
+      LinkWidgetCore.strings = LinkWidgetCore.loadStringBundle(LinkWidgetCore.strings); // this.strings make Firefox crash at launch
       for(var i in LinkWidgetCore._menuOrdering) LinkWidgetCore.menuOrdering[LinkWidgetCore._menuOrdering[i]] = (i-0) + 1;
       for each(i in LinkWidgetCore._menuRels) LinkWidgetCore.menuRels[i] = true;
       for each(i in LinkWidgetCore._buttonRels) LinkWidgetCore.buttonRels[i] = true;
@@ -114,7 +114,6 @@ var LinkWidgetCore = {
     delayedStartup : function() {
       LinkWidgetCore.lw_dump("delayedStartup");
       LinkWidgetCore.loadPrefs();
-//      dump("lw :: delayedStartup | LinkWidgetCore.loadPrefs\n");
       gPrefService.addObserver(LinkWidgetCore.prefPrefix, LinkWidgetCore.prefObserver, false);
       for(var h in LinkWidgetCore.eventHandlers) {
 //
@@ -314,7 +313,7 @@ LinkWidgetCore.lw_dump('addLinkForPage');
     },
 
     onMoreMenuShowing : function() {
-LinkWidgetCore.lw_dump('onMoreMenuShowing');
+//LinkWidgetCore.lw_dump('onMoreMenuShowing');
       const linkmaps = content.document.linkWidgetLinks;
       // Update all existing views
       for(var rel in LinkWidgetCore.views) LinkWidgetCore.views[rel].show(linkmaps[rel] || null);
@@ -561,7 +560,7 @@ LinkWidgetCore.lw_dump('Scan');
 
 // link is an <a href> link
 guessLinkRel : function (link, txt) {
-LinkWidgetCore.lw_dump('guessLinkRel');
+//LinkWidgetCore.lw_dump('guessLinkRel');
   if(LinkWidgetCore.regexps.next.test(txt)) return "next";
   if(LinkWidgetCore.regexps.prev.test(txt)) return "prev";
   if(LinkWidgetCore.regexps.first.test(txt)) return "first";
@@ -609,7 +608,6 @@ guessPrevNextLinksFromURL : function (doc, guessPrev, guessNext) {
       LinkWidgetCore.addLinkForPage(pre + nxt + post, null, null, null, doc, { next: true });
     }
 }
-
 
 };
 

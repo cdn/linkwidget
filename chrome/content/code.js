@@ -194,7 +194,7 @@ var LinkWidgetCore = {
       LinkWidgetCore.buttons = {};
       for(var rel in LinkWidgetCore.buttonRels) {
         var elt = document.getElementById("linkwidget-"+rel);
-        if(elt) LinkWidgetCore.buttons[rel] = initLinkWidgetButton(elt, rel);
+        if(elt) LinkWidgetCore.buttons[rel] = LinkWidgetCore.initButton(elt, rel);
       }
     },
 
@@ -605,6 +605,32 @@ guessPrevNextLinksFromURL : function (doc, guessPrev, guessNext) {
     }
 },
 
+// Top, Up, First, Prev, Next, and Last menu-buttons
+// Hackery employed to disable the dropmarker if there is just one link.
+initButton : function (elt, rel) {
+  if(elt.alreadyInitialised) return elt;
+  elt.alreadyInitialised = true;
+  elt.rel = rel;
+  // to avoid repetitive XUL
+  elt.onmouseover = LinkWidgetCore.mouseEnter;
+  elt.onmouseout = LinkWidgetCore.mouseExit;
+  elt.onclick = LinkWidgetCore.itemClicked;
+  elt.oncontextmenu = LinkWidgetCore.buttonRightClicked;
+  elt.setAttribute("oncommand", "LinkWidgetCore.loadPage(event);"); // .oncommand does not exist
+  elt.setAttribute("context", "");
+  elt.setAttribute("tooltip", "linkwidget-tooltip");
+
+  elt.addEventListener("DOMMouseScroll", LinkWidgetCore.mouseScrollHandler, false);
+
+  for(var i in linkWidgetButton) elt[i] = linkWidgetButton[i]; // references external const
+  var popup = elt.popup = document.createElement("menupopup");
+  elt.appendChild(popup);
+  popup.setAttribute("onpopupshowing", "return this.parentNode.buildMenu();");
+  // hackish
+  var anonKids = document.getAnonymousNodes(elt);
+  elt.dropMarker = anonKids[anonKids.length-1];
+  return elt;
+}
 
 };
 
@@ -664,33 +690,6 @@ const linkWidgetItemBase = {
   }
 };
 
-
-// Top, Up, First, Prev, Next, and Last menu-buttons
-// Hackery employed to disable the dropmarker if there is just one link.
-function initLinkWidgetButton(elt, rel) {
-  if(elt.alreadyInitialised) return elt;
-  elt.alreadyInitialised = true;
-  elt.rel = rel;
-  // to avoid repetitive XUL
-  elt.onmouseover = LinkWidgetCore.mouseEnter;
-  elt.onmouseout = LinkWidgetCore.mouseExit;
-  elt.onclick = LinkWidgetCore.itemClicked;
-  elt.oncontextmenu = LinkWidgetCore.buttonRightClicked;
-  elt.setAttribute("oncommand", "LinkWidgetCore.loadPage(event);"); // .oncommand does not exist
-  elt.setAttribute("context", "");
-  elt.setAttribute("tooltip", "linkwidget-tooltip");
-
-  elt.addEventListener("DOMMouseScroll", LinkWidgetCore.mouseScrollHandler, false);
-
-  for(var i in linkWidgetButton) elt[i] = linkWidgetButton[i]; // reference following const
-  var popup = elt.popup = document.createElement("menupopup");
-  elt.appendChild(popup);
-  popup.setAttribute("onpopupshowing", "return this.parentNode.buildMenu();");
-  // hackish
-  var anonKids = document.getAnonymousNodes(elt);
-  elt.dropMarker = anonKids[anonKids.length-1];
-  return elt;
-};
 
 const linkWidgetButton = {
   __proto__: linkWidgetItemBase,

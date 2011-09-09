@@ -112,7 +112,7 @@ var LinkWidgetCore = {
     },
 
     delayedStartup : function() {
-      LinkWidgetCore.lw_dump("delayedStartup");
+//      LinkWidgetCore.lw_dump("delayedStartup");
       LinkWidgetCore.loadPrefs();
       gPrefService.addObserver(LinkWidgetCore.prefPrefix, LinkWidgetCore.prefObserver, false);
       for(var h in LinkWidgetCore.eventHandlers) {
@@ -474,6 +474,8 @@ var LinkWidgetCore = {
     const xmltype = /^(?:application|text)\/(?:rdf\+)?xml$/;
     if(feedtype.test(type) || (xmltype.test(type) && /\brss\b/i.test(title))) return null;
   }
+
+  if(relStr && /openid/i.test(relStr)) return null;
 
   const whitespace = /[ \t\f\r\n\u200B]+/; // per HTML4.01 spec
   const rels = {};

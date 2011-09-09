@@ -100,7 +100,7 @@ var LinkWidgetCore = {
     },
 
     startup : function() {
-      LinkWidgetCore.lw_dump("startup\n");
+//      LinkWidgetCore.lw_dump("startup");
       window.removeEventListener("load", LinkWidgetCore.startup, false); // this. ?
       LinkWidgetCore.strings = LinkWidgetCore.loadStringBundle(LinkWidgetCore.strings); // this.strings make Firefox crash at launch
       for(var i in LinkWidgetCore._menuOrdering) LinkWidgetCore.menuOrdering[LinkWidgetCore._menuOrdering[i]] = (i-0) + 1;
@@ -143,11 +143,16 @@ var LinkWidgetCore = {
           gBrowser.removeEventListener(h, window[LinkWidgetCore.eventHandlers[h]], false);
           gBrowser.tabContainer.removeEventListener(h, window[LinkWidgetCore.eventHandlers[h]], false); // 4.01+ -- ONLY some
       }
+          gBrowser.tabContainer.removeEventListener('select', LinkWidgetCore.tabSelectedHandler, false);
+          gBrowser.removeEventListener('pagehide', LinkWidgetCore.pageHideHandler, false);
+          gBrowser.removeEventListener('pageshow', LinkWidgetCore.pageShowHandler, false);
+          gBrowser.removeEventListener('DOMContentLoaded', LinkWidgetCore.pageLoadedHandler, false);
+          gBrowser.removeEventListener('DOMLinkAdded', LinkWidgetCore.linkAddedHandler, false);
       gPrefService.removeObserver(LinkWidgetCore.prefPrefix, LinkWidgetCore.prefObserver);
     },
 
     loadPrefs : function() {
-      LinkWidgetCore.lw_dump("loadPrefs");
+//      LinkWidgetCore.lw_dump("loadPrefs");
       const branch = Components.classes["@mozilla.org/preferences-service;1"]
                              .getService(Components.interfaces.nsIPrefService)
                              .QueryInterface(Components.interfaces.nsIPrefBranch)

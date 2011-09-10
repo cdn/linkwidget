@@ -90,6 +90,7 @@ var LinkWidgetCore = {
     moreMenu : null,
     morePopup : null,
 
+
     aConsoleService: Components.classes["@mozilla.org/consoleservice;1"].
     getService(Components.interfaces.nsIConsoleService),
  
@@ -99,8 +100,8 @@ var LinkWidgetCore = {
         dump(msg + "\n");
     },
 
+
     startup : function() {
-//      LinkWidgetCore.lw_dump("startup");
       window.removeEventListener("load", LinkWidgetCore.startup, false); // this. ?
       LinkWidgetCore.strings = LinkWidgetCore.loadStringBundle(LinkWidgetCore.strings); // this.strings make Firefox crash at launch
       for(var i in LinkWidgetCore._menuOrdering) LinkWidgetCore.menuOrdering[LinkWidgetCore._menuOrdering[i]] = (i-0) + 1;
@@ -112,7 +113,6 @@ var LinkWidgetCore = {
     },
 
     delayedStartup : function() {
-//      LinkWidgetCore.lw_dump("delayedStartup");
       LinkWidgetCore.loadPrefs();
       gPrefService.addObserver(LinkWidgetCore.prefPrefix, LinkWidgetCore.prefObserver, false);
       for(var h in LinkWidgetCore.eventHandlers) {
@@ -120,15 +120,12 @@ var LinkWidgetCore = {
           gBrowser.tabContainer.addEventListener(h, window[LinkWidgetCore.eventHandlers[h]], false); // 4.01+ -- ONLY some
       }
 
-//        gBrowser.tabContainer.addEventListener('pageshow', LinkWidgetCore.pageShowHandler, false);
-          gBrowser.tabContainer.addEventListener('select', LinkWidgetCore.tabSelectedHandler, false); // yes
+          gBrowser.tabContainer.addEventListener('select', LinkWidgetCore.tabSelectedHandler, false);
 
-//          gBrowser.tabContainer.addEventListener('DOMLinkAdded', LinkWidgetCore.linkAddedHandler, false); // yes | no ?
-
-          gBrowser.addEventListener('pagehide', LinkWidgetCore.pageHideHandler, false); // yes
-          gBrowser.addEventListener('pageshow', LinkWidgetCore.pageShowHandler, false); // yes
-          gBrowser.addEventListener('DOMContentLoaded', LinkWidgetCore.pageLoadedHandler, false); // yes
-          gBrowser.addEventListener('DOMLinkAdded', LinkWidgetCore.linkAddedHandler, false); // also ?
+          gBrowser.addEventListener('pagehide', LinkWidgetCore.pageHideHandler, false);
+          gBrowser.addEventListener('pageshow', LinkWidgetCore.pageShowHandler, false);
+          gBrowser.addEventListener('DOMContentLoaded', LinkWidgetCore.pageLoadedHandler, false);
+          gBrowser.addEventListener('DOMLinkAdded', LinkWidgetCore.linkAddedHandler, false);
 
       // replace the toolbar customisation callback
         var box = document.getElementById("navigator-toolbox");
@@ -137,7 +134,6 @@ var LinkWidgetCore = {
     },
 
     shutdown : function() {
-//      LinkWidgetCore.lw_dump("shutdown");
       window.removeEventListener("unload", LinkWidgetCore.shutdown, false);
       for(var h in LinkWidgetCore.eventHandlers) {
           gBrowser.removeEventListener(h, window[LinkWidgetCore.eventHandlers[h]], false);
@@ -152,7 +148,6 @@ var LinkWidgetCore = {
     },
 
     loadPrefs : function() {
-//      LinkWidgetCore.lw_dump("loadPrefs");
       const branch = Components.classes["@mozilla.org/preferences-service;1"]
                              .getService(Components.interfaces.nsIPrefService)
                              .QueryInterface(Components.interfaces.nsIPrefBranch)
@@ -195,7 +190,6 @@ var LinkWidgetCore = {
     },
 
     initVisibleButtons : function() {
-//      LinkWidgetCore.lw_dump("initVisibleButtons");
       LinkWidgetCore.buttons = {};
       for(var rel in LinkWidgetCore.buttonRels) {
         var elt = document.getElementById("linkwidget-"+rel);
@@ -204,7 +198,6 @@ var LinkWidgetCore = {
     },
 
     linkAddedHandler : function(event) {
-//LinkWidgetCore.lw_dump('linkAddedHandler');
       var elt = event.originalTarget;
       var doc = elt.ownerDocument;
       if(!(elt instanceof HTMLLinkElement) || !elt.href || !(elt.rel || elt.rev)) return;
@@ -214,7 +207,6 @@ var LinkWidgetCore = {
 
     // Really ought to delete/nullify doc.linkWidgetLinks on "close" (but not on "pagehide")
     pageHideHandler : function(event) {
-//LinkWidgetCore.lw_dump('pageHideHandler');
       // Links like: <a href="..." onclick="this.style.display='none'">.....</a>
       // (the onclick handler could instead be on an ancestor of the link) lead to unload/pagehide
       // events with originalTarget==a text node.  So use ownerDocument (which is null for Documents)
@@ -228,7 +220,6 @@ var LinkWidgetCore = {
     },
 
     pageLoadedHandler : function(event) {
-//LinkWidgetCore.lw_dump('pageLoadedHandler');
       const doc = event.originalTarget, win = doc.defaultView;
       if(win != win.top || doc.linkWidgetHasGuessedLinks) return;
     
@@ -256,7 +247,6 @@ var LinkWidgetCore = {
     },
 
     tabSelectedHandler : function(event) {
-//      LinkWidgetCore.lw_dump('tabSelectedHandler');
     //  let newTab = event.originalTarget;
       if(event.originalTarget.localName != "tabs") return;
       LinkWidgetCore.refreshLinks();
@@ -264,7 +254,6 @@ var LinkWidgetCore = {
 
     // xxx isn't this too keen to refresh?
     pageShowHandler : function(event) {
-//LinkWidgetCore.lw_dump('pageShowHandler');
       const doc = event.originalTarget;
       // Link guessing for things with no DOMContentLoaded (e.g. ImageDocument)
       if(!doc.linkWidgetHasGuessedLinks) LinkWidgetCore.pageLoadedHandler(event);
@@ -274,7 +263,6 @@ var LinkWidgetCore = {
     },
 
     refreshLinks : function() {
-    //alert('lWRL'); LinkWidgetCore.lw_dump('refreshLinks');
       for each(var btn in LinkWidgetCore.buttons) btn.show(null);
       if(LinkWidgetCore.moreMenu) LinkWidgetCore.moreMenu.disabled = true;
 
@@ -291,7 +279,6 @@ var LinkWidgetCore = {
     },
 
     addLinkForPage : function(url, txt, lang, media, doc, rels) {
-//LinkWidgetCore.lw_dump('addLinkForPage');
       const link = new LinkWidgetLink(url, txt, lang, media);
       // put the link in a rel->[link] map on the document's XPCNativeWrapper
       var doclinks = doc.linkWidgetLinks || (doc.linkWidgetLinks = {});
@@ -314,7 +301,6 @@ var LinkWidgetCore = {
     },
 
     onMoreMenuShowing : function() {
-//LinkWidgetCore.lw_dump('onMoreMenuShowing');
       const linkmaps = content.document.linkWidgetLinks;
       // Update all existing views
       for(var rel in LinkWidgetCore.views) LinkWidgetCore.views[rel].show(linkmaps[rel] || null);
@@ -438,6 +424,7 @@ var LinkWidgetCore = {
         return matches && /\./.test(matches[1]) ? prefix + matches[1] + "/" : null;
     },
 
+
     // null values mean that rel should be ignored
     relConversions : {
       home: "top",
@@ -463,181 +450,179 @@ var LinkWidgetCore = {
     },
 
     getLinkRels : function (relStr, revStr, mimetype, title) {
-//LinkWidgetCore.lw_dump('LinkWidgetCore.getLinkRels');
-  // Ignore certain links
-  if(LinkWidgetCore.regexps.ignore_rels.test(relStr)) return null;
-  // Ignore anything Firefox regards as an RSS/Atom-feed link
-  if(relStr && /alternate/i.test(relStr)) {
-    // xxx have seen JS errors where "mimetype has no properties" (i.e., is null)
-    if(mimetype) { const type = mimetype.replace(/\s|;.*/g, "").toLowerCase(); }
-    const feedtype = /^application\/(?:rss|atom)\+xml$/;
-    const xmltype = /^(?:application|text)\/(?:rdf\+)?xml$/;
-    if(feedtype.test(type) || (xmltype.test(type) && /\brss\b/i.test(title))) return null;
-  }
+      // Ignore certain links
+      if(LinkWidgetCore.regexps.ignore_rels.test(relStr)) return null;
+      // Ignore anything Firefox regards as an RSS/Atom-feed link
+      if(relStr && /alternate/i.test(relStr)) {
+        // xxx have seen JS errors where "mimetype has no properties" (i.e., is null)
+        if(mimetype) { const type = mimetype.replace(/\s|;.*/g, "").toLowerCase(); }
+        const feedtype = /^application\/(?:rss|atom)\+xml$/;
+        const xmltype = /^(?:application|text)\/(?:rdf\+)?xml$/;
+        if(feedtype.test(type) || (xmltype.test(type) && /\brss\b/i.test(title))) return null;
+      }
 
-  const whitespace = /[ \t\f\r\n\u200B]+/; // per HTML4.01 spec
-  const rels = {};
-  var haveRels = false;
-  if(relStr) {
-    var relValues = relStr.split(whitespace);
-    for(var i = 0; i != relValues.length; i++) {
-      var rel = relValues[i].toLowerCase();
-      // this has to use "in", because the entries can be null (meaning "ignore")
-      rel = rel in LinkWidgetCore.relConversions ? LinkWidgetCore.relConversions[rel] : rel;
-      if(rel) rels[rel] = true, haveRels = true;
+      const whitespace = /[ \t\f\r\n\u200B]+/; // per HTML4.01 spec
+      const rels = {};
+      var haveRels = false;
+      if(relStr) {
+        var relValues = relStr.split(whitespace);
+        for(var i = 0; i != relValues.length; i++) {
+          var rel = relValues[i].toLowerCase();
+          // this has to use "in", because the entries can be null (meaning "ignore")
+          rel = rel in LinkWidgetCore.relConversions ? LinkWidgetCore.relConversions[rel] : rel;
+          if(rel) rels[rel] = true, haveRels = true;
+        }
+      }
+      if(revStr) {
+        var revValues = revStr.split(whitespace);
+        for(i = 0; i < revValues.length; i++) {
+          rel = revToRel[revValues[i].toLowerCase()] || null;
+          if(rel) rels[rel] = true, haveRels = true;
+        }
+      }
+      return haveRels ? rels : null;
+    },
+
+    loadStringBundle : function (bundlePath) {
+      const strings = {};
+      try {
+        var bundle = Components.classes["@mozilla.org/intl/stringbundle;1"]
+                     .getService(Components.interfaces.nsIStringBundleService)
+                     .createBundle(bundlePath)
+                     .getSimpleEnumeration();
+      } catch(ex) {
+        return {};  // callers can all survive without
+      }
+
+      while(bundle.hasMoreElements()) {
+        var item = bundle.getNext().QueryInterface(Components.interfaces.nsIPropertyElement);
+        strings[item.key] = item.value;
+      }
+
+      return strings;
+    },
+
+
+    // a map from 2/3-letter lang codes to the langs' names in the current locale
+    languageNames : null,
+
+    // code is a language code, e.g. en, en-GB, es, fr-FR
+    getLanguageName : function (code) {
+        if(!LinkWidgetCore.languageNames) LinkWidgetCore.languageNames =
+          LinkWidgetCore.loadStringBundle("chrome://global/locale/languageNames.properties");
+        const dict = LinkWidgetCore.languageNames;
+        if(code in dict) return dict[code];
+        // if we have something like "en-GB", change to "English (GB)"
+        var parts = code.match(/^(.{2,3})-(.*)$/);
+        // xxx make the parentheses localizable
+        if(parts && parts[1] in dict) return dict[parts[1]]+" ("+parts[2]+")";
+        return code;
+    },
+
+
+    scanPageForLinks : function (doc) {
+      const links = doc.links;
+      // The scanning blocks the UI, so we don't want to spend too long on it. Previously we'd block the
+      // UI for several seconds on http://antwrp.gsfc.nasa.gov/apod/archivepix.html (>3000 links)
+      const max = Math.min(links.length, 500);
+
+      for(var i = 0; i != max; ++i) {
+        var link = links[i], href = link.href;
+        if(!href || href.charAt(0)=='#') continue; // ignore internal links
+
+        var txt = link.innerHTML
+            .replace(/<[^>]+alt=(["'])(.*?)\1[^>]*>/ig, " $2 ") // keep alt attrs
+            .replace(/<[^>]*>/g, "") // drop tags + comments
+            .replace("&lt;", "<")
+            .replace("&gt;", ">")
+            .replace(/\s+/g, " ")
+            .replace(/^\s+|\s+$/g, "");
+        var rels = (link.rel || link.rev) && LinkWidgetCore.getLinkRels(link.rel, link.rev);
+        if(!rels) {
+          var rel = LinkWidgetCore.guessLinkRel(link, txt);
+          if(rel) rels = {}, rels[rel] = true;
+        }
+        if(rels) LinkWidgetCore.addLinkForPage(href, txt, link.hreflang, null, doc, rels);
+      }
+    },
+
+    // link is an <a href> link
+    guessLinkRel : function (link, txt) {
+      if(LinkWidgetCore.regexps.next.test(txt)) return "next";
+      if(LinkWidgetCore.regexps.prev.test(txt)) return "prev";
+      if(LinkWidgetCore.regexps.first.test(txt)) return "first";
+      if(LinkWidgetCore.regexps.last.test(txt)) return "last";
+      const imgs = link.getElementsByTagName("img"), num = imgs.length;
+      for(var i = 0; i != num; ++i) {
+        // guessing is more accurate on relative URLs, and .src is always absolute
+        var src = imgs[i].getAttribute("src");
+        if(LinkWidgetCore.regexps.img_next.test(src)) return "next";
+        if(LinkWidgetCore.regexps.img_prev.test(src)) return "prev";
+        if(LinkWidgetCore.regexps.img_first.test(src)) return "first";
+        if(LinkWidgetCore.regexps.img_last.test(src)) return "last";
+      }
+      return null;
+    },
+
+    guessPrevNextLinksFromURL : function (doc, guessPrev, guessNext) {
+        if(!guessPrev && !guessNext) return;
+
+        function isDigit(c) { return ("0" <= c && c <= "9") }
+
+        const location = doc.location;
+        var url = location.href;
+        var min = location.host.length + location.protocol.length + 2; // 2 for "//"
+
+        var e, s;
+        for(e = url.length; e > min && !isDigit(url[e-1]); --e);
+        if(e==min) return;
+        for(s = e - 1; s > min && isDigit(url[s-1]); --s);
+        // avoid guessing "foo%21bar" as next from "foo%20bar" (i.e. "foo bar")
+        if(s && url[s-1] == "%") return;
+
+        var old = url.substring(s,e);
+        var num = parseInt(old, 10); // force base 10 because number could start with zeros
+
+        var pre = url.substring(0,s), post = url.substring(e);
+        if(guessPrev) {
+          var prv = ""+(num-1);
+          while(prv.length < old.length) prv = "0" + prv;
+          LinkWidgetCore.addLinkForPage(pre + prv + post, null, null, null, doc, { prev: true });
+        }
+        if(guessNext) {
+          var nxt = ""+(num+1);
+          while(nxt.length < old.length) nxt = "0" + nxt;
+          LinkWidgetCore.addLinkForPage(pre + nxt + post, null, null, null, doc, { next: true });
+        }
+    },
+
+
+    // Top, Up, First, Prev, Next, and Last menu-buttons
+    // Hackery employed to disable the dropmarker if there is just one link.
+    initButton : function (elt, rel) {
+      if(elt.alreadyInitialised) return elt;
+      elt.alreadyInitialised = true;
+      elt.rel = rel;
+      // to avoid repetitive XUL
+      elt.onmouseover = LinkWidgetCore.mouseEnter;
+      elt.onmouseout = LinkWidgetCore.mouseExit;
+      elt.onclick = LinkWidgetCore.itemClicked;
+      elt.oncontextmenu = LinkWidgetCore.buttonRightClicked;
+      elt.setAttribute("oncommand", "LinkWidgetCore.loadPage(event);"); // .oncommand does not exist
+      elt.setAttribute("context", "");
+      elt.setAttribute("tooltip", "linkwidget-tooltip");
+
+      elt.addEventListener("DOMMouseScroll", LinkWidgetCore.mouseScrollHandler, false);
+
+      for(var i in linkWidgetButton) elt[i] = linkWidgetButton[i]; // references external const
+      var popup = elt.popup = document.createElement("menupopup");
+      elt.appendChild(popup);
+      popup.setAttribute("onpopupshowing", "return this.parentNode.buildMenu();");
+      // hackish
+      var anonKids = document.getAnonymousNodes(elt);
+      elt.dropMarker = anonKids[anonKids.length-1];
+      return elt;
     }
-  }
-  if(revStr) {
-    var revValues = revStr.split(whitespace);
-    for(i = 0; i < revValues.length; i++) {
-      rel = revToRel[revValues[i].toLowerCase()] || null;
-      if(rel) rels[rel] = true, haveRels = true;
-    }
-  }
-  return haveRels ? rels : null;
-},
-
-loadStringBundle : function (bundlePath) {
-  const strings = {};
-  try {
-    var bundle = Components.classes["@mozilla.org/intl/stringbundle;1"]
-                 .getService(Components.interfaces.nsIStringBundleService)
-                 .createBundle(bundlePath)
-                 .getSimpleEnumeration();
-  } catch(ex) {
-    return {};  // callers can all survive without
-  }
-
-  while(bundle.hasMoreElements()) {
-    var item = bundle.getNext().QueryInterface(Components.interfaces.nsIPropertyElement);
-    strings[item.key] = item.value;
-  }
-
-  return strings;
-},
-
-// a map from 2/3-letter lang codes to the langs' names in the current locale
-languageNames : null,
-
-// code is a language code, e.g. en, en-GB, es, fr-FR
-getLanguageName : function (code) {
-    if(!LinkWidgetCore.languageNames) LinkWidgetCore.languageNames =
-      LinkWidgetCore.loadStringBundle("chrome://global/locale/languageNames.properties");
-    const dict = LinkWidgetCore.languageNames;
-    if(code in dict) return dict[code];
-    // if we have something like "en-GB", change to "English (GB)"
-    var parts = code.match(/^(.{2,3})-(.*)$/);
-    // xxx make the parentheses localizable
-    if(parts && parts[1] in dict) return dict[parts[1]]+" ("+parts[2]+")";
-    return code;
-},
-
-scanPageForLinks : function (doc) {
-//LinkWidgetCore.lw_dump('scanPageForLinks');
-  const links = doc.links;
-  // The scanning blocks the UI, so we don't want to spend too long on it. Previously we'd block the
-  // UI for several seconds on http://antwrp.gsfc.nasa.gov/apod/archivepix.html (>3000 links)
-  const max = Math.min(links.length, 500);
-
-  for(var i = 0; i != max; ++i) {
-    var link = links[i], href = link.href;
-    if(!href || href.charAt(0)=='#') continue; // ignore internal links
-
-    var txt = link.innerHTML
-        .replace(/<[^>]+alt=(["'])(.*?)\1[^>]*>/ig, " $2 ") // keep alt attrs
-        .replace(/<[^>]*>/g, "") // drop tags + comments
-        .replace("&lt;", "<")
-        .replace("&gt;", ">")
-        .replace(/\s+/g, " ")
-        .replace(/^\s+|\s+$/g, "");
-    var rels = (link.rel || link.rev) && LinkWidgetCore.getLinkRels(link.rel, link.rev);
-    if(!rels) {
-      var rel = LinkWidgetCore.guessLinkRel(link, txt);
-      if(rel) rels = {}, rels[rel] = true;
-    }
-    if(rels) LinkWidgetCore.addLinkForPage(href, txt, link.hreflang, null, doc, rels);
-  }
-// ars.userfriendly.org uses <map><area alt= href= /></map>
-
-},
-
-// link is an <a href> link
-guessLinkRel : function (link, txt) {
-//LinkWidgetCore.lw_dump('guessLinkRel');
-  if(LinkWidgetCore.regexps.next.test(txt)) return "next";
-  if(LinkWidgetCore.regexps.prev.test(txt)) return "prev";
-  if(LinkWidgetCore.regexps.first.test(txt)) return "first";
-  if(LinkWidgetCore.regexps.last.test(txt)) return "last";
-  const imgs = link.getElementsByTagName("img"), num = imgs.length;
-  for(var i = 0; i != num; ++i) {
-    // guessing is more accurate on relative URLs, and .src is always absolute
-    var src = imgs[i].getAttribute("src");
-    if(LinkWidgetCore.regexps.img_next.test(src)) return "next";
-    if(LinkWidgetCore.regexps.img_prev.test(src)) return "prev";
-    if(LinkWidgetCore.regexps.img_first.test(src)) return "first";
-    if(LinkWidgetCore.regexps.img_last.test(src)) return "last";
-  }
-  return null;
-},
-
-guessPrevNextLinksFromURL : function (doc, guessPrev, guessNext) {
-    if(!guessPrev && !guessNext) return;
-
-    function isDigit(c) { return ("0" <= c && c <= "9") }
-
-    const location = doc.location;
-    var url = location.href;
-    var min = location.host.length + location.protocol.length + 2; // 2 for "//"
-
-    var e, s;
-    for(e = url.length; e > min && !isDigit(url[e-1]); --e);
-    if(e==min) return;
-    for(s = e - 1; s > min && isDigit(url[s-1]); --s);
-    // avoid guessing "foo%21bar" as next from "foo%20bar" (i.e. "foo bar")
-    if(s && url[s-1] == "%") return;
-
-    var old = url.substring(s,e);
-    var num = parseInt(old, 10); // force base 10 because number could start with zeros
-
-    var pre = url.substring(0,s), post = url.substring(e);
-    if(guessPrev) {
-      var prv = ""+(num-1);
-      while(prv.length < old.length) prv = "0" + prv;
-      LinkWidgetCore.addLinkForPage(pre + prv + post, null, null, null, doc, { prev: true });
-    }
-    if(guessNext) {
-      var nxt = ""+(num+1);
-      while(nxt.length < old.length) nxt = "0" + nxt;
-      LinkWidgetCore.addLinkForPage(pre + nxt + post, null, null, null, doc, { next: true });
-    }
-},
-
-// Top, Up, First, Prev, Next, and Last menu-buttons
-// Hackery employed to disable the dropmarker if there is just one link.
-initButton : function (elt, rel) {
-  if(elt.alreadyInitialised) return elt;
-  elt.alreadyInitialised = true;
-  elt.rel = rel;
-  // to avoid repetitive XUL
-  elt.onmouseover = LinkWidgetCore.mouseEnter;
-  elt.onmouseout = LinkWidgetCore.mouseExit;
-  elt.onclick = LinkWidgetCore.itemClicked;
-  elt.oncontextmenu = LinkWidgetCore.buttonRightClicked;
-  elt.setAttribute("oncommand", "LinkWidgetCore.loadPage(event);"); // .oncommand does not exist
-  elt.setAttribute("context", "");
-  elt.setAttribute("tooltip", "linkwidget-tooltip");
-
-  elt.addEventListener("DOMMouseScroll", LinkWidgetCore.mouseScrollHandler, false);
-
-  for(var i in linkWidgetButton) elt[i] = linkWidgetButton[i]; // references external const
-  var popup = elt.popup = document.createElement("menupopup");
-  elt.appendChild(popup);
-  popup.setAttribute("onpopupshowing", "return this.parentNode.buildMenu();");
-  // hackish
-  var anonKids = document.getAnonymousNodes(elt);
-  elt.dropMarker = anonKids[anonKids.length-1];
-  return elt;
-}
 
 };
 

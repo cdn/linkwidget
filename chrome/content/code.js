@@ -56,7 +56,8 @@ var LinkWidgetCore = {
       "img_first": null,
       "img_prev": null,
       "img_next": null,
-      "img_last": null
+      "img_last": null,
+      "search": null
     },
 
     // rels which should always use a submenu of the More menu, even for a single item
@@ -95,7 +96,7 @@ var LinkWidgetCore = {
  
     lw_dump : function(msg) {
         msg = 'Link Widgets :: ' + msg;
-       // this.aConsoleService.logStringMessage(msg);
+        this.aConsoleService.logStringMessage(msg);
         dump(msg + "\n");
     },
 
@@ -558,16 +559,43 @@ scanPageForLinks : function (doc) {
     if(rels) LinkWidgetCore.addLinkForPage(href, txt, link.hreflang, null, doc, rels);
   }
 // ars.userfriendly.org uses <map><area alt= href= /></map>
+  const maps = doc.getElementsByTagName('map');
+  if(maps.length > 0) LinkWidgetCore.lw_dump('Maps present: ' + maps.length);
+  if(maps.length == 0) return;
+  const areas = doc.getElementsByTagName('area');
+  if(areas.length > 0) LinkWidgetCore.lw_dump('Areas present: ' + areas.length);
+  if(areas.length == 0) return;
+  const maxim = Math.min(areas.length, 500);
 
+  for(i = 0; i != maxim; ++i) { // ++i vs i++
+    var link = areas[i], href = link.href;
+    if(!href || href.charAt(0)=='#') continue; // ignore internal links
+// LinkWidgetCore.lw_dump('alt:' + link.alt);
+// LinkWidgetCore.lw_dump('iH: ' + link.innerHTML); // null :]
+    var txt = link.alt + ' ' + link.title + ' ' + link.innerHTML
+        .replace(/<[^>]+alt=(["'])(.*?)\1[^>]*>/ig, " $2 ") // keep alt attrs
+        .replace(/<[^>]*>/g, "") // drop tags + comments
+        .replace("&lt;", "<")
+        .replace("&gt;", ">")
+        .replace(/\s+/g, " ")
+        .replace(/^\s+|\s+$/g, "");// LinkWidgetCore.lw_dump(txt);
+    var rels = (link.rel || link.rev) && LinkWidgetCore.getLinkRels(link.rel, link.rev);// LinkWidgetCore.lw_dump(rels);
+    if(!rels) {
+      var rel = LinkWidgetCore.guessLinkRel(link, txt);
+      if(rel) rels = {}, rels[rel] = true;
+    }// LinkWidgetCore.lw_dump(rels[0]);
+    if(rels) LinkWidgetCore.addLinkForPage(href, txt, link.hreflang, null, doc, rels);
+  }
 },
 
-// link is an <a href> link
+// link is an <a href>|<area href> link
 guessLinkRel : function (link, txt) {
 //LinkWidgetCore.lw_dump('guessLinkRel');
   if(LinkWidgetCore.regexps.next.test(txt)) return "next";
   if(LinkWidgetCore.regexps.prev.test(txt)) return "prev";
   if(LinkWidgetCore.regexps.first.test(txt)) return "first";
   if(LinkWidgetCore.regexps.last.test(txt)) return "last";
+  if(LinkWidgetCore.regexps.search.test(txt)) return "search";
   const imgs = link.getElementsByTagName("img"), num = imgs.length;
   for(var i = 0; i != num; ++i) {
     // guessing is more accurate on relative URLs, and .src is always absolute

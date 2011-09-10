@@ -44,3 +44,4 @@ pref("extensions.linkwidget.regexp.img_first", "first");
 pref("extensions.linkwidget.regexp.img_prev", "rev(?!iew)");
 pref("extensions.linkwidget.regexp.img_next", "ne?xt|fwd|forward");
 pref("extensions.linkwidget.regexp.img_last", "last");
+pref("extensions.linkwidget.regexp.img_last", "buscar|busqueda|pesquisa|recherche|ricerca|search|suche");

@@ -475,8 +475,6 @@ var LinkWidgetCore = {
     if(feedtype.test(type) || (xmltype.test(type) && /\brss\b/i.test(title))) return null;
   }
 
-  if(relStr && /openid/i.test(relStr)) return null;
-
   const whitespace = /[ \t\f\r\n\u200B]+/; // per HTML4.01 spec
   const rels = {};
   var haveRels = false;
@@ -559,6 +557,8 @@ scanPageForLinks : function (doc) {
     }
     if(rels) LinkWidgetCore.addLinkForPage(href, txt, link.hreflang, null, doc, rels);
   }
+// ars.userfriendly.org uses <map><area alt= href= /></map>
+
 },
 
 // link is an <a href> link

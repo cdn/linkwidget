@@ -11,9 +11,10 @@ pref("extensions.linkwidget.scanHyperlinks", true);
 // "schema.foo" is used by Dublin Core and FOAF.
 // "icon" turns up as "shortcut icon" too, I think.
 // "stylesheet" is here because of "alternate stylesheet", which also needs ignoring
+// openid. and openid2. delegation links are for authentication
 // pingback, fontdef and p3pv are inherited from Mozilla. XXX could they be moved to standardiseRelType?
 pref("extensions.linkwidget.regexp.ignore_rels",
-  "\\b(?:stylesheet\\b|icon\\b|pingback\\b|fontdef\\b|p3pv|schema\.|meta\\b)");
+  "\\b(?:stylesheet\\b|icon\\b|openid|pingback\\b|fontdef\\b|p3pv|schema\.|meta\\b)");
 
 // Improves URL-based up-guessing by going ".../foo/index.html" -> ".../"
 // (skipping ".../foo/")

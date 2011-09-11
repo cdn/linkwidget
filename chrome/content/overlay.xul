@@ -79,17 +79,17 @@ the terms of any one of the MPL, the GPL or the LGPL.
   </keyset>
 
   <toolbarbutton id="linkwidget-top" label="&top.label;" fallbackTooltipText="&top.tooltip;"
-      type="menu-button" disabled="true" class="linkwidget-button toolbarbutton-1"/>
+      type="menu" disabled="true" class="linkwidget-button toolbarbutton-1"/>
   <toolbarbutton id="linkwidget-up" label="&up.label;" fallbackTooltipText="&up.tooltip;"
-      type="menu-button" disabled="true" class="linkwidget-button toolbarbutton-1"/>
+      type="menu" disabled="true" class="linkwidget-button toolbarbutton-1"/>
   <toolbarbutton id="linkwidget-first" label="&first.label;" fallbackTooltipText="&first.tooltip;"
-      type="menu-button" disabled="true" class="linkwidget-button toolbarbutton-1"/>
+      type="menu" disabled="true" class="linkwidget-button toolbarbutton-1"/>
   <toolbarbutton id="linkwidget-prev" label="&prev.label;" fallbackTooltipText="&prev.tooltip;"
-      type="menu-button" disabled="true" class="linkwidget-button toolbarbutton-1"/>
+      type="menu" disabled="true" class="linkwidget-button toolbarbutton-1"/>
   <toolbarbutton id="linkwidget-next" label="&next.label;" fallbackTooltipText="&next.tooltip;"
-      type="menu-button" disabled="true" class="linkwidget-button toolbarbutton-1"/>
+      type="menu" disabled="true" class="linkwidget-button toolbarbutton-1"/>
   <toolbarbutton id="linkwidget-last" label="&last.label;" fallbackTooltipText="&last.tooltip;"
-      type="menu-button" disabled="true" class="linkwidget-button toolbarbutton-1"/>
+      type="menu" disabled="true" class="linkwidget-button toolbarbutton-1"/>
 
   <toolbarbutton id="linkwidget-more-menu" label="&more.label;" fallbackTooltipText="&more.tooltip;"
       type="menu" orient="" tooltip="linkwidget-tooltip" context="" disabled="true"

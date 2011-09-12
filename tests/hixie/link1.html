@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<HTML lang="en">
+
+<HEAD>
+  <META name="author" content="Ian Hickson">
+  <META name="copyright" content="&copy; copyright 1999 Ian Hickson">
+  <META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <META http-equiv="Content-Style-Type" content="text/css">
+
+<LINK title="The page in Dutch"
+      type="text/html"
+      rel="alternate"
+      hreflang="nl"
+      href="placeholder.html">
+<LINK title="The manual in Portuguese"
+      type="text/html"
+      rel="alternate"
+      hreflang="pt"
+      href="placeholder.html">
+<LINK title="The manual in Arabic"
+      type="text/html"
+      rel="alternate"
+      dir="rtl"
+      charset="ISO-8859-6"
+      hreflang="ar"
+      href="placeholder.html">
+<LINK lang="fr" title="La documentation en Fran&ccedil;ais"
+      type="text/html" 
+      rel="alternate"
+      hreflang="fr"
+      href="placeholder.html">
+<LINK title="The manual in postscript"
+      type="application/postscript"
+      rel="alternate"
+      media="print"
+      href="placeholder.html">
+
+  <TITLE>Evil Tests: LINK - 1</TITLE>
+  <STYLE TYPE="text/css">
+  </STYLE>
+</HEAD>
+
+<BODY>
+
+<H1>Link - 1</H1>
+
+<p>If you have any comments to make regarding this test, e-mail <a
+href="mailto:ian@hixie.ch">ian@hixie.ch</a>.</p>
+
+<dl>
+ <dt>Prerequisites</dt>
+ <dd>Browsers that are subjected to this test should support HTML2.</dd>
+</dl>
+
+<h2>1. <code>LINK</code> elements for structure </h2>
+
+<P>This document contains the following <code>LINK</code>s:</P>
+
+<PRE>
+&lt;!--1--&gt;  &lt;LINK title="The page in Dutch"
+		type="text/html"
+		rel="alternate"
+		hreflang="nl"
+		href="support/nl.html"&gt;
+
+&lt;!--2--&gt;  &lt;LINK title="The manual in Portuguese"
+		type="text/html"
+		rel="alternate"
+		hreflang="pt"
+		href="support/pt.html"&gt;
+
+&lt;!--3--&gt;  &lt;LINK title="The manual in Arabic"
+		type="text/html"
+		rel="alternate"
+		dir="rtl"
+		charset="ISO-8859-6"
+		hreflang="ar"
+		href="support/ar.html"&gt;
+
+&lt;!--4--&gt;  &lt;LINK lang="fr" title="La documentation en Fran&ccedil;ais"
+		type="text/html" 
+		rel="alternate"
+		hreflang="fr"
+		href="support/fr.html"&gt;
+
+&lt;!--5--&gt;  &lt;LINK title="The manual for printing"
+		type="text/html"
+		rel="alternate"
+		media="print"
+		href="support/print.html"&gt;
+</PRE>
+
+<P>UAs (web browsers) may support the <code>LINK</code> element, and
+may thus somehow provide access to these documents. This is not
+required by the HTML 4.0 specification. The specification says that
+this is an optional feature.</P>
+
+<P>The documents in question are:</P>
+
+<DL>
+  <DT>1. <cite>The manual in Dutch</cite></DT>
+  <DD>Alternate version of this document, but in Dutch.</DD>
+  <DT>2. <cite>The manual in Portuguese</cite></DT>
+  <DD>Alternate version of this document, but in Portuguese.</DD>
+  <DT>3. <cite>The manual in Arabic</cite></DT>
+  <DD>Alternate version of this document, but in Arabic.</DD>
+  <DT>4. <cite lang=fr>La documentation en Fran&ccedil;ais</cite></DT>
+  <DD>Alternate version of this document, but in French.</DD>
+  <DT>5. <cite>The manual for printing</cite></DT>
+  <DD>Alternate version of this document, but for print media.
+     (Instead of allowing direct access to this document, the browser
+      may simply use it when printing.)</DD>
+</DL>
+
+<P>Note. The language of the document linked to each time is
+<em>not</em> in the languages this document claims it is. Your browser
+may legitimately complain about this.</P>
+
+<h2>Submit Results</h2>
+
+    <FORM action="/tests/tesremas/newresult.pl" method="POST" class="resultsubmission">
+      <P>How does your browser fare on this test?
+        <SELECT NAME="result">
+           <OPTION VALUE="Y"> Your browser gives access to all 5 alternate documents. </OPTION>
+           <OPTION VALUE="P"> Your browser gives access to some of the alternate documents. </OPTION>
+           <OPTION VALUE="B"> Your browser tries, but labels the alternates incorrectly. </OPTION>
+           <OPTION VALUE="N"> The alternate documents are ignored, no interface is provided. </OPTION>
+        </SELECT>
+        <LABEL>Comment: <INPUT TYPE="text" NAME="comment"></LABEL>
+        <INPUT TYPE="submit" VALUE="Submit">
+      </P>
+    </FORM>
+
+
+<HR title="Footer">
+<p><a href="home.html">Up to the Evil Tests Page</A>.</p>
+<P>Bugzilla: <a href="http://bugzilla.mozilla.org/show_bug.cgi?id=2800">Bug 2800</A></P>
+<p>Last updated in January 1999.</p>
+
+</BODY></HTML>
+

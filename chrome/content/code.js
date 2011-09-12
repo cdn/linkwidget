@@ -582,6 +582,7 @@ var LinkWidgetCore = {
       if(LinkWidgetCore.regexps.prev.test(txt)) return "prev";
       if(LinkWidgetCore.regexps.first.test(txt)) return "first";
       if(LinkWidgetCore.regexps.last.test(txt)) return "last";
+      if(LinkWidgetCore.regexps.search.test(txt)) return "search";
       const imgs = link.getElementsByTagName("img"), num = imgs.length;
       for(var i = 0; i != num; ++i) {
         // guessing is more accurate on relative URLs, and .src is always absolute

@@ -110,7 +110,7 @@ var LinkWidgetCore = {
       for each(i in LinkWidgetCore._buttonRels) LinkWidgetCore.buttonRels[i] = true;
       LinkWidgetCore.initMoreMenu();
       LinkWidgetCore.initVisibleButtons();
-      setTimeout(LinkWidgetCore.delayedStartup, 1); // needs to happen after Fx's delayedStartup(); Fc?
+      setTimeout(function() { LinkWidgetCore.delayedStartup() }, 1); // needs to happen after Fx's delayedStartup(); Fc?
     },
 
     delayedStartup : function() {

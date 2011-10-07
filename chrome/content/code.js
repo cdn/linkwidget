@@ -608,7 +608,7 @@ var LinkWidgetCore = {
       elt.onmouseout = LinkWidgetCore.mouseExit;
       elt.onclick = LinkWidgetCore.itemClicked;
       elt.oncontextmenu = LinkWidgetCore.buttonRightClicked;
-      elt.setAttribute("oncommand", "LinkWidgetCore.loadPage(event);"); // .oncommand does not exist
+      elt.addEventListener("command", function(event) { LinkWidgetCore.loadPage(event) }, false);
       elt.setAttribute("context", "");
       elt.setAttribute("tooltip", "linkwidget-tooltip");
 
@@ -617,7 +617,7 @@ var LinkWidgetCore = {
       for(var i in linkWidgetButton) elt[i] = linkWidgetButton[i]; // references external const
       var popup = elt.popup = document.createElement("menupopup");
       elt.appendChild(popup);
-      popup.setAttribute("onpopupshowing", "return this.parentNode.buildMenu();");
+      popup.addEventListener("popupshowing", function() { return this.parentNode.buildMenu() }, false);
       // hackish
       var anonKids = document.getAnonymousNodes(elt);
       elt.dropMarker = anonKids[anonKids.length-1];
@@ -773,7 +773,7 @@ LinkWidgetItem.prototype = {
     m.hidden = true;
     m.className = "menu-iconic linkwidget-menu" + relclass;
     const p = this.popup = document.createElement("menupopup");
-    p.setAttribute("onpopupshowing", "this.linkWidgetItem.buildMenu();");
+    p.addEventListener("popupshowing", function() { this.linkWidgetItem.buildMenu() }, false);
 
     mi.linkWidgetItem = m.linkWidgetItem = p.linkWidgetItem = this;
     mi.relNum = m.relNum = this.relNum;
